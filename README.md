@@ -8,7 +8,8 @@ Borneo tall trees research using ForestGEO and ForestPlots inventory data and Gl
 - Scripts for data cleaning and analyses are in separately labeled folders
 - Papers folder contains references for tall trees manuscript and other background reading
 
-## Data cleaning (under construction --- still updating the protocols for each separate data cleaning process)
+
+## Data cleaning (under construction --- still updating the protocols for each separate data cleaning process):
 
 Data cleaning is separated into N(4) different data cleaning protocols: 
 
