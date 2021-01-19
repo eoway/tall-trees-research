@@ -13,12 +13,12 @@ Borneo tall trees research using ForestGEO and ForestPlots inventory data and Gl
 
 Data cleaning is separated into N(4) different data cleaning protocols: 
 
-# - main_dat  
+- main_dat  
   - clean DFstatus
   - clean taxonomic identifiers (correct spelling for family, genus, species; consistent terminology for indetermined/indet/uknown; etc.)
   - OTHER...
  
-# - growth_dat
+- growth_dat
 	- all: 
 		- retain only live stems
 		- exclude stems if: 
@@ -27,13 +27,13 @@ Data cleaning is separated into N(4) different data cleaning protocols:
 	- growth_dat_v1: negative growth rates of a smaller magnitude can be recalculated to 0
 	- growth_dat_v2: recalculate small negative growth rates to DBHj+1 = 0.05 + DBHj (when DBH is in cm)
 
-# - mort_dat
+- mort_dat
   	- potentially set annual increment threshold to slightly lower than 0
 		- e.g. annual_increment < -0.02
 		- and then set those = 0 in analyses, to allow for some measurement error
 		- ^^^ I THINK THIS WILL MAKE A BIG DIFFERENCE ^^^
       
-# - CSS_PSS_dat
+- CSS_PSS_dat
 	- exclude dead stems
 	- exclude broken below
 	- keep all other (i.e., don't exclude based on outlier growth rates, etc.)
