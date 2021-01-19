@@ -19,13 +19,13 @@ Data cleaning is separated into N(4) different data cleaning protocols:
   - OTHER...
 
 - growth_dat
-  		-all: 
-          - retain only live stems
-          - exclude stems if: 
+	- all: 
+		- retain only live stems
+		- exclude stems if: 
   			    - shrunk > 25% of initial DBH
   			    - grew > 7.5 mm annual increment (how many stems (as absolute & proportion)
-      -growth_dat_v1: negative growth rates of a smaller magnitude can be recalculated to 0
-      -growth_dat_v2: recalculate small negative growth rates to DBHj+1 = 0.05 + DBHj (when DBH is in cm)
+	- growth_dat_v1: negative growth rates of a smaller magnitude can be recalculated to 0
+	- growth_dat_v2: recalculate small negative growth rates to DBHj+1 = 0.05 + DBHj (when DBH is in cm)
 
 - mort_dat
   	- potentially set annual increment threshold to slightly lower than 0
@@ -34,7 +34,7 @@ Data cleaning is separated into N(4) different data cleaning protocols:
 		- ^^^ I THINK THIS WILL MAKE A BIG DIFFERENCE ^^^
       
 - CSS_PSS_dat
-		- exclude dead stems
-		- exclude broken below
-		- keep all other (i.e., don't exclude based on outlier growth rates, etc.)
+	- exclude dead stems
+	- exclude broken below
+	- keep all other (i.e., don't exclude based on outlier growth rates, etc.)
 
