@@ -29,8 +29,8 @@ Data cleaning is separated into N(4) different data cleaning protocols:
 		- exclude stems if: 
 			- shrunk > 25% of initial DBH (rgr < -0.25)
 			- grew > 7.5 mm (annual increment > 7.5)
-	- growth_dat_v1: negative growth rates of a smaller magnitude can be recalculated to 0
-	- growth_dat_v2: recalculate small negative growth rates to DBHj+1 = 0.05 + DBHj (when DBH is in cm)
+	- growth_dat_v1: negative growth rates recalculated to 0
+	- growth_dat_v2: negative growth rates recalculated to DBHj+1 = 0.05 + DBHj (when DBH is in cm)
 
 - mort_dat  (see clean_mort_dat.R)
   	- potentially set annual increment threshold to slightly lower than 0
