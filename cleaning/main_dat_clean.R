@@ -9,7 +9,7 @@
 #---------------------------------------------------------------------------------------------#
 # combine taxonomic info with DBH data (species, genus, family)
 # unit conversions for consistency
-# calculate Julian data
+# calculate Julian date
 # fill Julian dates where date == NA
 # add/modify columns and factors for consistency across datasets
 # calculate stem-level basal area (BA)
@@ -17,7 +17,7 @@
 # convert 'unknown' spp to 'indet'
 # update DFstatus
 # fill in DBH for dead/broken below stems from previous census if NA or 0
-# remove DNM50 outliers: remove the 0.5% stems w largest annual increment
+# remove DNM50 outliers: remove the 0.5% stems w extreme high and low relative growth rate
 
 # TO DO: convert stems to trees??
 #---------------------------------------------------------------------------------------------#
