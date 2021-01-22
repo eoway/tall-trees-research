@@ -18,6 +18,7 @@
 # update DFstatus
 # fill in DBH for dead/broken below stems from previous census if NA or 0
 # remove DNM50 outliers: remove the 0.5% stems w extreme high and low relative growth rate
+# check for duplicates
 
 # TO DO: convert stems to trees??
 #---------------------------------------------------------------------------------------------#
@@ -1548,6 +1549,245 @@ head(DNM50_v2)
 
 
 
+
+
+
+
+
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+# CHECK FOR DUPLICATES
+#---------------------------------------------------------------------------------------------#
+
+library(here)
+library(skimr)
+library(janitor)
+library(stringr)
+
+#---------------------------------------------------------------------------------------------#
+# LAMBIR
+#---------------------------------------------------------------------------------------------#
+table(LHC$census)
+LHP91 <- filter(LHC, census == "census_1991")
+LHP91$stemID[duplicated(LHP91$stemID)] 
+LHP97 <- filter(LHC, census == "census_1997")
+LHP97$stemID[duplicated(LHP97$stemID)] 
+LHP03 <- filter(LHC, census == "census_2003")
+LHP03$stemID[duplicated(LHP03$stemID)] 
+LHP08 <- filter(LHC, census == "census_2007_08")
+LHP08$stemID[duplicated(LHP08$stemID)] 
+
+LHP91 <- filter(LHS, census == "census_1991")
+LHP91$stemID[duplicated(LHP91$stemID)] 
+LHP97 <- filter(LHS, census == "census_1997")
+LHP97$stemID[duplicated(LHP97$stemID)] 
+LHP03 <- filter(LHS, census == "census_2003")
+LHP03$stemID[duplicated(LHP03$stemID)] 
+LHP08 <- filter(LHS, census == "census_2007_08")
+LHP08$stemID[duplicated(LHP08$stemID)] 
+
+LHP91 <- filter(LHl, census == "census_1991")
+LHP91$stemID[duplicated(LHP91$stemID)] 
+LHP97 <- filter(LHl, census == "census_1997")
+LHP97$stemID[duplicated(LHP97$stemID)] 
+LHP03 <- filter(LHl, census == "census_2003")
+LHP03$stemID[duplicated(LHP03$stemID)] 
+LHP08 <- filter(LHl, census == "census_2007_08")
+LHP08$stemID[duplicated(LHP08$stemID)] 
+
+LHP91 <- filter(LHfl, census == "census_1991")
+LHP91$stemID[duplicated(LHP91$stemID)] 
+LHP97 <- filter(LHfl, census == "census_1997")
+LHP97$stemID[duplicated(LHP97$stemID)] 
+LHP03 <- filter(LHfl, census == "census_2003")
+LHP03$stemID[duplicated(LHP03$stemID)] 
+LHP08 <- filter(LHfl, census == "census_2007_08")
+LHP08$stemID[duplicated(LHP08$stemID)] 
+
+# NO DUPLICATES #
+
+#LHP52: Check for Strange Taxonomic Entries--------
+table(LHC$family)
+table(LHC$genus)
+table(LHC$species)
+#---------------------------------------------------------------------------------------------#
+
+
+#---------------------------------------------------------------------------------------------#
+# DNM50
+#---------------------------------------------------------------------------------------------#
+table(DNM50_v2$census)
+DNM5011 <- filter(DNM50_v2, census == "census_2011_15")
+DNM5011$stemID[duplicated(DNM5011$stemID)] 
+DNM5019 <- filter(DNM50_v2, census == "census_2019")
+DNM5019$stemID[duplicated(DNM5019$stemID)] 
+#---------------------------------------------------------------------------------------------#
+# Use stemID here instead of treeID, although I left the treeID check in case we do want to 
+# filter stems where there are more than N duplicates (e.g. 4 in the example below)
+#---------------------------------------------------------------------------------------------#
+#DNM50: Check for Strange Taxonomic Entries--------
+table(DNM50_v2$family)
+table(DNM50_v2$genus)
+table(DNM50_v2$species)
+
+#---------------------------------------------------------------------------------------------#
+# DNM5011$treeID[duplicated(DNM5011$treeID)]
+# #makes a dataset of DNM5011 + a column called dupe_count
+# DNM50dupes1 <- get_dupes(DNM5011, treeID)
+# length(DNM50dupes1$dbh)
+# DNM50dupes1 <- DNM50dupes1[order(DNM50dupes1$treeID, -DNM50dupes1$dbh),] 
+# 
+# #length(DNM50dupes1$dbh)
+# summary(DNM50dupes1)
+# 
+# dim(DNM50dupes1)
+# summary(DNM50dupes1$dupe_count)
+# 
+# # set aside obs to keep (where dupe_count <= 4)
+# dat_keep <- filter(DNM50dupes1, dupe_count <= 4)
+# # set aside obs to update (where dupe_count > 4)
+# dat_update <- filter(DNM50dupes1, dupe_count > 4); dim(dat_update)
+# # remove duplicates
+# dat_1 <- dat_update[ !duplicated(dat_update$treeID), ] 
+# # combine data that was kept with updated data
+# new_dat <- bind_rows(dat_1,dat_keep)
+# # recalculate # duplicates
+# new_dat2 <- get_dupes(new_dat, treeID)
+# 
+# summary(new_dat2$dupe_count)
+# hist(new_dat2$dupe_count)
+# boxplot(new_dat2$dupe_count)
+# #---------------------------------------------------------------------------------------------#
+# #then repeat this process for the secxond census's duplicates
+# DNM5019 <- filter(DNM50, census == "census_2019")
+# #DNM5019$treeID[duplicated(DNM5019$treeID)]
+# DNM5019$stemID[duplicated(DNM5019$stemID)]
+# #DNM50 <- rbind(DNM50dupes1, DNM50dupes2)
+#---------------------------------------------------------------------------------------------#
+
+
+#---------------------------------------------------------------------------------------------#
+# DNM1
+#---------------------------------------------------------------------------------------------#
+table(DNM1$census)
+DNM106 <- filter(DNM1, census == "01_census_2006")
+DNM106$stemID[duplicated(DNM106$stemID)] # EO EDIT: you're using treeID AND stemID here, not sure
+DNM113 <- filter(DNM1, census == "01_census_2013")
+DNM113$stemID[duplicated(DNM113$stemID)]
+DNM116 <- filter(DNM1, census == "01_census_2016")
+DNM116$stemID[duplicated(DNM116$stemID)]
+
+#DNM1: Check for Strange Taxonomic Entries--------
+table(DNM1$family)
+table(DNM1$genus)
+table(DNM1$species)
+
+#---------------------------------------------------------------------------------------------#
+# DNM2
+#---------------------------------------------------------------------------------------------#
+table(DNM2$census)
+DNM206 <- filter(DNM2, census == "02_census_2006")
+DNM206$stemID[duplicated(DNM206$stemID)]
+DNM213 <- filter(DNM2, census == "02_census_2013")
+DNM213$stemID[duplicated(DNM213$stemID)]
+DNM216 <- filter(DNM2, census == "02_census_2016")
+DNM216$stemID[duplicated(DNM216$stemID)]
+#DNM2: Check for Strange Taxonomic Entries--------
+table(DNM2$family)
+table(DNM2$genus)
+table(DNM2$species)
+
+#---------------------------------------------------------------------------------------------#
+# DNM3
+#---------------------------------------------------------------------------------------------#
+table(DNM3$census)
+DNM306 <- filter(DNM1, census == "03_census_2006")
+DNM306$stemID[duplicated(DNM106$stemID)]
+DNM313 <- filter(DNM1, census == "03_census_2013")
+DNM313$stemID[duplicated(DNM113$stemID)]
+DNM316 <- filter(DNM1, census == "03_census_2016")
+DNM316$stemID[duplicated(DNM116$stemID)]
+#DNM3: Check for Strange Taxonomic Entries--------
+table(DNM3$family)
+table(DNM3$genus)
+table(DNM3$species)
+
+#---------------------------------------------------------------------------------------------#
+# SPKA
+#---------------------------------------------------------------------------------------------#
+table(SPKA$census)
+
+SPKA901 <- filter(SPKA, census == "09_census_2001")
+SPKA901$stemID[duplicated(SPKA901$stemID)]
+SPKA909 <- filter(SPKA, census == "09_census_2009")
+SPKA909$stemID[duplicated(SPKA909$stemID)]
+SPKA914 <- filter(SPKA, census == "09_census_2014")
+SPKA914$stemID[duplicated(SPKA914$stemID)]
+
+SPKA1001 <- filter(SPKA, census == "10_census_2001")
+SPKA1001$stemID[duplicated(SPKA1001$stemID)]
+SPKA1009 <- filter(SPKA, census == "10_census_2009")
+SPKA1009$stemID[duplicated(SPKA1009$stemID)]
+SPKA1014 <- filter(SPKA, census == "10_census_2014")
+SPKA1014$stemID[duplicated(SPKA1014$stemID)]
+
+#Check for Strange Taxonomic Entries--------
+table(SPKA$family)
+table(SPKA$genus)
+table(SPKA$species)
+
+#---------------------------------------------------------------------------------------------#
+# SPKH
+#---------------------------------------------------------------------------------------------#
+table(SPKH$census)
+
+SPKH401 <- filter(SPKH, census == "04_census_2001")
+SPKH401$stemID[duplicated(SPKH401$stemID)]
+SPKH408 <- filter(SPKH, census == "04_census_2008")
+SPKH408$stemID[duplicated(SPKH408$stemID)]
+SPKH414 <- filter(SPKH, census == "04_census_2014")
+SPKH414$stemID[duplicated(SPKH414$stemID)]
+
+SPKH501 <- filter(SPKH, census == "05_census_2001")
+SPKH501$stemID[duplicated(SPKH501$stemID)]
+SPKH508 <- filter(SPKH, census == "05_census_2008")
+SPKH508$stemID[duplicated(SPKH508$stemID)]
+SPKH514 <- filter(SPKH, census == "05_census_2014")
+SPKH514$stemID[duplicated(SPKH514$stemID)]
+
+SPKH3001 <- filter(SPKH, census == "30_census_2001")
+SPKH3001$stemID[duplicated(SPKH3001$stemID)]
+SPKH3010 <- filter(SPKH, census == "30_census_2010")
+SPKH3010$stemID[duplicated(SPKH3010$stemID)]
+SPKH3015 <- filter(SPKH, census == "30_census_2015")
+SPKH3015$stemID[duplicated(SPKH3015$stemID)]
+
+#SPKH: Check for Strange Taxonomic Entries--------
+table(SPKH$family)
+table(SPKH$genus)
+table(SPKH$species)
+
+#---------------------------------------------------------------------------------------------#
+# SPKS8
+#---------------------------------------------------------------------------------------------#
+table(SPKS$census)
+SPKS801 <- filter(SPKS, census == "08_census_2001")
+SPKS801$stemID[duplicated(SPKS801$stemID)]
+SPKS809 <- filter(SPKS, census == "08_census_2009")
+SPKS809$stemID[duplicated(SPKS809$stemID)]
+SPKS814 <- filter(SPKS, census == "08_census_2014")
+SPKS814$stemID[duplicated(SPKS814$stemID)]
+
+#Check for Strange Taxonomic Entries--------
+table(SPKS$family)
+table(SPKS$genus)
+table(SPKS$species)
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+
+
+#---------------------------------------------------------------------------------------------#
+# Combine all plots
 #---------------------------------------------------------------------------------------------#
 second_clean_dat <- rbind(DNM1, DNM2, DNM3, DNM50_v2, LHC, LHS, LHl, LHfl, SPKA, SPKS, SPKH)
 #---------------------------------------------------------------------------------------------#
