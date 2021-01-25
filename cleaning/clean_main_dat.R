@@ -16,9 +16,11 @@
 # join GWDD wood density (WD) for ForestGEO using species mean, or genus mean, or family mean
 # convert 'unknown' spp to 'indet'
 # update DFstatus
-# fill in DBH for dead/broken below stems from previous census if NA or 0
 # remove DNM50 outliers: remove the 0.5% stems w extreme high and low relative growth rate
 # check for duplicates
+
+# fill in DBH for dead/broken below stems from previous census if NA or 0
+
 
 # TO DO: convert stems to trees??
 #---------------------------------------------------------------------------------------------#
@@ -32,6 +34,7 @@ library(skimr)
 library(dplyr)
 library(stringr)
 library(readxl)
+library(janitor)
 
 #---------------------------------------------------------------------------------------------#
 # Load ForestGEO data                                                                         # 
@@ -81,7 +84,7 @@ lambir1 <- lambir.stem1; lambir2 <- lambir.stem2; lambir3 <- lambir.stem3; lambi
 #---------------------------------------------------------------------------------------------#
 ## Merge Lambir soil type indices with 4th census
 #---------------------------------------------------------------------------------------------#
-## commented out example from Sabrina Russo
+## commented out example is from Sabrina Russo
 #stem4.RM3a = merge(stem4.RM2, lambir.habs, by.x = "index20", by.y="index", all.x=T)
 lambir1$index <- as.factor(lambir1$quadrat); lambir1$index <- as.numeric(lambir1$index)
 lambir2$index <- as.factor(lambir2$quadrat); lambir2$index <- as.numeric(lambir2$index)
@@ -904,25 +907,185 @@ length(firstcleandata$species)
 #---------------------------------------------------------------------------------------------#
 # Update DFstatus
 #---------------------------------------------------------------------------------------------#
+#http://www.rainfor.org/upload/ManualsEnglish/RAINFOR%20data%20codes-Updated_Oct2014_EN.pdf
+#---------------------------------------------------------------------------------------------#
 table(firstcleandata$DFstatus)
 
-firstcleandata$DFstatus <- gsub("0", "y", firstcleandata$DFstatus)
-firstcleandata$DFstatus <- gsub("dead", "y", firstcleandata$DFstatus)
-firstcleandata$DFstatus<- gsub("broken below", "yy", firstcleandata$DFstatus)
-firstcleandata$DFstatus <- gsub("^b.*", "yy", firstcleandata$DFstatus)
 #---------------------------------------------------------------------------------------------#
-# Prior = a stem that is not in the current census, but will appear in a future census. 
+# dead
 #---------------------------------------------------------------------------------------------#
-firstcleandata$DFstatus <- gsub("prior", "yyy", firstcleandata$DFstatus) # EO EDIT - for lambir
-firstcleandata$DFstatus <- gsub("stem_gone", "yyy", firstcleandata$DFstatus) # EO EDIT - for lambir
-firstcleandata$DFstatus <- gsub("missing", "yyy", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("dead", "D", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("0", "D", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("diz", "D", firstcleandata$DFstatus)
 
-firstcleandata$DFstatus<- gsub("[^y]+", "A", firstcleandata$DFstatus)
-firstcleandata$DFstatus <- gsub("yyy","missing", firstcleandata$DFstatus)
-firstcleandata$DFstatus<- gsub("yy", "B", firstcleandata$DFstatus)
-firstcleandata$DFstatus <- gsub("y", "D", firstcleandata$DFstatus)
+#---------------------------------------------------------------------------------------------#
+# alive
+#---------------------------------------------------------------------------------------------#
+firstcleandata$DFstatus <- gsub("alive", "A", firstcleandata$DFstatus)
 
+firstcleandata$DFstatus <- gsub("bcgm", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bcmn", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bcmz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bgmz", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("cfmz", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("ceg", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cfm", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cgh", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("chm", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("chn", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("clm", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cmn", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cmz", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("fgq", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("fhz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("gqz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("hiz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("izn", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("lmz", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("bgz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bmz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bmn", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("biz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bim", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bgz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bfg", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bem", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bdg", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bcz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bcn", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bcm", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bci", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bcf", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bce", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bcd", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("aeh", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("ahn", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("bz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bq", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bn", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bm", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bk", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bi", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bh", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bg", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bf", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("be", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bd", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bc", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("cd", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("ce", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cf", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cg", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("ch", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("ci", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cl", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cm", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cn", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cq", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("cz", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("dh", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("dm", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("dn", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("dq", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("eg", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("eh", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("em", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("fz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("gz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("gq", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("hm", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("hq", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("iz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("in", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("im", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("il", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("lm", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("lq", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("mz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("ms", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("mn", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("qz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("qn", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("ah", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("an", "A", firstcleandata$DFstatus)
+
+#---------------------------------------------------------------------------------------------#
+# dead
+#---------------------------------------------------------------------------------------------#
+firstcleandata$DFstatus <- gsub("dz", "D", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("k", "D", firstcleandata$DFstatus)
+
+#---------------------------------------------------------------------------------------------#
+# alive
+#---------------------------------------------------------------------------------------------#
+firstcleandata$DFstatus <- gsub("m", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("q", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("z", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("l", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("i", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("g", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("f", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("e", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("d", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("c", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("b", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("a", "A", firstcleandata$DFstatus)
+
+firstcleandata$DFstatus <- gsub("prAor", "prior", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("AroDAn AAow", "B", firstcleandata$DFstatus) # broken below
+firstcleandata$DFstatus <- gsub("stA_AonA", "stem_gone", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("AAssAA", "missing", firstcleandata$DFstatus)
+
+#---------------------------------------------------------------------------------------------#
 table(firstcleandata$DFstatus)
+#---------------------------------------------------------------------------------------------#
+
+# test <- subset(firstcleandata, site == "LHP")
+# table(test$DFstatus)
+# census1 <- subset(test, census == "census_1991")
+# census2 <- subset(test, census == "census_1997")
+# census3 <- subset(test, census == "census_2003")
+# census4 <- subset(test, census == "census_2007_08")
+# table(census1$DFstatus)
+# table(census2$DFstatus)
+# table(census3$DFstatus)
+# table(census4$DFstatus)
+
+#---------------------------------------------------------------------------------------------#
+# Previous version
+#---------------------------------------------------------------------------------------------#
+# # firstcleandata$DFstatus <- gsub("0", "y", firstcleandata$DFstatus)
+# # firstcleandata$DFstatus <- gsub("dead", "y", firstcleandata$DFstatus)
+# firstcleandata$DFstatus<- gsub("broken below", "yy", firstcleandata$DFstatus)
+# firstcleandata$DFstatus <- gsub("^b.*", "yy", firstcleandata$DFstatus)
+# #---------------------------------------------------------------------------------------------#
+# # Prior = a stem that is not in the current census, but will appear in a future census. 
+# #---------------------------------------------------------------------------------------------#
+# firstcleandata$DFstatus <- gsub("prior", "yyy", firstcleandata$DFstatus) # EO EDIT - for lambir
+# firstcleandata$DFstatus <- gsub("stem_gone", "yyy", firstcleandata$DFstatus) # EO EDIT - for lambir
+# firstcleandata$DFstatus <- gsub("missing", "yyy", firstcleandata$DFstatus)
+# 
+# firstcleandata$DFstatus<- gsub("[^y]+", "A", firstcleandata$DFstatus)
+# firstcleandata$DFstatus <- gsub("yyy","missing", firstcleandata$DFstatus)
+# firstcleandata$DFstatus<- gsub("yy", "B", firstcleandata$DFstatus)
+# firstcleandata$DFstatus <- gsub("y", "D", firstcleandata$DFstatus)
+# 
+# table(firstcleandata$DFstatus)
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
@@ -994,7 +1157,7 @@ t1dbh <- select(dnm_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat <- left_join(dnm_census2, t1dbh, by = "stemID"); dim(temp_dat)
 summary(temp_dat$dbh.x)
-temp_dat$dbh.x <- ifelse(is.na(temp_dat$dbh.x), temp_dat$dbh.y, temp_dat$dbh.x)
+temp_dat$dbh.x <- ifelse(temp_dat$DFstatus == "A" & is.na(temp_dat$dbh.x), temp_dat$dbh.y, temp_dat$dbh.x)
 summary(temp_dat$dbh.x); dim(temp_dat)
 
 # reassign to original dat
@@ -1022,7 +1185,7 @@ t1dbh <- select(lhc_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(lhc_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 lhc_census2$dbh <- temp_dat1$dbh.x
@@ -1032,7 +1195,7 @@ t2dbh <- select(lhc_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(lhc_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 lhc_census3$dbh <- temp_dat2$dbh.x
@@ -1042,7 +1205,7 @@ t3dbh <- select(lhc_census3, stemID, dbh)
 # add previous census dbh to next census
 temp_dat3 <- left_join(lhc_census4, t3dbh, by = "stemID"); dim(temp_dat3)
 summary(temp_dat3$dbh.x)
-temp_dat3$dbh.x <- ifelse(is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
+temp_dat3$dbh.x <- ifelse(temp_dat3$DFstatus == "A" & is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
 summary(temp_dat3$dbh.x); dim(temp_dat3)
 # reassign to original dat
 lhc_census4$dbh <- temp_dat3$dbh.x
@@ -1069,7 +1232,7 @@ t1dbh <- select(lhs_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(lhs_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 lhs_census2$dbh <- temp_dat1$dbh.x
@@ -1079,7 +1242,7 @@ t2dbh <- select(lhs_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(lhs_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 lhs_census3$dbh <- temp_dat2$dbh.x
@@ -1089,7 +1252,7 @@ t3dbh <- select(lhs_census3, stemID, dbh)
 # add previous census dbh to next census
 temp_dat3 <- left_join(lhs_census4, t3dbh, by = "stemID"); dim(temp_dat3)
 summary(temp_dat3$dbh.x)
-temp_dat3$dbh.x <- ifelse(is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
+temp_dat3$dbh.x <- ifelse(temp_dat3$DFstatus == "A" & is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
 summary(temp_dat3$dbh.x); dim(temp_dat3)
 # reassign to original dat
 lhs_census4$dbh <- temp_dat3$dbh.x
@@ -1117,7 +1280,7 @@ t1dbh <- select(lhl_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(lhl_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 lhl_census2$dbh <- temp_dat1$dbh.x
@@ -1127,7 +1290,7 @@ t2dbh <- select(lhl_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(lhl_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 lhl_census3$dbh <- temp_dat2$dbh.x
@@ -1137,7 +1300,7 @@ t3dbh <- select(lhl_census3, stemID, dbh)
 # add previous census dbh to next census
 temp_dat3 <- left_join(lhl_census4, t3dbh, by = "stemID"); dim(temp_dat3)
 summary(temp_dat3$dbh.x)
-temp_dat3$dbh.x <- ifelse(is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
+temp_dat3$dbh.x <- ifelse(temp_dat3$DFstatus == "A" & is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
 summary(temp_dat3$dbh.x); dim(temp_dat3)
 # reassign to original dat
 lhl_census4$dbh <- temp_dat3$dbh.x
@@ -1167,7 +1330,7 @@ t1dbh <- select(lhfl_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(lhfl_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 lhfl_census2$dbh <- temp_dat1$dbh.x
@@ -1177,7 +1340,7 @@ t2dbh <- select(lhfl_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(lhfl_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 lhfl_census3$dbh <- temp_dat2$dbh.x
@@ -1187,7 +1350,7 @@ t3dbh <- select(lhfl_census3, stemID, dbh)
 # add previous census dbh to next census
 temp_dat3 <- left_join(lhfl_census4, t3dbh, by = "stemID"); dim(temp_dat3)
 summary(temp_dat3$dbh.x)
-temp_dat3$dbh.x <- ifelse(is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
+temp_dat3$dbh.x <- ifelse(temp_dat3$DFstatus == "A" & is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
 summary(temp_dat3$dbh.x); dim(temp_dat3)
 # reassign to original dat
 lhfl_census4$dbh <- temp_dat3$dbh.x
@@ -1221,7 +1384,7 @@ t1dbh <- select(spka9_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(spka9_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 spka9_census2$dbh <- temp_dat1$dbh.x
@@ -1230,7 +1393,7 @@ t2dbh <- select(spka9_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(spka9_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 spka9_census3$dbh <- temp_dat2$dbh.x
@@ -1240,7 +1403,7 @@ t1dbh <- select(spka10_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(spka10_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 spka10_census2$dbh <- temp_dat1$dbh.x
@@ -1249,7 +1412,7 @@ t2dbh <- select(spka10_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(spka10_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 spka10_census3$dbh <- temp_dat2$dbh.x
@@ -1271,7 +1434,7 @@ t1dbh <- select(spks8_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(spks8_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 spks8_census2$dbh <- temp_dat1$dbh.x
@@ -1280,7 +1443,7 @@ t2dbh <- select(spks8_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(spks8_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 spks8_census3$dbh <- temp_dat2$dbh.x
@@ -1311,7 +1474,7 @@ t1dbh <- select(spkh4_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(spkh4_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 spkh4_census2$dbh <- temp_dat1$dbh.x
@@ -1320,7 +1483,7 @@ t2dbh <- select(spkh4_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(spkh4_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 spkh4_census3$dbh <- temp_dat2$dbh.x
@@ -1330,7 +1493,7 @@ t1dbh <- select(spkh5_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(spkh5_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 spkh5_census2$dbh <- temp_dat1$dbh.x
@@ -1339,7 +1502,7 @@ t2dbh <- select(spkh5_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(spkh5_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 spkh5_census3$dbh <- temp_dat2$dbh.x
@@ -1349,7 +1512,7 @@ t1dbh <- select(spkh30_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(spkh30_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 spkh30_census2$dbh <- temp_dat1$dbh.x
@@ -1358,7 +1521,7 @@ t2dbh <- select(spkh30_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(spkh30_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 spkh30_census3$dbh <- temp_dat2$dbh.x
@@ -1382,7 +1545,7 @@ t1dbh <- select(dnm1_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(dnm1_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 dnm1_census2$dbh <- temp_dat1$dbh.x
@@ -1391,7 +1554,7 @@ t2dbh <- select(dnm1_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(dnm1_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 dnm1_census3$dbh <- temp_dat2$dbh.x
@@ -1413,7 +1576,7 @@ t1dbh <- select(dnm2_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(dnm2_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 dnm2_census2$dbh <- temp_dat1$dbh.x
@@ -1422,7 +1585,7 @@ t2dbh <- select(dnm2_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(dnm2_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 dnm2_census3$dbh <- temp_dat2$dbh.x
@@ -1444,7 +1607,7 @@ t1dbh <- select(dnm3_census1, stemID, dbh)
 # add previous census dbh to next census
 temp_dat1 <- left_join(dnm3_census2, t1dbh, by = "stemID"); dim(temp_dat1)
 summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
+temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
 summary(temp_dat1$dbh.x); dim(temp_dat1)
 # reassign to original dat
 dnm3_census2$dbh <- temp_dat1$dbh.x
@@ -1453,7 +1616,7 @@ t2dbh <- select(dnm3_census2, stemID, dbh)
 # add previous census dbh to next census
 temp_dat2 <- left_join(dnm3_census3, t2dbh, by = "stemID"); dim(temp_dat2)
 summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
+temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
 summary(temp_dat2$dbh.x); dim(temp_dat2)
 # reassign to original dat
 dnm3_census3$dbh <- temp_dat2$dbh.x
@@ -1558,11 +1721,6 @@ head(DNM50_v2)
 #---------------------------------------------------------------------------------------------#
 # CHECK FOR DUPLICATES
 #---------------------------------------------------------------------------------------------#
-
-library(here)
-library(skimr)
-library(janitor)
-library(stringr)
 
 #---------------------------------------------------------------------------------------------#
 # LAMBIR
