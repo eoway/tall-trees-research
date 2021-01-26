@@ -20,8 +20,8 @@ Data cleaning is separated into N(4) different data cleaning protocols:
   - join wood density from Global Wood Density Database (GWDD) with ForestGEO data by species
   - convert 'unknown' spp to 'indet'
   - update DFstatus
-  - fill DBH for dead/broken below stems using DBH from previous census (where DBH == NA or 0)
   - remove Danum 50-ha outliers based on stems with extreme relative growth rates 
+  - fill DBH for alive [not dead/broken below?] stems using DBH from previous census (where DBH == NA or 0)
  
 - growth_dat  (see clean_growth_dat.R)
 	- all: 
