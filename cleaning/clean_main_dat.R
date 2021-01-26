@@ -19,7 +19,7 @@
 # remove DNM50 outliers: remove the 0.5% stems w extreme high and low relative growth rate
 # check for duplicates
 
-# fill in DBH for dead/broken below stems from previous census if NA or 0
+# fill in DBH for alive [not dead/broken below?] stems from previous census if NA or 0
 
 
 # TO DO: convert stems to trees??

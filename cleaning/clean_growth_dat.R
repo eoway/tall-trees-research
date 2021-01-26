@@ -38,6 +38,7 @@ ggplot(clean_dat, aes(dbh)) +
 #---------------------------------------------------------------------------------------------#
 growdata <- filter(clean_dat, status == "A")
 table(growdata$status)
+summary(growdata$dbh)
 #---------------------------------------------------------------------------------------------#
 
 
@@ -508,7 +509,7 @@ dim(DNM50_2011_2019)
 dim(DNM50_2011_2019remove)
 dim(DNM50_2011_2019remove)[[1]]/dim(DNM50_2011_2019)[[1]]*100
 #---------------------------------------------------------------------------------------------#
-# 26 stems removed (0.01% ALIVE stems removed) 
+# 28 stems removed (0.01% ALIVE stems removed) 
 #---------------------------------------------------------------------------------------------#
 # take a look at the values
 par(mfrow=c(1,2))
@@ -559,7 +560,7 @@ dim(SPKA9_2001_2009)
 dim(SPKA9_2001_2009remove)
 dim(SPKA9_2001_2009remove)[[1]]/dim(SPKA9_2001_2009)[[1]]*100
 #---------------------------------------------------------------------------------------------#
-# 1 stems removed (0.03% ALIVE stems removed)
+# 0 stems removed (0.0% ALIVE stems removed)
 #---------------------------------------------------------------------------------------------#
 # take a look at the values
 par(mfrow=c(1,2))
@@ -966,7 +967,7 @@ dim(SPKH30_2001_2010)
 dim(SPKH30_2001_2010remove)
 dim(SPKH30_2001_2010remove)[[1]]/dim(SPKH30_2001_2010)[[1]]*100
 #---------------------------------------------------------------------------------------------#
-# 1 stems removed (0.01% ALIVE stems removed)
+# 0 stems removed (0.0% ALIVE stems removed)
 #---------------------------------------------------------------------------------------------#
 # take a look at the values
 par(mfrow=c(1,2))
@@ -1017,7 +1018,7 @@ dim(SPKH30_2010_2015)
 dim(SPKH30_2010_2015remove)
 dim(SPKH30_2010_2015remove)[[1]]/dim(SPKH30_2010_2015)[[1]]*100
 #---------------------------------------------------------------------------------------------#
-# 12 stems removed (0.19% ALIVE stems removed)
+# 0 stems removed (0.0% ALIVE stems removed)
 #---------------------------------------------------------------------------------------------#
 # take a look at the values
 par(mfrow=c(1,2))
@@ -1148,7 +1149,7 @@ dim(LHC_03_08)
 dim(LHC_03_08remove)
 dim(LHC_03_08remove)[[1]]/dim(LHC_03_08)[[1]]*100
 #---------------------------------------------------------------------------------------------#
-# 17 stems removed (0.01% ALIVE stems removed)
+# 16 stems removed (0.01% ALIVE stems removed)
 #---------------------------------------------------------------------------------------------#
 
 
@@ -1165,8 +1166,8 @@ removal_ID <- rbind(SPKS08_2001_2009remove, SPKS08_2009_2014remove, DNM1_2006_20
                       SPKH5_2001_2008remove, SPKH5_2008_2014remove, SPKH30_2001_2010remove, 
                       SPKH30_2010_2015remove, LHC_91_97remove, LHC_97_037remove, LHC_03_08remove)
 str(removal_ID)
-dim(removal_ID) # n = 80
-dim(growdata)   # n = 2,085,328
+dim(removal_ID) # n = 67
+dim(growdata)   # n = 2,056,491
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 #write.csv(removal_ID, here("Desktop", "Research", "R", "Data", "removal_IDS.csv"))
@@ -1188,6 +1189,9 @@ str(tree_IDs_remove)
 
 withremoval <- growdata[!growdata$new_ID %in% tree_IDs_remove, ] 
 
+# test <- subset(growdata, new_ID == "1404482SPKH_05")
+# test <- subset(withremoval, new_ID == "1404482SPKH_05")
+
 SPKA <- subset(withremoval, site == "SPKA"); table(SPKA$status)
 SPKS <- subset(withremoval, site == "SPKS"); table(SPKS$status)
 SPKH <- subset(withremoval, site == "SPKH"); table(SPKH$status)
@@ -1196,14 +1200,16 @@ summary(DNM50$dbh)
 LHP <- subset(growdata, site == "LHP"); table(LHP$status)
 
 #---------------------------------------------------------------------------------------------#
-dim(growdata)    # n = 2,085,328
-dim(withremoval) # n = 2,085,100
-dim(growdata)[[1]] - length(tree_IDs_remove) # 2,085,248
+dim(growdata)    # n = 2,056,491
+dim(withremoval) # n = 2,056,301
+dim(growdata)[[1]] - length(tree_IDs_remove) # 2,056,424
 #---------------------------------------------------------------------------------------------#
 # I think 'withremoval' is smaller than ('growdata' - the number of 'tree_IDs_remove') because
 # tree_IDs_remove is by plot, not by census. So it's removing the plot-level treeIDs each time
 # they occur in a plot (~2-3 times depending on the number of censuses). 
 #---------------------------------------------------------------------------------------------#
+
+table(withremoval$status)
 
 #---------------------------------------------------------------------------------------------#
 write.csv(withremoval, "G:/My Drive/Harvard/Plot_Data/clean_inventory_data/growth_dat.csv")
