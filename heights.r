@@ -59,21 +59,27 @@ latitude=c(4.955965,4.20161,5.852336,2.973,-3.9603,-12.4402)
 coord=cbind(longitude,latitude); coord
 
 E = retrieve_raster("E", coord, format="nc"); E
+# Danum "E" value
 E_DNM = E[1]; E_DNM #-0.0365256
+# Lambir "E" value
 E_LHP = E[2]
+# Sepilok "E" value
 E_SPK = E[3]
-E_ALP = E[4]; E_ALP #-0.09335928
-E_CRA = E[5]; E_CRA #-0.04474343
+# Alpahuayo "E" value
+#E_ALP = E[4]; E_ALP #-0.09335928
+# Cicra "E" value
+#E_CRA = E[5]; E_CRA #-0.04474343
 
 #Calculate Heights-----
 #Feld
 data$heightFeld <- dbh2h_01(data$dbh, hgt_max_SEA, hgt_ref_SEA, b1Ht_SEA, b2Ht_SEA)
- table(data$heightFeld)
+table(data$heightFeld)
 #Chave
 data$heightCh <- dbh2h_34(data$dbh,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34)
 table(data$heightCh)
 #Chave with E
-data$heightE <- dbh2h_ChaveE(data$dbh,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34,E)
+# need to specify which "E" value to use - from above
+data$heightE <- dbh2h_ChaveE(data$dbh,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34,E_DNM)
 
 
 #Quantiles------
