@@ -31,10 +31,7 @@ Data cleaning is separated into N(4) different data cleaning protocols:
 			- grew > 7.5 mm (annual increment > 7.5)
 
 - mort_dat  (see clean_mort_dat.R)
-  	- potentially set annual increment threshold to slightly lower than 0
-		- e.g. annual_increment < -0.02
-		- and then set those = 0 in analyses, to allow for some measurement error
-		- ^^^ I THINK THIS WILL MAKE A BIG DIFFERENCE ^^^
+  	- retain only single observation per tree -> exclude all stem duplicates except the largest DBH
       
 - CSS_PSS_dat  (see clean_css_pss_dat.R)
 	- exclude dead stems
