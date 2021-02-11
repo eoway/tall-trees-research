@@ -33,6 +33,7 @@ Data cleaning is separated into N(4) different data cleaning protocols:
 - mort_dat  (see clean_mort_dat.R)
   	- retain only a single observation per tree -> exclude all stem duplicates except the largest DBH
 	- exclude status = 'prior' - for Lambir censuses 1, 2, and 3
+	- update status as alive or dead depending on 'broken below' considering all stems per tree - for Danum 50 censuses 1 and 2; Lambir censuses 1, 3, and 3
 	- update status as alive or dead depending on 'stem_gone' considering all stems per tree - for Lambir census 4
       
 - CSS_PSS_dat  (see clean_css_pss_dat.R)
