@@ -44,33 +44,74 @@ SPKS8  <- filter(clean_dat, plot == "SPKS_08")
 
 #---------------------------------------------------------------------------------------------#
 # CONSOLIDATE STEMS BASED ON TREEID
+# REMOVE status == 'prior' OBSERVATIONS (relevant to Lambir only)
+#       Prior = a stem that is not in the current census, but will appear in a future census. 
+# UPDATE status == "stem_gone" OBSERVATIONS (relevant to Lambir only)
+# UPDATE status == "broken below" OBSERVATIONS (relevant to Danum 50)
 #---------------------------------------------------------------------------------------------#
+
 
 #---------------------------------------------------------------------------------------------#
 # LHP52
 #---------------------------------------------------------------------------------------------#
 table(LHP52$census)
 #---------------------------------------------------------------------------------------------#
-LHP91 <- filter(LHP52, census == "census_1991")
-LHP91$treeID[duplicated(LHP91$treeID)] 
-length(unique(LHP91$stemID))
-length(unique(LHP91$treeID))
+LHP91_1 <- filter(LHP52, census == "census_1991")
+# remove status == 'prior' obs
+LHP91 <- filter(LHP91_1, status != "prior")
+dim(LHP91_1); dim(LHP91) 
+table(LHP91_1$status); table(LHP91$status)
 
-dim(LHP91)
-LHP91 <- LHP91[order(LHP91$treeID, -LHP91$dbh),]
-dim(LHP91)
+# deal with broken below 
+# ifelse(any status %in% any of the same tree ID == "A", status == A, status = D)
+LHP91_keep_v1 <- LHP91 %>% group_by(treeID) %>% summarize(X1 = X1,
+                                                              plot_x = plot_x,
+                                                              plot_y = plot_y,
+                                                              hom = mean(hom, na.rm=T),
+                                                              quadrat = mean(quadrat, na.rm=T),
+                                                              family = family,
+                                                              genus = genus, 
+                                                              species = species,
+                                                              stemID = stemID,
+                                                              dbh = max(dbh, na.rm=T),
+                                                              Date = mean(Date, na.rm=T),
+                                                              date = mean(date, na.rm=T),
+                                                              status = case_when(sum(ifelse(status == "A", 1, 0)) > 0 ~ "A", 
+                                                                                 TRUE ~ "D"),
+                                                              IDlevel = IDlevel,
+                                                              site = site, 
+                                                              census = census, 
+                                                              plot = plot, 
+                                                              Shade.Tol = Shade.Tol, 
+                                                              soil = soil, 
+                                                              stem_BA = stem_BA,
+                                                              mean_wd = mean(mean_wd, na.rm=T))
 
-length(LHP91$dbh)
-summary(LHP91)
-dim(LHP91)
+## LHP91_keep_v1 still same dimensions as LHP91, so needs to be reduced to treeIDs only (n = )
 
-# Keep only the first row for each duplicate of LHP91$treeID
-# this row will have the largest value for LHP91$dbh
-LHP91_keep <- LHP91[!duplicated(LHP91$treeID),]
+
+LHP91_keep_v1$treeID[duplicated(LHP91_keep_v1$treeID)] 
+length(unique(LHP91_keep_v1$stemID))
+length(unique(LHP91_keep_v1$treeID))
+
+dim(LHP91_keep_v1)
+LHP91_keep_v1 <- LHP91_keep_v1[order(LHP91_keep_v1$treeID, -LHP91_keep_v1$dbh),]
+dim(LHP91_keep_v1)
+
+length(LHP91_keep_v1$dbh)
+summary(LHP91_keep_v1)
+dim(LHP91_keep_v1)
+
+# Keep only the first row for each duplicate of LHP91_keep_v1$treeID
+# this row will have the largest value for LHP91_keep_v1$dbh
+LHP91_keep <- LHP91_keep_v1[!duplicated(LHP91_keep_v1$treeID),]
 ### may want to revise this so that: 
 ### I'm selecting the largest stem AND determining DEAD status based on ALL stems 
-length(LHP91$dbh); length(LHP91_keep$dbh)
-max(LHP91$dbh, na.rm=T); max(LHP91_keep$dbh, na.rm=T)
+length(LHP91_keep_v1$dbh); length(LHP91_keep$dbh)
+max(LHP91_keep_v1$dbh, na.rm=T); max(LHP91_keep$dbh, na.rm=T)
+
+# reorder LHP91_keep columns to original order
+LHP91_keep <- as.data.frame(select(LHP91_keep, X1, plot_x, plot_y, hom, quadrat, family, genus, species, treeID, stemID, dbh, Date, date, status, IDlevel, site, census, plot, Shade.Tol, soil, stem_BA, mean_wd)) 
 
 #---------------------------------------------------------------------------------------------#
 # old code from when based on stemID - keep only trees with ~4 stems
@@ -92,63 +133,260 @@ max(LHP91$dbh, na.rm=T); max(LHP91_keep$dbh, na.rm=T)
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
-LHP97 <- filter(LHP52, census == "census_1997")
-LHP97$treeID[duplicated(LHP97$treeID)] 
+LHP97_1 <- filter(LHP52, census == "census_1997")
+LHP97 <- filter(LHP97_1, status != "prior")
+dim(LHP97_1); dim(LHP97) 
+table(LHP97_1$status); table(LHP97$status)
 
-length(LHP97$dbh)
-LHP97 <- LHP97[order(LHP97$treeID, -LHP97$dbh),]
-LHP97_keep <- LHP97[!duplicated(LHP97$treeID),]
-length(LHP97$dbh); length(LHP97_keep$dbh)
-max(LHP97$dbh, na.rm=T); max(LHP97_keep$dbh, na.rm=T)
+# deal with broken below 
+# ifelse(any status %in% any of the same tree ID == "A", status == A, status = D)
+LHP97_keep_v1 <- LHP97 %>% group_by(treeID) %>% summarize(X1 = X1,
+                                                          plot_x = plot_x,
+                                                          plot_y = plot_y,
+                                                          hom = mean(hom, na.rm=T),
+                                                          quadrat = mean(quadrat, na.rm=T),
+                                                          family = family,
+                                                          genus = genus, 
+                                                          species = species,
+                                                          stemID = stemID,
+                                                          dbh = max(dbh, na.rm=T),
+                                                          Date = mean(Date, na.rm=T),
+                                                          date = mean(date, na.rm=T),
+                                                          status = case_when(sum(ifelse(status == "A", 1, 0)) > 0 ~ "A", 
+                                                                             TRUE ~ "D"),
+                                                          IDlevel = IDlevel,
+                                                          site = site, 
+                                                          census = census, 
+                                                          plot = plot, 
+                                                          Shade.Tol = Shade.Tol, 
+                                                          soil = soil, 
+                                                          stem_BA = stem_BA,
+                                                          mean_wd = mean(mean_wd, na.rm=T))
+
+## LHP97_keep_v1 still same dimensions as LHP97, so needs to be reduced to treeIDs only (n = )
+
+LHP97_keep_v1$treeID[duplicated(LHP97_keep_v1$treeID)] 
+
+length(LHP97_keep_v1$dbh)
+LHP97_keep_v1 <- LHP97_keep_v1[order(LHP97_keep_v1$treeID, -LHP97_keep_v1$dbh),]
+LHP97_keep <- LHP97_keep_v1[!duplicated(LHP97_keep_v1$treeID),]
+length(LHP97_keep_v1$dbh); length(LHP97_keep$dbh)
+max(LHP97_keep_v1$dbh, na.rm=T); max(LHP97_keep$dbh, na.rm=T)
+
+# reorder LHP97_keep columns to original order
+LHP97_keep <- as.data.frame(select(LHP97_keep, X1, plot_x, plot_y, hom, quadrat, family, genus, species, treeID, stemID, dbh, Date, date, status, IDlevel, site, census, plot, Shade.Tol, soil, stem_BA, mean_wd)) 
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
-LHP03 <- filter(LHP52, census == "census_2003")
-LHP03$treeID[duplicated(LHP03$treeID)] 
+LHP03_1 <- filter(LHP52, census == "census_2003")
+LHP03 <- filter(LHP03_1, status != "prior")
+dim(LHP03_1); dim(LHP03) 
+table(LHP03_1$status); table(LHP03$status)
 
-LHP03 <- LHP03[order(LHP03$treeID, -LHP03$dbh),]
-LHP03_keep <- LHP03[!duplicated(LHP03$treeID),]
-length(LHP03$dbh); length(LHP03_keep$dbh)
-max(LHP03$dbh, na.rm=T); max(LHP03_keep$dbh, na.rm=T)
+# deal with broken below 
+# ifelse(any status %in% any of the same tree ID == "A", status == A, status = D)
+LHP03_keep_v1 <- LHP03 %>% group_by(treeID) %>% summarize(X1 = X1,
+                                                          plot_x = plot_x,
+                                                          plot_y = plot_y,
+                                                          hom = mean(hom, na.rm=T),
+                                                          quadrat = mean(quadrat, na.rm=T),
+                                                          family = family,
+                                                          genus = genus, 
+                                                          species = species,
+                                                          stemID = stemID,
+                                                          dbh = max(dbh, na.rm=T),
+                                                          Date = mean(Date, na.rm=T),
+                                                          date = mean(date, na.rm=T),
+                                                          status = case_when(sum(ifelse(status == "A", 1, 0)) > 0 ~ "A", 
+                                                                             TRUE ~ "D"),
+                                                          IDlevel = IDlevel,
+                                                          site = site, 
+                                                          census = census, 
+                                                          plot = plot, 
+                                                          Shade.Tol = Shade.Tol, 
+                                                          soil = soil, 
+                                                          stem_BA = stem_BA,
+                                                          mean_wd = mean(mean_wd, na.rm=T))
+
+## LHP03_keep_v1 still same dimensions as LHP03, so needs to be reduced to treeIDs only (n = )
+
+LHP03_keep_v1$treeID[duplicated(LHP03_keep_v1$treeID)] 
+
+LHP03_keep_v1 <- LHP03_keep_v1[order(LHP03_keep_v1$treeID, -LHP03_keep_v1$dbh),]
+LHP03_keep <- LHP03_keep_v1[!duplicated(LHP03_keep_v1$treeID),]
+length(LHP03_keep_v1$dbh); length(LHP03_keep$dbh)
+max(LHP03_keep_v1$dbh, na.rm=T); max(LHP03_keep$dbh, na.rm=T)
+
+# reorder LHP03_keep columns to original order
+LHP03_keep <- as.data.frame(select(LHP03_keep, X1, plot_x, plot_y, hom, quadrat, family, genus, species, treeID, stemID, dbh, Date, date, status, IDlevel, site, census, plot, Shade.Tol, soil, stem_BA, mean_wd)) 
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
-LHP08 <- filter(LHP52, census == "census_2007_08")
-LHP08$treeID[duplicated(LHP08$treeID)] 
+LHP08_1 <- filter(LHP52, census == "census_2007_08")
+LHP08 <- filter(LHP08_1, status != "prior") # not actually relevant for this census
+dim(LHP08_1); dim(LHP08) 
+table(LHP08_1$status); table(LHP08$status)
 
-LHP08 <- LHP08[order(LHP08$treeID, -LHP08$dbh),]
-LHP08_keep <- LHP08[!duplicated(LHP08$treeID),]
-length(LHP08$dbh); length(LHP08_keep$dbh)
-max(LHP08$dbh, na.rm=T); max(LHP08_keep$dbh, na.rm=T)
+# deal with stem_gone 
+# ifelse(any status %in% any of the same tree ID == "A", status == A, status = D)
+LHP08_keep_v1 <- LHP08 %>% group_by(treeID) %>% summarize(X1 = X1,
+                                                          plot_x = plot_x,
+                                                          plot_y = plot_y,
+                                                          hom = mean(hom, na.rm=T),
+                                                          quadrat = mean(quadrat, na.rm=T),
+                                                          family = family,
+                                                          genus = genus, 
+                                                          species = species,
+                                                          stemID = stemID,
+                                                          dbh = max(dbh, na.rm=T),
+                                                          Date = mean(Date, na.rm=T),
+                                                          date = mean(date, na.rm=T),
+                                                          status = case_when(sum(ifelse(status == "A", 1, 0)) > 0 ~ "A", 
+                                                                             TRUE ~ "D"),
+                                                          IDlevel = IDlevel,
+                                                          site = site, 
+                                                          census = census, 
+                                                          plot = plot, 
+                                                          Shade.Tol = Shade.Tol, 
+                                                          soil = soil, 
+                                                          stem_BA = stem_BA,
+                                                          mean_wd = mean(mean_wd, na.rm=T))
+
+## LHP08_keep_v1 still same dimensions as LHP08, so needs to be reduced to treeIDs only (n = 493357)
+
+LHP08_keep_v1$treeID[duplicated(LHP08_keep_v1$treeID)] 
+
+LHP08_keep_v1 <- LHP08_keep_v1[order(LHP08_keep_v1$treeID, -LHP08_keep_v1$dbh),]
+LHP08_keep <- LHP08_keep_v1[!duplicated(LHP08_keep_v1$treeID),]
+length(LHP08_keep_v1$dbh); length(LHP08_keep$dbh)
+max(LHP08_keep_v1$dbh, na.rm=T); max(LHP08_keep$dbh, na.rm=T)
+
+# dim(LHP08); dim(LHP08_keep); dim(LHP08_keep_v1)
+# table(LHP08$status); table(LHP08_keep$status); table(LHP08_keep_v1$status)
+# 
+# length(unique(LHP08$stemID)); length(unique(LHP08$treeID))
+# length(unique(LHP08_keep$stemID)); length(unique(LHP08_keep$treeID))
+# length(unique(LHP08_keep_v1$stemID)); length(unique(LHP08_keep_v1$treeID))
+
+# reorder LHP08_keep columns to original order
+LHP08_keep <- as.data.frame(select(LHP08_keep, X1, plot_x, plot_y, hom, quadrat, family, genus, species, treeID, stemID, dbh, Date, date, status, IDlevel, site, census, plot, Shade.Tol, soil, stem_BA, mean_wd)) 
+
 #---------------------------------------------------------------------------------------------#
 LHP_keep <- rbind(LHP91_keep, LHP97_keep, LHP03_keep, LHP08_keep)
 #---------------------------------------------------------------------------------------------#
+str(LHP_keep)
+#LHP_keep$status <- as.factor(LHP_keep$status)
+table(LHP_keep$status)
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+
 
 #---------------------------------------------------------------------------------------------#
 # DNM50
 #---------------------------------------------------------------------------------------------#
 table(DNM50$census)
 DNM5011 <- filter(DNM50, census == "census_2011_15")
-DNM5011$treeID[duplicated(DNM5011$treeID)] 
 
-DNM5011 <- DNM5011[order(DNM5011$treeID, -DNM5011$dbh),]
-DNM5011_keep <- DNM5011[!duplicated(DNM5011$treeID),]
-length(DNM5011$dbh); length(DNM5011_keep$dbh)
-max(DNM5011$dbh, na.rm=T); max(DNM5011_keep$dbh, na.rm=T)
+table(DNM5011$status)
+
+# deal with broken below 
+# ifelse(any status %in% any of the same tree ID == "A", status == A, status = D)
+DNM5011_keep_v1 <- DNM5011 %>% group_by(treeID) %>% summarize(X1 = X1,
+                                                          plot_x = plot_x,
+                                                          plot_y = plot_y,
+                                                          hom = mean(hom, na.rm=T),
+                                                          quadrat = mean(quadrat, na.rm=T),
+                                                          family = family,
+                                                          genus = genus, 
+                                                          species = species,
+                                                          stemID = stemID,
+                                                          dbh = max(dbh, na.rm=T),
+                                                          Date = mean(Date, na.rm=T),
+                                                          date = mean(date, na.rm=T),
+                                                          status = case_when(sum(ifelse(status == "A", 1, 0)) > 0 ~ "A", 
+                                                                             TRUE ~ "D"),
+                                                          IDlevel = IDlevel,
+                                                          site = site, 
+                                                          census = census, 
+                                                          plot = plot, 
+                                                          Shade.Tol = Shade.Tol, 
+                                                          soil = soil, 
+                                                          stem_BA = stem_BA,
+                                                          mean_wd = mean(mean_wd, na.rm=T))
+
+## DNM5011_keep_v1 still same dimensions as DNM5011, so needs to be reduced to treeIDs only (n = 209912)
+
+DNM5011_keep_v1$treeID[duplicated(DNM5011_keep_v1$treeID)] 
+
+DNM5011_keep_v1 <- DNM5011_keep_v1[order(DNM5011_keep_v1$treeID, -DNM5011_keep_v1$dbh),]
+DNM5011_keep <- DNM5011_keep_v1[!duplicated(DNM5011_keep_v1$treeID),]
+length(DNM5011_keep_v1$dbh); length(DNM5011_keep$dbh)
+max(DNM5011_keep_v1$dbh, na.rm=T); max(DNM5011_keep$dbh, na.rm=T)
+
+# dim(DNM5011); dim(DNM5011_keep); dim(DNM5011_keep_v1)
+# table(DNM5011$status); table(DNM5011_keep$status); table(DNM5011_keep_v1$status)
+# 
+# length(unique(DNM5011$stemID)); length(unique(DNM5011$treeID))
+# length(unique(DNM5011_keep$stemID)); length(unique(DNM5011_keep$treeID))
+# length(unique(DNM5011_keep_v1$stemID)); length(unique(DNM5011_keep_v1$treeID))
+
+# reorder DNM5011_keep columns to original order
+DNM5011_keep <- as.data.frame(select(DNM5011_keep, X1, plot_x, plot_y, hom, quadrat, family, genus, species, treeID, stemID, dbh, Date, date, status, IDlevel, site, census, plot, Shade.Tol, soil, stem_BA, mean_wd)) 
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
 DNM5019 <- filter(DNM50, census == "census_2019")
-DNM5019$treeID[duplicated(DNM5019$treeID)] 
+table(DNM5019$status)
 
-DNM5019 <- DNM5019[order(DNM5019$treeID, -DNM5019$dbh),]
-DNM5019_keep <- DNM5019[!duplicated(DNM5019$treeID),]
-length(DNM5019$dbh); length(DNM5019_keep$dbh)
-max(DNM5019$dbh, na.rm=T); max(DNM5019_keep$dbh, na.rm=T)
+# deal with broken below 
+# ifelse(any status %in% any of the same tree ID == "A", status == A, status = D)
+DNM5019_keep_v1 <- DNM5019 %>% group_by(treeID) %>% summarize(X1 = X1,
+                                                              plot_x = plot_x,
+                                                              plot_y = plot_y,
+                                                              hom = mean(hom, na.rm=T),
+                                                              quadrat = mean(quadrat, na.rm=T),
+                                                              family = family,
+                                                              genus = genus, 
+                                                              species = species,
+                                                              stemID = stemID,
+                                                              dbh = max(dbh, na.rm=T),
+                                                              Date = mean(Date, na.rm=T),
+                                                              date = mean(date, na.rm=T),
+                                                              status = case_when(sum(ifelse(status == "A", 1, 0)) > 0 ~ "A", 
+                                                                                 TRUE ~ "D"),
+                                                              IDlevel = IDlevel,
+                                                              site = site, 
+                                                              census = census, 
+                                                              plot = plot, 
+                                                              Shade.Tol = Shade.Tol, 
+                                                              soil = soil, 
+                                                              stem_BA = stem_BA,
+                                                              mean_wd = mean(mean_wd, na.rm=T))
+
+## DNM5019_keep_v1 still same dimensions as DNM5019, so needs to be reduced to treeIDs only (n = 209912)
+
+DNM5019_keep_v1$treeID[duplicated(DNM5019_keep_v1$treeID)] 
+
+DNM5019_keep_v1 <- DNM5019_keep_v1[order(DNM5019_keep_v1$treeID, -DNM5019_keep_v1$dbh),]
+DNM5019_keep <- DNM5019_keep_v1[!duplicated(DNM5019_keep_v1$treeID),]
+length(DNM5019_keep_v1$dbh); length(DNM5019_keep$dbh)
+max(DNM5019_keep_v1$dbh, na.rm=T); max(DNM5019_keep$dbh, na.rm=T)
+
+# dim(DNM5019); dim(DNM5019_keep); dim(DNM5019_keep_v1)
+# table(DNM5019$status); table(DNM5019_keep$status); table(DNM5019_keep_v1$status)
+# 
+# length(unique(DNM5019$stemID)); length(unique(DNM5019$treeID))
+# length(unique(DNM5019_keep$stemID)); length(unique(DNM5019_keep$treeID))
+# length(unique(DNM5019_keep_v1$stemID)); length(unique(DNM5019_keep_v1$treeID))
+
+# reorder DNM5011_keep columns to original order
+DNM5019_keep <- as.data.frame(select(DNM5019_keep, X1, plot_x, plot_y, hom, quadrat, family, genus, species, treeID, stemID, dbh, Date, date, status, IDlevel, site, census, plot, Shade.Tol, soil, stem_BA, mean_wd)) 
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
 DNM50_keep <- rbind(DNM5011_keep, DNM5019_keep)
+#---------------------------------------------------------------------------------------------#
+table(DNM50_keep$status)
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
@@ -188,6 +426,7 @@ DNM50_keep <- rbind(DNM5011_keep, DNM5019_keep)
 # #DNM5019$treeID[duplicated(DNM5019$treeID)]
 # DNM5019$stemID[duplicated(DNM5019$stemID)]
 # #DNM50 <- rbind(DNM50dupes1, DNM50dupes2)
+#---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
 
@@ -569,7 +808,7 @@ cleandata <- rbind(LHP_keep, DNM50_keep, DNM1_keep, DNM2_keep, DNM3_keep, SPKA9_
 
 #---------------------------------------------------------------------------------------------#
 dim(clean_dat) # 2699589 - original
-dim(cleandata) # 2516255 - reduced
+dim(cleandata) # 2217712 - reduced
 #dim(cleandata)[[1]] - length(tree_IDs_remove) # 630246
 #---------------------------------------------------------------------------------------------#
 
