@@ -35,6 +35,7 @@ library(dplyr)
 library(stringr)
 library(readxl)
 library(janitor)
+library(fgeo)
 
 #---------------------------------------------------------------------------------------------#
 # Load ForestGEO data                                                                         # 
@@ -48,6 +49,12 @@ dnm1 <- read_tsv("Harvard/Plot_Data/CTFS_ForestGEO/Data/PlotDataReport02-14-2019
 dnm2 <- read_tsv("Harvard/Plot_Data/CTFS_ForestGEO/Data/PlotDataReport04-17-2020_1896600351_census2.txt")
 tax <- read_tsv("Harvard/Plot_Data/CTFS_ForestGEO/Data/TaxonomyReport02-14-2019_844633710.txt")
 #---------------------------------------------------------------------------------------------#
+
+# test <- pick_main_stem(dnm1)
+# table(test$Status)
+# 
+# test2 <- pick_main_stem(dnm2)
+# table(test2$Status)
 
 #----------------------------------------- LAMBIR data ---------------------------------------# 
 # four censuses (data collected ~1991, 1997, 2003, and 2007/08)
@@ -211,6 +218,7 @@ dnm2$dbh <- dnm2$DBH*0.1
 # boxplot(log(dnm2$dbh))
 # boxplot(log(test$dbh))
 #---------------------------------------------------------------------------------------------#
+
 
 #---------------------------------------------------------------------------------------------#
 # Calculate Julian Date
@@ -442,12 +450,14 @@ DNM50 <- rbind(dnm1_select, dnm2_select)
 colnames(DNM50) <- c("gx","gy","hom","quadrat","tag","sp","Family","Genus","Species","treeID","stemID","dbh",
                      "ExactDate","JulianDate","DFstatus","IDlevel", "site", "census", "plot",
                      "Shade.Tol","soil")
+table(DNM50$DFstatus)
 
 ForestGEO <- rbind(DNM50, lhp1_select, lhp2_select, lhp3_select, lhp4_select)
 
 colnames(ForestGEO) <- c("plot_x","plot_y","hom","quadrat","tag","sp","family","genus","species","treeID","stemID",
                      "dbh","Date","JulianDate","DFstatus","IDlevel", "site", "census", "plot",
                      "Shade.Tol","soil")
+
 
 #---------------------------------------------------------------------------------------------#
 # calculate stem_BA
@@ -868,6 +878,9 @@ forest_plots_final <- select(forest_plots_clean, plot_x, plot_y, hom, quadrat, f
                              plot, Shade.Tol, soil, stem_BA, mean_wd)
 
 firstcleandata <- bind_rows(forest_plots_final, ForestGEO_final)
+#---------------------------------------------------------------------------------------------#
+danum_50_ha <- filter(firstcleandata, site == "DNM50")
+table(danum_50_ha$DFstatus)
 #---------------------------------------------------------------------------------------------#
 
 summary(firstcleandata)
@@ -1641,8 +1654,11 @@ summary(DNM3_update$dbh)
 table(DNM50$census)
 table(DNM50$DFstatus)
 
-census1 <- filter(DNM50, census == "census_2011_15")
-census2 <- filter(DNM50, census == "census_2019")
+DNM50_dead <- filter(DNM50, DFstatus == "D" | DFstatus == "missing")
+DNM50_alive <- filter(DNM50, DFstatus == "A" | DFstatus == "B")
+
+census1 <- filter(DNM50_alive, census == "census_2011_15")
+census2 <- filter(DNM50_alive, census == "census_2019")
 
 # check the number of unique stems in each dataset and compare between datasets
 length(unique(census1$stemID)); dim(census1)
@@ -1703,16 +1719,15 @@ DNM50_census2 <- DNM50_cleaned[,c(22:29,9,30:41)]
 colnames(DNM50_census1) <- colnames(DNM50)
 colnames(DNM50_census2) <- colnames(DNM50)
 
-DNM50_v2 <- rbind(DNM50_census1, DNM50_census2)
+# bind alive census1 & census2 AND bind dead and missing stems back in
+DNM50_v2 <- rbind(DNM50_census1, DNM50_census2, DNM50_dead)
+
 head(DNM50_v2) 
+table(DNM50_v2$DFstatus)
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
-
-
-
-
-
+#---------------------------------------------------------------------------------------------#
 
 
 
@@ -1958,6 +1973,11 @@ table(second_clean_dat$plot)
 
 table(firstcleandata$site)
 table(second_clean_dat$site)
+
+#---------------------------------------------------------------------------------------------#
+danum_50_ha <- filter(second_clean_dat, site == "DNM50")
+table(danum_50_ha$DFstatus)
+#---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
