@@ -4,7 +4,7 @@ Borneo tall trees research using ForestGEO and ForestPlots inventory data and Gl
 ## Organization of this repo:
 
 - Draft manuscript is in main folder
-- Data folder contains data for all analyses
+- Data is in Google Drive Tall_trees_research folder
 - Scripts for data cleaning and analyses are in separately labeled folders
 - Papers folder contains references for tall trees manuscript and other background reading
 
@@ -21,7 +21,7 @@ Data cleaning is separated into N(4) different data cleaning protocols:
   - convert 'unknown' spp to 'indet'
   - update DFstatus
   - remove Danum 50-ha outliers based on stems with extreme relative growth rates 
-  - fill DBH for alive [not dead/broken below?] stems using DBH from previous census (where DBH == NA or 0)
+  - fill DBH for all [not just alive] stems using DBH from previous census (where DBH == NA or 0)
  
 - growth_dat  (see clean_growth_dat.R)
 	- all: 
