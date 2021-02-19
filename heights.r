@@ -4,10 +4,10 @@ library(skimr)
 library(dplyr)
 library(stringr)
 
-data <- read_csv(here("Desktop", "Research", "R", "Data", "data_clean.csv"))
+data <- read_csv(here("Elsa Clean", "main_dat.csv"))
 
 #Height Equations------
-#use the Feldpuasch et al 2011 equation with the Southeast Asia regional coefficients
+#use the Feldpausch et al 2011 equation with the Southeast Asia regional coefficients
 dbh2h_01 <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht){ # exclude hgt_ref here if using first dbh_crit eq.
   #  dbh_crit <- exp((log(hgt_max)-b1Ht)/b2Ht)
   dbh_crit <- exp(-0.5 / hgt_ref * (b2Ht - sqrt(b2Ht**2 - 4 * hgt_ref * (b1Ht - log(hgt_max)))))
@@ -121,13 +121,13 @@ table(emergent90Ch)
 data$tree_type90Ch <- ifelse(data$species %in% c(emergent90Ch), "emrgnt", "non_emrgnt")
 
 #Chave with E
-#emergent90E <- filter(data, dbh >= quantile90E)
-#table(emergent90E$dbh)
+emergent90E <- filter(data, dbh >= quantile90E)
+table(emergent90E$dbh)
 
-#emergent90E <- unique(emergent90E$species)
-#table(emergent90E)
+emergent90E <- unique(emergent90E$species)
+table(emergent90E)
 
-#data$tree_type90E <- ifelse(data$species %in% c(emergent90E), "emrgnt", "non_emrgnt")
+data$tree_type90E <- ifelse(data$species %in% c(emergent90E), "emrgnt", "non_emrgnt")
 
 
 #quantile 95-------
@@ -149,14 +149,14 @@ table(emergent95Ch)
 
 data$tree_type95Ch <- ifelse(data$species %in% c(emergent95Ch), "emrgnt", "non_emrgnt")
 
-##Chave with E
-#emergent95E <- filter(data, dbh >= quantile95E)
-#table(emergent95E$dbh)
-#
-#emergent95E <- unique(emergent95E$species)
-#table(emergent95E)
-#
-#data$tree_type95E <- ifelse(data$species %in% c(emergent95E), "emrgnt", "non_emrgnt")
+#Chave with E
+emergent95E <- filter(data, dbh >= quantile95E)
+table(emergent95E$dbh)
+
+emergent95E <- unique(emergent95E$species)
+table(emergent95E)
+
+data$tree_type95E <- ifelse(data$species %in% c(emergent95E), "emrgnt", "non_emrgnt")
 
 #quantile 99-------
 #Feld
@@ -175,13 +175,819 @@ table(emergent99Ch$dbh)
 emergent99Ch <- unique(emergent99Ch$species)
 table(emergent99Ch)
 
-data$tree_type95Ch <- ifelse(data$species %in% c(emergent99Ch), "emrgnt", "non_emrgnt")
-
+data$tree_type99Ch <- ifelse(data$species %in% c(emergent99Ch), "emrgnt", "non_emrgnt")
 #Chave with E
-#emergent99E <- filter(data, dbh >= quantile99E)
-#table(emergent99E$dbh)
-#
-#emergent99E <- unique(emergent99E$species)
-#table(emergent99E)
-#
-#data$tree_type99E <- ifelse(data$species %in% c(emergent99E), "emrgnt", "non_emrgnt")#
+emergent99E <- filter(data, dbh >= quantile99E)
+table(emergent99E$dbh)
+
+emergent99E <- unique(emergent99E$species)
+table(emergent99E)
+
+data$tree_type99E <- ifelse(data$species %in% c(emergent99E), "emrgnt", "non_emrgnt")
+
+#Binning-----------
+data$size_class <- 
+  cut(data$dbh, breaks=c(0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,95,100,
+                              105,110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,195,200,205,max(data$dbh, na.rm=T)),
+  )
+
+table(data$site)
+
+#Plots------
+#Separate by site------
+table(data$site)
+DNM1=filter(data, site == "DNM1")
+DNM2=filter(data, site == "DNM2")
+DNM3=filter(data, site == "DNM3")
+DNM50=filter(data, site == "DNM50")
+LHP=filter(data, site == "LHP")
+SPKA=filter(data, site == "SPKA")
+SPKH=filter(data, site == "SPKH")
+SPKS=filter(data, site == "SPKS")
+
+#Variables----
+DNM1nem90F <- filter(DNM1, tree_type90F == "non_emrgnt")
+DNM1nem95F <- filter(DNM1, tree_type95F == "non_emrgnt")
+DNM1nem99F <- filter(DNM1, tree_type99F == "non_emrgnt")
+DNM1nem90Ch <- filter(DNM1, tree_type90Ch == "non_emrgnt")
+DNM1nem95Ch <- filter(DNM1, tree_type95Ch == "non_emrgnt")
+DNM1nem99Ch <- filter(DNM1, tree_type99Ch == "non_emrgnt")
+DNM1nem90E <- filter(DNM1, tree_type90E == "non_emrgnt")
+DNM1nem95E <- filter(DNM1, tree_type95E == "non_emrgnt")
+DNM1nem99E <- filter(DNM1, tree_type99E == "non_emrgnt")
+
+DNM2nem90F <- filter(DNM2, tree_type90F == "non_emrgnt")
+DNM2nem95F <- filter(DNM2, tree_type95F == "non_emrgnt")
+DNM2nem99F <- filter(DNM2, tree_type99F == "non_emrgnt")
+DNM2nem90Ch <- filter(DNM2, tree_type90Ch == "non_emrgnt")
+DNM2nem95Ch <- filter(DNM2, tree_type95Ch == "non_emrgnt")
+DNM2nem99Ch <- filter(DNM2, tree_type99Ch == "non_emrgnt")
+DNM2nem90E <- filter(DNM2, tree_type90E == "non_emrgnt")
+DNM2nem95E <- filter(DNM2, tree_type95E == "non_emrgnt")
+DNM2nem99E <- filter(DNM2, tree_type99E == "non_emrgnt")
+
+DNM3nem90F <- filter(DNM3, tree_type90F == "non_emrgnt")
+DNM3nem95F <- filter(DNM3, tree_type95F == "non_emrgnt")
+DNM3nem99F <- filter(DNM3, tree_type99F == "non_emrgnt")
+DNM3nem90Ch <- filter(DNM3, tree_type90Ch == "non_emrgnt")
+DNM3nem95Ch <- filter(DNM3, tree_type95Ch == "non_emrgnt")
+DNM3nem99Ch <- filter(DNM3, tree_type99Ch == "non_emrgnt")
+DNM3nem90E <- filter(DNM3, tree_type90E == "non_emrgnt")
+DNM3nem95E <- filter(DNM3, tree_type95E == "non_emrgnt")
+DNM3nem99E <- filter(DNM3, tree_type99E == "non_emrgnt")
+
+DNM50nem90F <- filter(DNM50, tree_type90F == "non_emrgnt")
+DNM50nem95F <- filter(DNM50, tree_type95F == "non_emrgnt")
+DNM50nem99F <- filter(DNM50, tree_type99F == "non_emrgnt")
+DNM50nem90Ch <- filter(DNM50, tree_type90Ch == "non_emrgnt")
+DNM50nem95Ch <- filter(DNM50, tree_type95Ch == "non_emrgnt")
+DNM50nem99Ch <- filter(DNM50, tree_type99Ch == "non_emrgnt")
+DNM50nem90E <- filter(DNM50, tree_type90E == "non_emrgnt")
+DNM50nem95E <- filter(DNM50, tree_type95E == "non_emrgnt")
+DNM50nem99E <- filter(DNM50, tree_type99E == "non_emrgnt")
+
+LHPnem90F <- filter(LHP, tree_type90F == "non_emrgnt")
+LHPnem95F <- filter(LHP, tree_type95F == "non_emrgnt")
+LHPnem99F <- filter(LHP, tree_type99F == "non_emrgnt")
+LHPnem90Ch <- filter(LHP, tree_type90Ch == "non_emrgnt")
+LHPnem95Ch <- filter(LHP, tree_type95Ch == "non_emrgnt")
+LHPnem99Ch <- filter(LHP, tree_type99Ch == "non_emrgnt")
+LHPnem90E <- filter(LHP, tree_type90E == "non_emrgnt")
+LHPnem95E <- filter(LHP, tree_type95E == "non_emrgnt")
+LHPnem99E <- filter(LHP, tree_type99E == "non_emrgnt")
+
+SPKAnem90F <- filter(SPKA, tree_type90F == "non_emrgnt")
+SPKAnem95F <- filter(SPKA, tree_type95F == "non_emrgnt")
+SPKAnem99F <- filter(SPKA, tree_type99F == "non_emrgnt")
+SPKAnem90Ch <- filter(SPKA, tree_type90Ch == "non_emrgnt")
+SPKAnem95Ch <- filter(SPKA, tree_type95Ch == "non_emrgnt")
+SPKAnem99Ch <- filter(SPKA, tree_type99Ch == "non_emrgnt")
+SPKAnem90E <- filter(SPKA, tree_type90E == "non_emrgnt")
+SPKAnem95E <- filter(SPKA, tree_type95E == "non_emrgnt")
+SPKAnem99E <- filter(SPKA, tree_type99E == "non_emrgnt")
+
+SPKHnem90F <- filter(SPKH, tree_type90F == "non_emrgnt")
+SPKHnem95F <- filter(SPKH, tree_type95F == "non_emrgnt")
+SPKHnem99F <- filter(SPKH, tree_type99F == "non_emrgnt")
+SPKHnem90Ch <- filter(SPKH, tree_type90Ch == "non_emrgnt")
+SPKHnem95Ch <- filter(SPKH, tree_type95Ch == "non_emrgnt")
+SPKHnem99Ch <- filter(SPKH, tree_type99Ch == "non_emrgnt")
+SPKHnem90E <- filter(SPKH, tree_type90E == "non_emrgnt")
+SPKHnem95E <- filter(SPKH, tree_type95E == "non_emrgnt")
+SPKHnem99E <- filter(SPKH, tree_type99E == "non_emrgnt")
+
+SPKSnem90F <- filter(SPKS, tree_type90F == "non_emrgnt")
+SPKSnem95F <- filter(SPKS, tree_type95F == "non_emrgnt")
+SPKSnem99F <- filter(SPKS, tree_type99F == "non_emrgnt")
+SPKSnem90Ch <- filter(SPKS, tree_type90Ch == "non_emrgnt")
+SPKSnem95Ch <- filter(SPKS, tree_type95Ch == "non_emrgnt")
+SPKSnem99Ch <- filter(SPKS, tree_type99Ch == "non_emrgnt")
+SPKSnem90E <- filter(SPKS, tree_type90E == "non_emrgnt")
+SPKSnem95E <- filter(SPKS, tree_type95E == "non_emrgnt")
+SPKSnem99E <- filter(SPKS, tree_type99E == "non_emrgnt")
+
+#DNM1 Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+DNM1 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM1nem90F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 95th percentile
+DNM1 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM1nem95F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 99th percentile
+DNM1 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM1nem99F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Feld) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+DNM1 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM1nem90Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 95th percentile
+DNM1 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM1nem95Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 99th percentile
+DNM1 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM1nem99Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Ch) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+DNM1 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM1nem90E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile90E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 95th percentile
+DNM1 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM1nem95E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile95E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 99th percentile
+DNM1 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM1nem99E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile99E) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#DNM2 Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+DNM2 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM2nem90F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 95th percentile
+DNM2 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM2nem95F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 99th percentile
+DNM2 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM2nem99F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Feld) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+DNM2 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM2nem90Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 95th percentile
+DNM2 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM2nem95Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 99th percentile
+DNM2 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM2nem99Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Ch) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+DNM2 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM2nem90E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile90E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 95th percentile
+DNM2 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM2nem95E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile95E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 99th percentile
+DNM2 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM2nem99E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile99E) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#DNM3 Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+DNM3 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem90F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 95th percentile
+DNM3 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem95F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 99th percentile
+DNM3 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem99F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Feld) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+DNM3 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem90Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 95th percentile
+DNM3 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem95Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 99th percentile
+DNM3 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem99Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Ch) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+DNM3 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem90E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile90E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 95th percentile
+DNM3 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem95E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile95E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 99th percentile
+DNM3 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem99E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile99E) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#DNM50 Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+DNM50 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem90F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 95th percentile
+DNM50 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem95F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 99th percentile
+DNM50 %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM3nem99F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Feld) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+DNM50 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM50nem90Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 95th percentile
+DNM50 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM50nem95Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 99th percentile
+DNM50 %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM50nem99Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Ch) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+DNM50 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM50nem90E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile90E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 95th percentile
+DNM50 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM50nem95E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile95E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 99th percentile
+DNM50 %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = DNM50nem99E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile99E) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#LHP Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+LHP %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = LHPnem90F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 95th percentile
+LHP %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = LHPnem95F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 99th percentile
+LHP %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = LHPnem99F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Feld) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+LHP %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = LHPnem90Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 95th percentile
+LHP %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = LHPnem95Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 99th percentile
+LHP %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = LHPnem99Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Ch) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+LHP %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = LHPnem90E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile90E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 95th percentile
+LHP %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = LHPnem95E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile95E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 99th percentile
+LHP %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = LHPnem99E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile99E) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#SPKA Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+SPKA %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKAnem90F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 95th percentile
+SPKA %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKAnem95F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 99th percentile
+SPKA %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKAnem99F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Feld) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+SPKA %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKAnem90Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 95th percentile
+SPKA %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKAnem95Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 99th percentile
+SPKA %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKAnem99Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Ch) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+SPKA %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKAnem90E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile90E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 95th percentile
+SPKA %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKAnem95E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile95E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 99th percentile
+SPKA %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKAnem99E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile99E) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#SPKH Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+SPKH %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKHnem90F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 95th percentile
+SPKH %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKHnem95F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 99th percentile
+SPKH %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKHnem99F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Feld) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+SPKH %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKHnem90Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 95th percentile
+SPKH %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKHnem95Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 99th percentile
+SPKH %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKHnem99Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Ch) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+SPKH %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKHnem90E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile90E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 95th percentile
+SPKH %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKHnem95E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile95E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 99th percentile
+SPKH %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKHnem99E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile99E) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#SPKS Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+SPKS %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKSnem90F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 95th percentile
+SPKS %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKSnem95F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Feld)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Feldpausch Heights 99th percentile
+SPKS %>%
+  ggplot(aes(heightFeld, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKSnem99F,mapping = aes(heightFeld, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Feld) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+SPKS %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKSnem90Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile90Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 95th percentile
+SPKS %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKSnem95Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile95Ch)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave Heights 99th percentile
+SPKS %>%
+  ggplot(aes(heightCh, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKSnem99Ch,mapping = aes(heightCh, dbh), color="blue")+
+  geom_vline(xintercept = quantile99Ch) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+SPKS %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKSnem90E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile90E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 95th percentile
+SPKS %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKSnem95E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile95E)+
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+#Chave E Heights 99th percentile
+SPKS %>%
+  ggplot(aes(heightE, dbh))+
+  geom_point(color = "red")+
+  geom_point(data = SPKSnem99E,mapping = aes(heightE, dbh), color="blue")+
+  geom_vline(xintercept = quantile99E) +
+  scale_x_continuous(trans = 'log2') +
+  scale_y_continuous(trans = 'log2')
+
+
