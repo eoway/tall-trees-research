@@ -49,6 +49,9 @@ dnm1 <- read_tsv("Harvard/Plot_Data/CTFS_ForestGEO/Data/PlotDataReport02-14-2019
 dnm2 <- read_tsv("Harvard/Plot_Data/CTFS_ForestGEO/Data/PlotDataReport04-17-2020_1896600351_census2.txt")
 tax <- read_tsv("Harvard/Plot_Data/CTFS_ForestGEO/Data/TaxonomyReport02-14-2019_844633710.txt")
 #---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+table(dnm1$Status); table(dnm2$Status)
+#---------------------------------------------------------------------------------------------#
 
 # test <- pick_main_stem(dnm1)
 # table(test$Status)
@@ -457,7 +460,71 @@ ForestGEO <- rbind(DNM50, lhp1_select, lhp2_select, lhp3_select, lhp4_select)
 colnames(ForestGEO) <- c("plot_x","plot_y","hom","quadrat","tag","sp","family","genus","species","treeID","stemID",
                      "dbh","Date","JulianDate","DFstatus","IDlevel", "site", "census", "plot",
                      "Shade.Tol","soil")
+#---------------------------------------------------------------------------------------------#
 
+#---------------------------------------------------------------------------------------------#
+# Check mortality rates at Danum & Lambir
+#---------------------------------------------------------------------------------------------#
+# dnm1_select <- filter(DNM50, census == "census_2011_15")
+# dnm2_select <- filter(DNM50, census == "census_2019")
+# 
+# dnm1_main_stem <- pick_main_stem(dnm1_select)
+# dnm2_main_stem <- pick_main_stem(dnm2_select)
+# 
+# colnames(dnm1_main_stem)[14:15] <- c("date","status")
+# colnames(dnm2_main_stem)[14:15] <- c("date","status")
+# 
+# dnm1_main_stem$status <- gsub("alive","A",dnm1_main_stem$status)
+# dnm2_main_stem$status <- gsub("alive","A",dnm2_main_stem$status)
+# dnm1_main_stem$status <- gsub("dead","D",dnm1_main_stem$status)
+# dnm2_main_stem$status <- gsub("dead","D",dnm2_main_stem$status)
+# 
+# lhp1_main_stem <- pick_main_stem(lhp1_select)
+# lhp2_main_stem <- pick_main_stem(lhp2_select)
+# lhp3_main_stem <- pick_main_stem(lhp3_select)
+# lhp4_main_stem <- pick_main_stem(lhp4_select)
+# 
+# colnames(lhp1_main_stem)[14:15] <- c("date","status")
+# colnames(lhp2_main_stem)[14:15] <- c("date","status")
+# colnames(lhp3_main_stem)[14:15] <- c("date","status")
+# colnames(lhp4_main_stem)[14:15] <- c("date","status")
+# 
+# lhp1_main_stem$status <- gsub("alive","A",lhp1_main_stem$status)
+# lhp2_main_stem$status <- gsub("alive","A",lhp2_main_stem$status)
+# lhp3_main_stem$status <- gsub("alive","A",lhp3_main_stem$status)
+# lhp4_main_stem$status <- gsub("alive","A",lhp4_main_stem$status)
+# 
+# lhp1_main_stem$status <- gsub("broken below","A",lhp1_main_stem$status)
+# lhp2_main_stem$status <- gsub("broken below","A",lhp2_main_stem$status)
+# lhp3_main_stem$status <- gsub("broken below","A",lhp3_main_stem$status)
+# lhp4_main_stem$status <- gsub("broken below","A",lhp4_main_stem$status)
+# 
+# lhp1_main_stem$status <- gsub("dead","D",lhp1_main_stem$status)
+# lhp2_main_stem$status <- gsub("dead","D",lhp2_main_stem$status)
+# lhp3_main_stem$status <- gsub("dead","D",lhp3_main_stem$status)
+# lhp4_main_stem$status <- gsub("dead","D",lhp4_main_stem$status)
+# 
+# lhp1_main_stem_gt1 <- subset(lhp1_main_stem, dbh > 1)
+# lhp2_main_stem_gt1 <- subset(lhp2_main_stem, dbh > 1)
+# lhp3_main_stem_gt1 <- subset(lhp3_main_stem, dbh > 1)
+# lhp4_main_stem_gt1 <- subset(lhp4_main_stem, dbh > 1)
+# 
+# 
+# mort1 <- mortality_ctfs(dnm1_main_stem, dnm2_main_stem) 
+# mort1$rate*100; mort1$lower*100; mort1$upper*100
+# 
+# mort1 <- mortality_ctfs(lhp1_main_stem, lhp2_main_stem) 
+# mort1$rate*100; mort1$lower*100; mort1$upper*100
+# 
+# mort2 <- mortality_ctfs(lhp2_main_stem, lhp3_main_stem) 
+# mort2$rate*100; mort2$lower*100; mort2$upper*100
+# 
+# mort3 <- mortality_ctfs(lhp3_main_stem, lhp4_main_stem) 
+# mort3$rate*100; mort3$lower*100; mort3$upper*100
+# 
+# mort1$rate*100; mort2$rate*100; mort3$rate*100
+# 
+# mean(c(mort1$rate, mort2$rate, mort3$rate))
 
 #---------------------------------------------------------------------------------------------#
 # calculate stem_BA
@@ -881,6 +948,7 @@ firstcleandata <- bind_rows(forest_plots_final, ForestGEO_final)
 #---------------------------------------------------------------------------------------------#
 danum_50_ha <- filter(firstcleandata, site == "DNM50")
 table(danum_50_ha$DFstatus)
+
 #---------------------------------------------------------------------------------------------#
 
 summary(firstcleandata)
@@ -929,7 +997,7 @@ table(firstcleandata$DFstatus)
 #---------------------------------------------------------------------------------------------#
 firstcleandata$DFstatus <- gsub("dead", "D", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("0", "D", firstcleandata$DFstatus)
-firstcleandata$DFstatus <- gsub("diz", "D", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("diz", "A", firstcleandata$DFstatus) # used to be Dead
 
 #---------------------------------------------------------------------------------------------#
 # alive
@@ -1040,8 +1108,8 @@ firstcleandata$DFstatus <- gsub("an", "A", firstcleandata$DFstatus)
 #---------------------------------------------------------------------------------------------#
 # dead
 #---------------------------------------------------------------------------------------------#
-firstcleandata$DFstatus <- gsub("dz", "D", firstcleandata$DFstatus)
-firstcleandata$DFstatus <- gsub("k", "D", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("dz", "A", firstcleandata$DFstatus) # used to be Dead
+firstcleandata$DFstatus <- gsub("k", "A", firstcleandata$DFstatus) # used to be Dead
 
 #---------------------------------------------------------------------------------------------#
 # alive
@@ -1060,7 +1128,8 @@ firstcleandata$DFstatus <- gsub("b", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("a", "A", firstcleandata$DFstatus)
 
 firstcleandata$DFstatus <- gsub("prAor", "prior", firstcleandata$DFstatus)
-firstcleandata$DFstatus <- gsub("AroDAn AAow", "B", firstcleandata$DFstatus) # broken below
+#firstcleandata$DFstatus <- gsub("AroDAn AAow", "B", firstcleandata$DFstatus) # broken below
+firstcleandata$DFstatus <- gsub("AroAAn AAow", "B", firstcleandata$DFstatus) # broken below
 firstcleandata$DFstatus <- gsub("stA_AonA", "stem_gone", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("AAssAA", "missing", firstcleandata$DFstatus)
 
@@ -1106,7 +1175,7 @@ table(firstcleandata$DFstatus)
 
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
-# Fill in DBH for dead/broken below stems from previous census if NA or 0
+# Fill in DBH for dead stems from previous census if NA or 0
 #---------------------------------------------------------------------------------------------#
 table(firstcleandata$DFstatus)
 
@@ -1121,6 +1190,8 @@ DNM1 <- subset(firstcleandata, site == "DNM1"); table(DNM1$DFstatus)
 DNM2 <- subset(firstcleandata, site == "DNM2"); table(DNM2$DFstatus)
 DNM3 <- subset(firstcleandata, site == "DNM3"); table(DNM3$DFstatus)
 DNM  <- subset(firstcleandata, site == "DNM50"); table(DNM$DFstatus)
+
+## ????? DO THIS FOR ALL ??????
 
 # convert all DBH to NA for all ForestPlots where DFstatus == D & DBH == 0
 dat_D <- subset(SPKA, DFstatus == "D"); table(dat_D$DFstatus)
@@ -1153,495 +1224,18 @@ dat_notD <- subset(DNM3, DFstatus != "D" | is.na(DFstatus)); table(dat_notD$DFst
 dat_D$dbh <- ifelse(dat_D$dbh == 0, NA, dat_D$dbh)
 DNM3 <- rbind(dat_D, dat_notD)
 
-# test <- subset(DNM, DFstatus != "A")
-# test <- subset(DNM, DFstatus == "A")
-# test <- subset(DNM, DFstatus == "D")
-# table(test$DFstatus)
-# summary(test$dbh)
 
 #---------------------------------------------------------------------------------------------#
-# ForestGEO dead trees are mostly == NA DBH
 #---------------------------------------------------------------------------------------------#
-dnm_census2 <- subset(DNM, census == "census_2019"); dim(dnm_census2) #263911
-dnm_census1 <- subset(DNM, census == "census_2011_15"); dim(dnm_census1) #256724
-
-t1dbh <- select(dnm_census1, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat <- left_join(dnm_census2, t1dbh, by = "stemID"); dim(temp_dat)
-summary(temp_dat$dbh.x)
-temp_dat$dbh.x <- ifelse(temp_dat$DFstatus == "A" & is.na(temp_dat$dbh.x), temp_dat$dbh.y, temp_dat$dbh.x)
-summary(temp_dat$dbh.x); dim(temp_dat)
-
-# reassign to original dat
-dnm_census2$dbh <- temp_dat$dbh.x
-
-# rbind into single site again
-DNM50 <- rbind(dnm_census1, dnm_census2)
-
-DNM_update <- subset(DNM50, DFstatus != "A" & census == "census_2019")
-table(DNM_update$DFstatus)
-table(DNM_update$census)
-summary(DNM_update$dbh)
+# SKIP FROM HERE.................
+#---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
-# do for each set of censuses (Dead at census 2 & census 3 & census 4)
 #---------------------------------------------------------------------------------------------#
-lhc_census1 <- subset(LHC, plot == "LH_clay" & census == "census_1991"); dim(lhc_census1) #28894
-lhc_census2 <- subset(LHC, plot == "LH_clay" & census == "census_1997"); dim(lhc_census2) #28894
-lhc_census3 <- subset(LHC, plot == "LH_clay" & census == "census_2003"); dim(lhc_census3) #28894
-lhc_census4 <- subset(LHC, plot == "LH_clay" & census == "census_2007_08"); dim(lhc_census4) #28894
-
-t1dbh <- select(lhc_census1, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat1 <- left_join(lhc_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-lhc_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(lhc_census2, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat2 <- left_join(lhc_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-lhc_census3$dbh <- temp_dat2$dbh.x
-
-t3dbh <- select(lhc_census3, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat3 <- left_join(lhc_census4, t3dbh, by = "stemID"); dim(temp_dat3)
-summary(temp_dat3$dbh.x)
-temp_dat3$dbh.x <- ifelse(temp_dat3$DFstatus == "A" & is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
-summary(temp_dat3$dbh.x); dim(temp_dat3)
-# reassign to original dat
-lhc_census4$dbh <- temp_dat3$dbh.x
-
-# rbind into single site again
-dim(LHC)
-LHC <- rbind(lhc_census1, lhc_census2, lhc_census3, lhc_census4)
-dim(LHC)
-
-LHC_update <- subset(LHC, DFstatus == "D")
-table(LHC_update$DFstatus)
-summary(LHC_update$dbh)
-
+# TO HERE.................
 #---------------------------------------------------------------------------------------------#
-# do for each set of censuses (Dead at census 2 & census 3 & census 4)
 #---------------------------------------------------------------------------------------------#
-lhs_census1 <- subset(LHS, plot == "LH_sandstone" & census == "census_1991"); dim(lhs_census1) #316402
-lhs_census2 <- subset(LHS, plot == "LH_sandstone" & census == "census_1997"); dim(lhs_census2) #316402
-lhs_census3 <- subset(LHS, plot == "LH_sandstone" & census == "census_2003"); dim(lhs_census3) #316402
-lhs_census4 <- subset(LHS, plot == "LH_sandstone" & census == "census_2007_08"); dim(lhs_census4) #316402
-
-t1dbh <- select(lhs_census1, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat1 <- left_join(lhs_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-lhs_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(lhs_census2, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat2 <- left_join(lhs_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-lhs_census3$dbh <- temp_dat2$dbh.x
-
-t3dbh <- select(lhs_census3, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat3 <- left_join(lhs_census4, t3dbh, by = "stemID"); dim(temp_dat3)
-summary(temp_dat3$dbh.x)
-temp_dat3$dbh.x <- ifelse(temp_dat3$DFstatus == "A" & is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
-summary(temp_dat3$dbh.x); dim(temp_dat3)
-# reassign to original dat
-lhs_census4$dbh <- temp_dat3$dbh.x
-
-# rbind into single site again
-dim(LHS)
-LHS <- rbind(lhs_census1, lhs_census2, lhs_census3, lhs_census4)
-dim(LHS)
-
-LHS_update <- subset(LHS, DFstatus == "D")
-table(LHS_update$DFstatus)
-summary(LHS_update$dbh)
-#---------------------------------------------------------------------------------------------#
-
-#---------------------------------------------------------------------------------------------#
-# do for each set of censuses (Dead at census 2 & census 3 & census 4)
-#---------------------------------------------------------------------------------------------#
-lhl_census1 <- subset(LHl, census == "census_1991"); dim(lhl_census1) #82168
-lhl_census2 <- subset(LHl, census == "census_1997"); dim(lhl_census2) #82168
-lhl_census3 <- subset(LHl, census == "census_2003"); dim(lhl_census3) #82168
-lhl_census4 <- subset(LHl, census == "census_2007_08"); dim(lhl_census4) #82168
-
-t1dbh <- select(lhl_census1, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat1 <- left_join(lhl_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-lhl_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(lhl_census2, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat2 <- left_join(lhl_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-lhl_census3$dbh <- temp_dat2$dbh.x
-
-t3dbh <- select(lhl_census3, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat3 <- left_join(lhl_census4, t3dbh, by = "stemID"); dim(temp_dat3)
-summary(temp_dat3$dbh.x)
-temp_dat3$dbh.x <- ifelse(temp_dat3$DFstatus == "A" & is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
-summary(temp_dat3$dbh.x); dim(temp_dat3)
-# reassign to original dat
-lhl_census4$dbh <- temp_dat3$dbh.x
-
-# rbind into single site again
-dim(LHl)
-LHl <- rbind(lhl_census1, lhl_census2, lhl_census3, lhl_census4)
-dim(LHl)
-
-LHl_update <- subset(LHl, DFstatus == "D")
-table(LHl_update$DFstatus)
-summary(LHl_update$dbh)
-#---------------------------------------------------------------------------------------------#
-
-
-
-#---------------------------------------------------------------------------------------------#
-# do for each set of censuses (Dead at census 2 & census 3 & census 4)
-#---------------------------------------------------------------------------------------------#
-lhfl_census1 <- subset(LHfl, census == "census_1991"); dim(lhfl_census1) #106213
-lhfl_census2 <- subset(LHfl, census == "census_1997"); dim(lhfl_census2) #106213
-lhfl_census3 <- subset(LHfl, census == "census_2003"); dim(lhfl_census3) #106213
-lhfl_census4 <- subset(LHfl, census == "census_2007_08"); dim(lhfl_census4) #106213
-
-t1dbh <- select(lhfl_census1, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat1 <- left_join(lhfl_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-lhfl_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(lhfl_census2, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat2 <- left_join(lhfl_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-lhfl_census3$dbh <- temp_dat2$dbh.x
-
-t3dbh <- select(lhfl_census3, stemID, dbh)
-
-# add previous census dbh to next census
-temp_dat3 <- left_join(lhfl_census4, t3dbh, by = "stemID"); dim(temp_dat3)
-summary(temp_dat3$dbh.x)
-temp_dat3$dbh.x <- ifelse(temp_dat3$DFstatus == "A" & is.na(temp_dat3$dbh.x), temp_dat3$dbh.y, temp_dat3$dbh.x)
-summary(temp_dat3$dbh.x); dim(temp_dat3)
-# reassign to original dat
-lhfl_census4$dbh <- temp_dat3$dbh.x
-
-# rbind into single site again
-dim(LHfl)
-LHfl <- rbind(lhfl_census1, lhfl_census2, lhfl_census3, lhfl_census4)
-dim(LHfl)
-
-LHfl_update <- subset(LHfl, DFstatus == "D")
-table(LHfl_update$DFstatus)
-summary(LHfl_update$dbh)
-#---------------------------------------------------------------------------------------------#
-
-
-
-#---------------------------------------------------------------------------------------------#
-# ForestPlots.net dead trees are mostly == 0 DBH
-#---------------------------------------------------------------------------------------------#
-# do for each set of censuses (Dead at census 2 & census 3)
-#---------------------------------------------------------------------------------------------#
-spka9_census1 <- subset(SPKA, census == "09_census_2001"); dim(spka9_census1) #4503
-spka9_census2 <- subset(SPKA, census == "09_census_2009"); dim(spka9_census2) #4503
-spka9_census3 <- subset(SPKA, census == "09_census_2014"); dim(spka9_census3) #4503
-
-spka10_census1 <- subset(SPKA, census == "10_census_2001"); dim(spka10_census1) #4341
-spka10_census2 <- subset(SPKA, census == "10_census_2009"); dim(spka10_census2) #4341
-spka10_census3 <- subset(SPKA, census == "10_census_2014"); dim(spka10_census3) #4341
-
-t1dbh <- select(spka9_census1, stemID, dbh)
-# add previous census dbh to next census
-temp_dat1 <- left_join(spka9_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-spka9_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(spka9_census2, stemID, dbh)
-# add previous census dbh to next census
-temp_dat2 <- left_join(spka9_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-spka9_census3$dbh <- temp_dat2$dbh.x
-
-
-t1dbh <- select(spka10_census1, stemID, dbh)
-# add previous census dbh to next census
-temp_dat1 <- left_join(spka10_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-spka10_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(spka10_census2, stemID, dbh)
-# add previous census dbh to next census
-temp_dat2 <- left_join(spka10_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-spka10_census3$dbh <- temp_dat2$dbh.x
-
-# rbind into single site again
-SPKA <- rbind(spka9_census1, spka9_census2, spka9_census3, spka10_census1, spka10_census2, spka10_census3)
-
-SPKA_update <- subset(SPKA, DFstatus != "A")
-table(SPKA_update$DFstatus)
-summary(SPKA_update$dbh)
-#---------------------------------------------------------------------------------------------#
-
-#---------------------------------------------------------------------------------------------#
-spks8_census1 <- subset(SPKS, census == "08_census_2001"); dim(spks8_census1) #6274
-spks8_census2 <- subset(SPKS, census == "08_census_2009"); dim(spks8_census2) #6274
-spks8_census3 <- subset(SPKS, census == "08_census_2014"); dim(spks8_census3) #6274
-
-t1dbh <- select(spks8_census1, stemID, dbh)
-# add previous census dbh to next census
-temp_dat1 <- left_join(spks8_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-spks8_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(spks8_census2, stemID, dbh)
-# add previous census dbh to next census
-temp_dat2 <- left_join(spks8_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-spks8_census3$dbh <- temp_dat2$dbh.x
-
-# rbind into single site again
-SPKS <- rbind(spks8_census1, spks8_census2, spks8_census3)
-
-SPKS_update <- subset(SPKS, DFstatus != "A")
-table(SPKS_update$DFstatus)
-summary(SPKS_update$dbh)
-#---------------------------------------------------------------------------------------------#
-
-
-#---------------------------------------------------------------------------------------------#
-spkh4_census1 <- subset(SPKH, census == "04_census_2001"); dim(spkh4_census1) #6532
-spkh4_census2 <- subset(SPKH, census == "04_census_2008"); dim(spkh4_census2) #6532
-spkh4_census3 <- subset(SPKH, census == "04_census_2014"); dim(spkh4_census3) #6532
-
-spkh5_census1 <- subset(SPKH, census == "05_census_2001"); dim(spkh5_census1) #8413
-spkh5_census2 <- subset(SPKH, census == "05_census_2008"); dim(spkh5_census2) #8413
-spkh5_census3 <- subset(SPKH, census == "05_census_2014"); dim(spkh5_census3) #8413
-
-spkh30_census1 <- subset(SPKH, census == "30_census_2001"); dim(spkh30_census1) #9420
-spkh30_census2 <- subset(SPKH, census == "30_census_2010"); dim(spkh30_census2) #9420
-spkh30_census3 <- subset(SPKH, census == "30_census_2015"); dim(spkh30_census3) #9420
-
-t1dbh <- select(spkh4_census1, stemID, dbh)
-# add previous census dbh to next census
-temp_dat1 <- left_join(spkh4_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-spkh4_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(spkh4_census2, stemID, dbh)
-# add previous census dbh to next census
-temp_dat2 <- left_join(spkh4_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-spkh4_census3$dbh <- temp_dat2$dbh.x
-
-
-t1dbh <- select(spkh5_census1, stemID, dbh)
-# add previous census dbh to next census
-temp_dat1 <- left_join(spkh5_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-spkh5_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(spkh5_census2, stemID, dbh)
-# add previous census dbh to next census
-temp_dat2 <- left_join(spkh5_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-spkh5_census3$dbh <- temp_dat2$dbh.x
-
-
-t1dbh <- select(spkh30_census1, stemID, dbh)
-# add previous census dbh to next census
-temp_dat1 <- left_join(spkh30_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-spkh30_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(spkh30_census2, stemID, dbh)
-# add previous census dbh to next census
-temp_dat2 <- left_join(spkh30_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-spkh30_census3$dbh <- temp_dat2$dbh.x
-
-# rbind into single site again
-SPKH <- rbind(spkh4_census1, spkh4_census2, spkh4_census3, 
-              spkh5_census1, spkh5_census2, spkh5_census3,
-              spkh30_census1, spkh30_census2, spkh30_census3)
-
-SPKH_update <- subset(SPKH, DFstatus != "A")
-table(SPKH_update$DFstatus)
-summary(SPKH_update$dbh)
-#---------------------------------------------------------------------------------------------#
-
-#---------------------------------------------------------------------------------------------#
-dnm1_census1 <- subset(DNM1, census == "01_census_2006"); dim(dnm1_census1) #453
-dnm1_census2 <- subset(DNM1, census == "01_census_2013"); dim(dnm1_census2) #453
-dnm1_census3 <- subset(DNM1, census == "01_census_2016"); dim(dnm1_census3) #453
-
-t1dbh <- select(dnm1_census1, stemID, dbh)
-# add previous census dbh to next census
-temp_dat1 <- left_join(dnm1_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-dnm1_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(dnm1_census2, stemID, dbh)
-# add previous census dbh to next census
-temp_dat2 <- left_join(dnm1_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-dnm1_census3$dbh <- temp_dat2$dbh.x
-
-# rbind into single site again
-DNM1 <- rbind(dnm1_census1, dnm1_census2, dnm1_census3)
-
-DNM1_update <- subset(DNM1, DFstatus != "A")
-table(DNM1_update$DFstatus)
-summary(DNM1_update$dbh)
-#---------------------------------------------------------------------------------------------#
-
-#---------------------------------------------------------------------------------------------#
-dnm2_census1 <- subset(DNM2, census == "02_census_2006"); dim(dnm2_census1) #529
-dnm2_census2 <- subset(DNM2, census == "02_census_2013"); dim(dnm2_census2) #529
-dnm2_census3 <- subset(DNM2, census == "02_census_2016"); dim(dnm2_census3) #529
-
-t1dbh <- select(dnm2_census1, stemID, dbh)
-# add previous census dbh to next census
-temp_dat1 <- left_join(dnm2_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-dnm2_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(dnm2_census2, stemID, dbh)
-# add previous census dbh to next census
-temp_dat2 <- left_join(dnm2_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-dnm2_census3$dbh <- temp_dat2$dbh.x
-
-# rbind into single site again
-DNM2 <- rbind(dnm2_census1, dnm2_census2, dnm2_census3)
-
-DNM2_update <- subset(DNM2, DFstatus != "A")
-table(DNM2_update$DFstatus)
-summary(DNM2_update$dbh)
-#---------------------------------------------------------------------------------------------#
-
-#---------------------------------------------------------------------------------------------#
-dnm3_census1 <- subset(DNM3, census == "03_census_2006"); dim(dnm3_census1) #536
-dnm3_census2 <- subset(DNM3, census == "03_census_2013"); dim(dnm3_census2) #536
-dnm3_census3 <- subset(DNM3, census == "03_census_2016"); dim(dnm3_census3) #536
-
-t1dbh <- select(dnm3_census1, stemID, dbh)
-# add previous census dbh to next census
-temp_dat1 <- left_join(dnm3_census2, t1dbh, by = "stemID"); dim(temp_dat1)
-summary(temp_dat1$dbh.x)
-temp_dat1$dbh.x <- ifelse(temp_dat1$DFstatus == "A" & is.na(temp_dat1$dbh.x), temp_dat1$dbh.y, temp_dat1$dbh.x)
-summary(temp_dat1$dbh.x); dim(temp_dat1)
-# reassign to original dat
-dnm3_census2$dbh <- temp_dat1$dbh.x
-
-t2dbh <- select(dnm3_census2, stemID, dbh)
-# add previous census dbh to next census
-temp_dat2 <- left_join(dnm3_census3, t2dbh, by = "stemID"); dim(temp_dat2)
-summary(temp_dat2$dbh.x)
-temp_dat2$dbh.x <- ifelse(temp_dat2$DFstatus == "A" & is.na(temp_dat2$dbh.x), temp_dat2$dbh.y, temp_dat2$dbh.x)
-summary(temp_dat2$dbh.x); dim(temp_dat2)
-# reassign to original dat
-dnm3_census3$dbh <- temp_dat2$dbh.x
-
-# rbind into single site again
-DNM3 <- rbind(dnm3_census1, dnm3_census2, dnm3_census3)
-
-DNM3_update <- subset(DNM3, DFstatus != "A")
-table(DNM3_update$DFstatus)
-summary(DNM3_update$dbh)
-#---------------------------------------------------------------------------------------------#
-
 
 
 #---------------------------------------------------------------------------------------------#
@@ -1651,14 +1245,16 @@ summary(DNM3_update$dbh)
 # order based on annual increment and exclude top and bottom 0.5% 
 # plot and check, use that to bind to others for full dataset
 #---------------------------------------------------------------------------------------------#
+DNM50 <- DNM
+
 table(DNM50$census)
 table(DNM50$DFstatus)
 
-DNM50_dead <- filter(DNM50, DFstatus == "D" | DFstatus == "missing")
-DNM50_alive <- filter(DNM50, DFstatus == "A" | DFstatus == "B")
+DNM50_exclude <- filter(DNM50, DFstatus == "D" | DFstatus == "missing" | DFstatus == "B")
+DNM50_include <- filter(DNM50, DFstatus == "A")
 
-census1 <- filter(DNM50_alive, census == "census_2011_15")
-census2 <- filter(DNM50_alive, census == "census_2019")
+census1 <- filter(DNM50_include, census == "census_2011_15")
+census2 <- filter(DNM50_include, census == "census_2019")
 
 # check the number of unique stems in each dataset and compare between datasets
 length(unique(census1$stemID)); dim(census1)
@@ -1681,17 +1277,20 @@ summary(DNM50_2011_2019$relative_gr)
 quantile(DNM50_2011_2019$relative_gr, 0.9999, na.rm=T)
 
 #---------------------------------------------------------------------------------------------#
-p99 <- quantile(DNM50_2011_2019$relative_gr, prob=0.995, na.rm=T); p99
-p01 <- quantile(DNM50_2011_2019$relative_gr, prob=0.015, na.rm=T); p01
+p99 <- quantile(DNM50_2011_2019$relative_gr, prob=0.99, na.rm=T); p99
+p01 <- quantile(DNM50_2011_2019$relative_gr, prob=0.01, na.rm=T); p01
 # set aside stems to remove: 
-DNM50_cleaned <- filter(DNM50_2011_2019, relative_gr < p99 & relative_gr > p01)
+DNM50_drop <- filter(DNM50_2011_2019, relative_gr > p99 | relative_gr < p01)
+DNM50_cleaned <- DNM50_2011_2019[!DNM50_2011_2019$stemID %in% DNM50_drop$stemID, ] 
+
+dim(DNM50_2011_2019); dim(DNM50_cleaned); dim(DNM50_drop)
 
 dim(DNM50_2011_2019) 
 dim(DNM50_cleaned)
 dim(DNM50_2011_2019)[[1]] - dim(DNM50_cleaned)[[1]]
 dim(DNM50_cleaned)[[1]]/dim(DNM50_2011_2019)[[1]]*100
 #---------------------------------------------------------------------------------------------#
-# 5146 stems removed (98.0% stems retained) 
+# 4368 stems removed (98% stems retained) 
 #---------------------------------------------------------------------------------------------#
 
 # take a look at the values
@@ -1714,16 +1313,25 @@ plot(DNM50_cleaned$dbh.x,DNM50_cleaned$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 #---------------------------------------------------------------------------------------------#
-DNM50_census1 <- DNM50_cleaned[,c(1:21)] 
-DNM50_census2 <- DNM50_cleaned[,c(22:29,9,30:41)]
-colnames(DNM50_census1) <- colnames(DNM50)
-colnames(DNM50_census2) <- colnames(DNM50)
+#DNM50_census1 <- DNM50_cleaned[,c(1:21)] 
+#DNM50_census2 <- DNM50_cleaned[,c(22:29,9,30:41)]
+#colnames(DNM50_census1) <- colnames(DNM50)
+#colnames(DNM50_census2) <- colnames(DNM50)
+
+DNM50_include_keep <- DNM50_include[!DNM50_include$stemID %in% DNM50_drop$stemID, ] 
 
 # bind alive census1 & census2 AND bind dead and missing stems back in
-DNM50_v2 <- rbind(DNM50_census1, DNM50_census2, DNM50_dead)
+DNM50_v2 <- rbind(DNM50_include_keep, DNM50_exclude)
 
 head(DNM50_v2) 
 table(DNM50_v2$DFstatus)
+summary(DNM50_v2$dbh)
+
+dnm1 <- subset(DNM50_v2, site == "DNM50" & census == "census_2011_15")
+dnm2 <- subset(DNM50_v2, site == "DNM50" & census == "census_2019")
+table(dnm1$DFstatus); table(dnm2$DFstatus)
+
+
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
@@ -1977,6 +1585,9 @@ table(second_clean_dat$site)
 #---------------------------------------------------------------------------------------------#
 danum_50_ha <- filter(second_clean_dat, site == "DNM50")
 table(danum_50_ha$DFstatus)
+dnm1 <- subset(danum_50_ha, site == "DNM50" & census == "census_2011_15")
+dnm2 <- subset(danum_50_ha, site == "DNM50" & census == "census_2019")
+table(dnm1$DFstatus); table(dnm2$DFstatus)
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
