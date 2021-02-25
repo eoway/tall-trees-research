@@ -14,7 +14,6 @@ library(janitor)
 #---------------------------------------------------------------------------------------------#
 # Load data                                                                                   # 
 #---------------------------------------------------------------------------------------------#
-#data <- read_csv(here("Desktop", "Research", "R", "Data", "data_first_clean.csv"))
 data <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv")
 
 clean_dat <-rename(data, date = JulianDate, status = DFstatus)
@@ -23,6 +22,7 @@ clean_dat <-rename(data, date = JulianDate, status = DFstatus)
 head(clean_dat)
 summary(clean_dat)
 table(clean_dat$status)
+
 #---------------------------------------------------------------------------------------------#
 # Separate by plot
 #---------------------------------------------------------------------------------------------#
@@ -781,10 +781,6 @@ SPKS8_keep <- rbind(SPKS801_keep, SPKS809_keep, SPKS814_keep)
 #---------------------------------------------------------------------------------------------#
 # Combine all plots
 #---------------------------------------------------------------------------------------------#
-
-#LHP_2 <- select(LHP_keep, X1, plot_x, plot_y, hom, quadrat, family, genus, species, treeID, stemID, dbh, Date, date, status, IDlevel, site, census, plot, Shade.Tol, soil, stem_BA, mean_wd)
-#cleandata <- rbind(LHP_2, DNM50, DNM1, DNM2, DNM3, SPKA9, SPKA10, SPKH4, SPKH5, SPKH30, SPKS8)
-
 cleandata <- rbind(LHP_keep, DNM50_keep, DNM1_keep, DNM2_keep, DNM3_keep, SPKA9_keep,
                    SPKA10_keep, SPKH4_keep, SPKH5_keep, SPKH30_keep, SPKS8_keep)
 cleandata$dbh <- ifelse(cleandata$dbh == '-Inf',NA, cleandata$dbh)
@@ -793,7 +789,6 @@ cleandata$dbh <- ifelse(cleandata$dbh == '-Inf',NA, cleandata$dbh)
 #---------------------------------------------------------------------------------------------#
 dim(clean_dat) # 2739063 - original
 dim(cleandata) # 2246092 - reduced
-#dim(cleandata)[[1]] - length(tree_IDs_remove) # 630246
 #---------------------------------------------------------------------------------------------#
 
 table(cleandata$status)
