@@ -1,9 +1,9 @@
 ## Preliminary cleaning of ForestGEO and ForestPlots inventory data and export 
-## 01-20-2021
+## 02-24-2021
 
 #---------------------------------------------------------------------------------------------#
-# ForestGEO    :  Danum, Lambir, (Pasoh eventually)
-# ForestPlots  :  Sepilok, Danum, (Allpahuayo, Cicra eventually)
+# ForestGEO    :  Danum (50-ha), Lambir (52-ha)                                               #
+# ForestPlots  :  Sepilok Alluvial/Sandstone/Heath (each 4-ha), Danum 1/2/3 (each 1-ha)       #
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
@@ -19,10 +19,7 @@
 # remove DNM50 outliers: remove the 0.5% stems w extreme high and low relative growth rate
 # check for duplicates
 
-# fill in DBH for alive [not dead/broken below?] stems from previous census if NA or 0
-
-
-# TO DO: convert stems to trees??
+# output data at stem level - not tree level
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
@@ -52,12 +49,6 @@ tax <- read_tsv("Harvard/Plot_Data/CTFS_ForestGEO/Data/TaxonomyReport02-14-2019_
 #---------------------------------------------------------------------------------------------#
 table(dnm1$Status); table(dnm2$Status)
 #---------------------------------------------------------------------------------------------#
-
-# test <- pick_main_stem(dnm1)
-# table(test$Status)
-# 
-# test2 <- pick_main_stem(dnm2)
-# table(test2$Status)
 
 #----------------------------------------- LAMBIR data ---------------------------------------# 
 # four censuses (data collected ~1991, 1997, 2003, and 2007/08)
@@ -211,15 +202,6 @@ lhp4$plot <- ifelse(lhp4$soil == "Clay", "LH_clay", ifelse(lhp4$soil == "Sandy_l
 #---------------------------------------------------------------------------------------------#
 dnm1$dbh <- dnm1$DBH*0.1
 dnm2$dbh <- dnm2$DBH*0.1
-#---------------------------------------------------------------------------------------------#
-# ## double trunks == 8.5% of trees in Danum (21808/256713)
-# # test <- dnm1 %>% group_by(treeID) %>% dplyr::summarize(n_stems=n(), 
-# #                                                dbh = sum(dbh))
-# test <- dnm2 %>% group_by(treeID) %>% dplyr::summarize(n_stems=n(), 
-#                                                        dbh = sum(dbh))
-# par(mfrow=c(1,2))
-# boxplot(log(dnm2$dbh))
-# boxplot(log(test$dbh))
 #---------------------------------------------------------------------------------------------#
 
 
@@ -462,69 +444,6 @@ colnames(ForestGEO) <- c("plot_x","plot_y","hom","quadrat","tag","sp","family","
                      "Shade.Tol","soil")
 #---------------------------------------------------------------------------------------------#
 
-#---------------------------------------------------------------------------------------------#
-# Check mortality rates at Danum & Lambir
-#---------------------------------------------------------------------------------------------#
-# dnm1_select <- filter(DNM50, census == "census_2011_15")
-# dnm2_select <- filter(DNM50, census == "census_2019")
-# 
-# dnm1_main_stem <- pick_main_stem(dnm1_select)
-# dnm2_main_stem <- pick_main_stem(dnm2_select)
-# 
-# colnames(dnm1_main_stem)[14:15] <- c("date","status")
-# colnames(dnm2_main_stem)[14:15] <- c("date","status")
-# 
-# dnm1_main_stem$status <- gsub("alive","A",dnm1_main_stem$status)
-# dnm2_main_stem$status <- gsub("alive","A",dnm2_main_stem$status)
-# dnm1_main_stem$status <- gsub("dead","D",dnm1_main_stem$status)
-# dnm2_main_stem$status <- gsub("dead","D",dnm2_main_stem$status)
-# 
-# lhp1_main_stem <- pick_main_stem(lhp1_select)
-# lhp2_main_stem <- pick_main_stem(lhp2_select)
-# lhp3_main_stem <- pick_main_stem(lhp3_select)
-# lhp4_main_stem <- pick_main_stem(lhp4_select)
-# 
-# colnames(lhp1_main_stem)[14:15] <- c("date","status")
-# colnames(lhp2_main_stem)[14:15] <- c("date","status")
-# colnames(lhp3_main_stem)[14:15] <- c("date","status")
-# colnames(lhp4_main_stem)[14:15] <- c("date","status")
-# 
-# lhp1_main_stem$status <- gsub("alive","A",lhp1_main_stem$status)
-# lhp2_main_stem$status <- gsub("alive","A",lhp2_main_stem$status)
-# lhp3_main_stem$status <- gsub("alive","A",lhp3_main_stem$status)
-# lhp4_main_stem$status <- gsub("alive","A",lhp4_main_stem$status)
-# 
-# lhp1_main_stem$status <- gsub("broken below","A",lhp1_main_stem$status)
-# lhp2_main_stem$status <- gsub("broken below","A",lhp2_main_stem$status)
-# lhp3_main_stem$status <- gsub("broken below","A",lhp3_main_stem$status)
-# lhp4_main_stem$status <- gsub("broken below","A",lhp4_main_stem$status)
-# 
-# lhp1_main_stem$status <- gsub("dead","D",lhp1_main_stem$status)
-# lhp2_main_stem$status <- gsub("dead","D",lhp2_main_stem$status)
-# lhp3_main_stem$status <- gsub("dead","D",lhp3_main_stem$status)
-# lhp4_main_stem$status <- gsub("dead","D",lhp4_main_stem$status)
-# 
-# lhp1_main_stem_gt1 <- subset(lhp1_main_stem, dbh > 1)
-# lhp2_main_stem_gt1 <- subset(lhp2_main_stem, dbh > 1)
-# lhp3_main_stem_gt1 <- subset(lhp3_main_stem, dbh > 1)
-# lhp4_main_stem_gt1 <- subset(lhp4_main_stem, dbh > 1)
-# 
-# 
-# mort1 <- mortality_ctfs(dnm1_main_stem, dnm2_main_stem) 
-# mort1$rate*100; mort1$lower*100; mort1$upper*100
-# 
-# mort1 <- mortality_ctfs(lhp1_main_stem, lhp2_main_stem) 
-# mort1$rate*100; mort1$lower*100; mort1$upper*100
-# 
-# mort2 <- mortality_ctfs(lhp2_main_stem, lhp3_main_stem) 
-# mort2$rate*100; mort2$lower*100; mort2$upper*100
-# 
-# mort3 <- mortality_ctfs(lhp3_main_stem, lhp4_main_stem) 
-# mort3$rate*100; mort3$lower*100; mort3$upper*100
-# 
-# mort1$rate*100; mort2$rate*100; mort3$rate*100
-# 
-# mean(c(mort1$rate, mort2$rate, mort3$rate))
 
 #---------------------------------------------------------------------------------------------#
 # calculate stem_BA
@@ -1137,41 +1056,6 @@ firstcleandata$DFstatus <- gsub("AAssAA", "missing", firstcleandata$DFstatus)
 table(firstcleandata$DFstatus)
 #---------------------------------------------------------------------------------------------#
 
-# test <- subset(firstcleandata, site == "LHP")
-# table(test$DFstatus)
-# census1 <- subset(test, census == "census_1991")
-# census2 <- subset(test, census == "census_1997")
-# census3 <- subset(test, census == "census_2003")
-# census4 <- subset(test, census == "census_2007_08")
-# table(census1$DFstatus)
-# table(census2$DFstatus)
-# table(census3$DFstatus)
-# table(census4$DFstatus)
-
-#---------------------------------------------------------------------------------------------#
-# Previous version
-#---------------------------------------------------------------------------------------------#
-# # firstcleandata$DFstatus <- gsub("0", "y", firstcleandata$DFstatus)
-# # firstcleandata$DFstatus <- gsub("dead", "y", firstcleandata$DFstatus)
-# firstcleandata$DFstatus<- gsub("broken below", "yy", firstcleandata$DFstatus)
-# firstcleandata$DFstatus <- gsub("^b.*", "yy", firstcleandata$DFstatus)
-# #---------------------------------------------------------------------------------------------#
-# # Prior = a stem that is not in the current census, but will appear in a future census. 
-# #---------------------------------------------------------------------------------------------#
-# firstcleandata$DFstatus <- gsub("prior", "yyy", firstcleandata$DFstatus) # EO EDIT - for lambir
-# firstcleandata$DFstatus <- gsub("stem_gone", "yyy", firstcleandata$DFstatus) # EO EDIT - for lambir
-# firstcleandata$DFstatus <- gsub("missing", "yyy", firstcleandata$DFstatus)
-# 
-# firstcleandata$DFstatus<- gsub("[^y]+", "A", firstcleandata$DFstatus)
-# firstcleandata$DFstatus <- gsub("yyy","missing", firstcleandata$DFstatus)
-# firstcleandata$DFstatus<- gsub("yy", "B", firstcleandata$DFstatus)
-# firstcleandata$DFstatus <- gsub("y", "D", firstcleandata$DFstatus)
-# 
-# table(firstcleandata$DFstatus)
-#---------------------------------------------------------------------------------------------#
-#---------------------------------------------------------------------------------------------#
-
-
 
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
@@ -1191,7 +1075,7 @@ DNM2 <- subset(firstcleandata, site == "DNM2"); table(DNM2$DFstatus)
 DNM3 <- subset(firstcleandata, site == "DNM3"); table(DNM3$DFstatus)
 DNM  <- subset(firstcleandata, site == "DNM50"); table(DNM$DFstatus)
 
-## ????? DO THIS FOR ALL ??????
+## ?? DO THIS FOR ALL SITES (including ForestGEO) ??
 
 # convert all DBH to NA for all ForestPlots where DFstatus == D & DBH == 0
 dat_D <- subset(SPKA, DFstatus == "D"); table(dat_D$DFstatus)
@@ -1227,13 +1111,7 @@ DNM3 <- rbind(dat_D, dat_notD)
 
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
-# SKIP FROM HERE.................
-#---------------------------------------------------------------------------------------------#
-#---------------------------------------------------------------------------------------------#
-
-#---------------------------------------------------------------------------------------------#
-#---------------------------------------------------------------------------------------------#
-# TO HERE.................
+#                         INSERT DBH == NA FILLING HERE IF NEEDED                             #
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
@@ -1313,10 +1191,6 @@ plot(DNM50_cleaned$dbh.x,DNM50_cleaned$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 #---------------------------------------------------------------------------------------------#
-#DNM50_census1 <- DNM50_cleaned[,c(1:21)] 
-#DNM50_census2 <- DNM50_cleaned[,c(22:29,9,30:41)]
-#colnames(DNM50_census1) <- colnames(DNM50)
-#colnames(DNM50_census2) <- colnames(DNM50)
 
 DNM50_include_keep <- DNM50_include[!DNM50_include$stemID %in% DNM50_drop$stemID, ] 
 
@@ -1330,8 +1204,6 @@ summary(DNM50_v2$dbh)
 dnm1 <- subset(DNM50_v2, site == "DNM50" & census == "census_2011_15")
 dnm2 <- subset(DNM50_v2, site == "DNM50" & census == "census_2019")
 table(dnm1$DFstatus); table(dnm2$DFstatus)
-
-
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
@@ -1592,7 +1464,5 @@ table(dnm1$DFstatus); table(dnm2$DFstatus)
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
-#write.csv(firstcleandata, "G:/My Drive/Harvard/Emergent_project/Data/data_first_clean.csv")
-#write.csv(firstcleandata, "G:/My Drive/Harvard/Plot_Data/clean_inventory_data/data_first_clean.csv")
 write.csv(second_clean_dat, "G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv")
 #---------------------------------------------------------------------------------------------#
