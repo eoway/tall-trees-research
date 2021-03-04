@@ -14,15 +14,14 @@ Borneo tall trees research using ForestGEO and ForestPlots inventory data and Gl
 Data cleaning is separated into N(4) different data cleaning protocols: 
 
 - main_dat  (see clean_main_dat.R)
-  - combine taxonomic infor and clean
+  - combine taxonomic info and clean
   - calculate and fill Julian dates
   - add/modify columns and factors for consistency across datasets
   - join wood density from Global Wood Density Database (GWDD) with ForestGEO data by species
   - convert 'unknown' spp to 'indet'
   - update DFstatus
   - remove Danum 50-ha outliers based on stems with extreme relative growth rates 
-  - fill DBH for all [not just alive] stems using DBH from previous census (where DBH == NA or 0)
- 
+  
 - growth_dat  (see clean_growth_dat.R)
 	- all: 
 		- retain only live stems

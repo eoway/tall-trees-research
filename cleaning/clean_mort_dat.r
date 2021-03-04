@@ -14,7 +14,6 @@ library(janitor)
 #---------------------------------------------------------------------------------------------#
 # Load data                                                                                   # 
 #---------------------------------------------------------------------------------------------#
-#data <- read_csv(here("Desktop", "Research", "R", "Data", "data_first_clean.csv"))
 data <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv")
 
 clean_dat <-rename(data, date = JulianDate, status = DFstatus)
@@ -23,13 +22,22 @@ clean_dat <-rename(data, date = JulianDate, status = DFstatus)
 head(clean_dat)
 summary(clean_dat)
 table(clean_dat$status)
+
 #---------------------------------------------------------------------------------------------#
 # Separate by plot
 #---------------------------------------------------------------------------------------------#
 table(clean_dat$plot)
 
-DNM50  <- filter(clean_dat, plot == "DNM50_FGEO")
 LHP52  <- filter(clean_dat, plot == "LH_clay" | plot == "LH_fineLoam" | plot == "LH_loam" | plot == "LH_sandstone")
+DNM50  <- filter(clean_dat, plot == "DNM50_FGEO")
+table(DNM50$status)
+
+#---------------------------------------------------------------------------------------------#
+DNM_c1 <- subset(DNM50, census == "census_2011_15")
+DNM_c2 <- subset(DNM50, census == "census_2019")
+# THESE SHOULDN'T HAVE THE SAME NUMBER OF ALIVE TREES IN EACH CENSUS 
+table(DNM_c1$status); table(DNM_c2$status)
+#---------------------------------------------------------------------------------------------#
 
 DNM1   <- filter(clean_dat, plot == "DNM1_01")
 DNM2   <- filter(clean_dat, plot == "DNM2_02")
@@ -770,49 +778,25 @@ SPKS8_keep <- rbind(SPKS801_keep, SPKS809_keep, SPKS814_keep)
 #---------------------------------------------------------------------------------------------#
 
 
-
 #---------------------------------------------------------------------------------------------#
 # Combine all plots
 #---------------------------------------------------------------------------------------------#
-
-#LHP_2 <- select(LHP_keep, X1, plot_x, plot_y, hom, quadrat, family, genus, species, treeID, stemID, dbh, Date, date, status, IDlevel, site, census, plot, Shade.Tol, soil, stem_BA, mean_wd)
-#cleandata <- rbind(LHP_2, DNM50, DNM1, DNM2, DNM3, SPKA9, SPKA10, SPKH4, SPKH5, SPKH30, SPKS8)
-
 cleandata <- rbind(LHP_keep, DNM50_keep, DNM1_keep, DNM2_keep, DNM3_keep, SPKA9_keep,
                    SPKA10_keep, SPKH4_keep, SPKH5_keep, SPKH30_keep, SPKS8_keep)
+cleandata$dbh <- ifelse(cleandata$dbh == '-Inf',NA, cleandata$dbh)
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
-# #removal_ID <- read_csv(here("Desktop", "Research", "R", "Data", "removal_IDS.csv"))
-# removal_ID <- read_csv("G:/My Drive/Harvard/Emergent_project/Data/removal_IDS.csv")
-# DNM50_removal_ID <- read_csv("G:/My Drive/Harvard/Emergent_project/Data/DNM50_removal_IDS.csv")
-# 
-# removal_ID$new_ID <- with(removal_ID, paste0(stemID, plot.x))
-# tree_IDs_remove <- removal_ID$new_ID
-# cleandata$new_ID <- with(cleandata, paste0(stemID, plot))
-# 
-# str(cleandata$new_ID)
-# str(tree_IDs_remove)
-# 
-# withremoval <- cleandata[!cleandata$new_ID %in% tree_IDs_remove, ] 
-# 
-# SPKA <- subset(withremoval, site == "SPKA"); table(SPKA$DFstatus)
-# SPKS <- subset(withremoval, site == "SPKS"); table(SPKS$DFstatus)
-# SPKH <- subset(withremoval, site == "SPKH"); table(SPKH$DFstatus)
-# DNM50 <- subset(withremoval, site == "DNM50"); table(SPKH$DFstatus)
-# summary(DNM50$dbh)
-# LHP <- subset(cleandata, site == "LHP"); table(LHP$DFstatus)
-#---------------------------------------------------------------------------------------------#
-#dim(cleandata)[[1]] - length(tree_IDs_remove) # 630246
-#---------------------------------------------------------------------------------------------#
-
-#---------------------------------------------------------------------------------------------#
-dim(clean_dat) # 2699589 - original
-dim(cleandata) # 2217712 - reduced
-#dim(cleandata)[[1]] - length(tree_IDs_remove) # 630246
+dim(clean_dat) # 2739063 - original
+dim(cleandata) # 2246092 - reduced
 #---------------------------------------------------------------------------------------------#
 
 table(cleandata$status)
+
+#---------------------------------------------------------------------------------------------#
+danum_50_ha <- filter(cleandata, site == "DNM50" & census == "census_2019")
+table(danum_50_ha$status)
+#---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
 write.csv(cleandata, "G:/My Drive/Harvard/Plot_Data/clean_inventory_data/mort_dat.csv")
