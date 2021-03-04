@@ -626,9 +626,6 @@ size1 <- DNM3_2013_2016$dbh.x
 DNM3_2013_2016$annual_increment <- (size2 - size1)/time
 DNM3_2013_2016$relative_gr      <- (log(size2) - log(size1))/time
 
-DNM3_2013_2016 <- filter(DNM3_2013_2016, DNM3_2013_2016$annual_increment >= 0
-                         & DNM3_2013_2016$annual_increment < 7.5)
-
 
 summary(DNM3_2013_2016$annual_increment)
 summary(DNM3_2013_2016$relative_gr)
@@ -647,7 +644,7 @@ plot(DNM3_2013_2016$dbh.x, DNM3_2013_2016$dbh.y, pch=19,
 abline(0,1, col="red", lwd=2) 
 
 #DNM3 Large interval --------
-DNM3 <- filter(growdata, plot == "DNM3_03" )
+DNM3 <- filter(growdata, plot == "DNM3_03")
 table(DNM3$censusID)
 
 DNM306  <- filter(DNM3, censusID == "03_census_2006")
@@ -664,23 +661,6 @@ census1 <- rbind(DNM306, DNM3131)
 census2 <- rbind(DNM3132, DNM316)
 
 DNM3_2006_2016 <- inner_join(census1, census2, by="pool_stem_ID")
-dim(DNM3_2006_2016) 
-dim(census1)
-dim(census2)
-dim(DNM1)
-dim(DNM1131)
-head(DNM3_2006_2016)
-table(DNM3_2006_2016$censusID.x)
-table(DNM3_2006_2016$censusID.y)
-# notice that in 'SPKS08_2001_2009' dbh.x is dbh at census 1 and dbh.y is dbh at census 2
-
-# check the number of unique stems in each dataset and compare between datasets
-length(unique(census1$stemID)); dim(census1)
-length(unique(census2$stemID)); dim(census2)
-
-# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
-DNM3_2006_2016 <- inner_join(census1, census2, by="stemID")
-dim(DNM3_2006_2016) 
 
 # calculate time difference and convert time from days to years  
 time <- (DNM3_2006_2016$date.y-DNM3_2006_2016$date.x)/365
