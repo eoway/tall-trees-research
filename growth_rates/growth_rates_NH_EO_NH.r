@@ -4,34 +4,9 @@ library(tidyverse)
 library(here)
 library(skimr)
 #Load Data----------
-data <- read_csv(here("Desktop", "Research", "R", "Data", "data_first_clean.csv"))
-#data <- read_csv("G:/My Drive/Harvard/Emergent_project/Data/data_first_clean.csv")
+growdata <- read_csv(here("Elsa Clean", "growth_dat.csv"))
 
-colnames(data)
-growdata <-rename (data, censusID = census, dbh = dbh, date = JulianDate, status = DFstatus)
-colnames(growdata)
-
-#Update DFstatus---------
-library(stringr)
-
-growdata$status <- gsub("0", "y", growdata$status)
-growdata$status <- gsub("dead", "y", growdata$status)
-growdata$status<- gsub("broken below", "yy", growdata$status)
-growdata$status <- gsub("^b.*", "yy", growdata$status)
-growdata$status <- gsub("missing", "yyy", growdata$status)
-
-growdata$status<- gsub("[^y]+", "A", growdata$status)
-
-growdata$status <- gsub("yyy","missing", growdata$status)
-growdata$status<- gsub("yy", "B", growdata$status)
-growdata$status <- gsub("y", "D", growdata$status)
-
-table(growdata$status)
-table(data$DFstatus)
-
-growdata$hom <- rep(130, length(growdata$dbh));
-
-growdata <- filter(growdata, status == "A")
+growdata <- filter(growdata, dbh >= 10)
 
 #SPKS08 first interval------------
 
@@ -65,8 +40,7 @@ size1 <- SPKS08_2001_2009$dbh.x
 SPKS08_2001_2009$annual_increment <- (size2 - size1)/time
 SPKS08_2001_2009$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKS08_2001_2009 <- filter(SPKS08_2001_2009, SPKS08_2001_2009$annual_increment >= 0
-                           & SPKS08_2001_2009$annual_increment < 7.5)
+
 summary(SPKS08_2001_2009)
 # take a look at the values - how do these compare to values and distributions in Condit et al 2006?
 summary(SPKS08_2001_2009$annual_increment)
@@ -117,8 +91,6 @@ size1 <- SPKS08_2009_2014$dbh.x
 SPKS08_2009_2014$annual_increment <- (size2 - size1)/time
 SPKS08_2009_2014$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKS08_2009_2014 <- filter(SPKS08_2009_2014, SPKS08_2009_2014$annual_increment >= 0
-                           & SPKS08_2009_2014$annual_increment < 7.5)
 
 summary(SPKS08_2009_2014$annual_increment)
 summary(SPKS08_2009_2014$relative_gr)
@@ -182,8 +154,6 @@ size1 <- SPKS08_2001_2014$dbh.x
 SPKS08_2001_2014$annual_increment <- (size2 - size1)/time
 SPKS08_2001_2014$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKS08_2001_2014 <- filter(SPKS08_2001_2014, SPKS08_2001_2014$annual_increment >= 0
-                                               & SPKS08_2001_2014$annual_increment < 7.5)
 
 summary(SPKS08_2001_2014$annual_increment)
 summary(SPKS08_2001_2014$relative_gr )
@@ -235,9 +205,6 @@ size1 <- DNM1_2006_2013$dbh.x
 DNM1_2006_2013$annual_increment <- (size2 - size1)/time
 DNM1_2006_2013$relative_gr      <- (log(size2) - log(size1))/time
 
-DNM1_2006_2013 <- filter(DNM1_2006_2013, DNM1_2006_2013$annual_increment >= 0
-                         & DNM1_2006_2013$annual_increment < 7.5)
-
 summary(DNM1_2006_2013$annual_increment)
 summary(DNM1_2006_2013$relative_gr  )
 
@@ -284,9 +251,6 @@ size1 <- DNM1_2013_2016$dbh.x
 # calculate growth rates: 
 DNM1_2013_2016$annual_increment <- (size2 - size1)/time
 DNM1_2013_2016$relative_gr      <- (log(size2) - log(size1))/time
-
-DNM1_2013_2016 <- filter(DNM1_2013_2016, DNM1_2013_2016$annual_increment >= 0
-                         & DNM1_2013_2016$annual_increment < 7.5)
 
 summary(DNM1_2013_2016$annual_increment)
 summary(DNM1_2013_2016$relative_gr)
@@ -336,15 +300,6 @@ table(DNM1_2006_2016$censusID.x)
 table(DNM1_2006_2016$censusID.y)
 # notice that in 'SPKS08_2001_2009' dbh.x is dbh at census 1 and dbh.y is dbh at census 2
 
-
-# check the number of unique stems in each dataset and compare between datasets
-length(unique(census1$stemID)); dim(census1)
-length(unique(census2$stemID)); dim(census2)
-
-# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
-DNM1_2006_2016 <- inner_join(census1, census2, by="stemID")
-dim(DNM1_2006_2016) 
-
 # calculate time difference and convert time from days to years  
 time <- (DNM1_2006_2016$date.y-DNM1_2006_2016$date.x)/365
 
@@ -355,9 +310,6 @@ size1 <- DNM1_2006_2016$dbh.x
 # calculate growth rates: 
 DNM1_2006_2016$annual_increment <- (size2 - size1)/time
 DNM1_2006_2016$relative_gr      <- (log(size2) - log(size1))/time
-
-DNM1_2006_2016 <- filter(DNM1_2006_2016, DNM1_2006_2016$annual_increment >= 0
-                         & DNM1_2006_2016$annual_increment < 7.5)
 
 summary(DNM1_2006_2016$annual_increment)
 summary(DNM1_2006_2016$relative_gr)
@@ -408,9 +360,6 @@ size1 <- DNM2_2006_2013$dbh.x
 DNM2_2006_2013$annual_increment <- (size2 - size1)/time
 DNM2_2006_2013$relative_gr      <- (log(size2) - log(size1))/time
 
-DNM2_2006_2013 <- filter(DNM2_2006_2013, DNM2_2006_2013$annual_increment >= 0
-                         & DNM2_2006_2013$annual_increment < 7.5)
-
 summary(DNM2_2006_2013$annual_increment)
 summary(DNM2_2006_2013$relative_gr )
 
@@ -459,9 +408,6 @@ size1 <- DNM2_2013_2016$dbh.x
 DNM2_2013_2016$annual_increment <- (size2 - size1)/time
 DNM2_2013_2016$relative_gr      <- (log(size2) - log(size1))/time
 
-DNM2_2013_2016 <- filter(DNM2_2013_2016, DNM2_2013_2016$annual_increment >= 0
-                         & DNM2_2013_2016$annual_increment < 7.5)
-
 summary(DNM2_2013_2016$annual_increment)
 summary(DNM2_2013_2016$relative_gr)
 
@@ -503,15 +449,6 @@ dim(census2)
 head(DNM2_2006_2016)
 table(DNM2_2006_2016$censusID.x)
 table(DNM2_2006_2016$censusID.y)
-# notice that in 'SPKS08_2001_2009' dbh.x is dbh at census 1 and dbh.y is dbh at census 2
-
-# check the number of unique stems in each dataset and compare between datasets
-length(unique(census1$stemID)); dim(census1)
-length(unique(census2$stemID)); dim(census2)
-
-# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
-DNM2_2006_2016 <- inner_join(census1, census2, by="stemID")
-dim(DNM2_2006_2016) 
 
 # calculate time difference and convert time from days to years  
 time <- (DNM2_2006_2016$date.y-DNM2_2006_2016$date.x)/365
@@ -523,9 +460,6 @@ size1 <- DNM2_2006_2016$dbh.x
 # calculate growth rates: 
 DNM2_2006_2016$annual_increment <- (size2 - size1)/time
 DNM2_2006_2016$relative_gr      <- (log(size2) - log(size1))/time
-
-DNM2_2006_2016 <- filter(DNM2_2006_2016, DNM2_2006_2016$annual_increment >= 0
-                         & DNM2_2006_2016$annual_increment < 7.5)
 
 summary(DNM2_2006_2016$annual_increment)
 summary(DNM2_2006_2016$relative_gr )
@@ -574,9 +508,6 @@ size1 <- DNM3_2006_2013$dbh.x
 # calculate growth rates: 
 DNM3_2006_2013$annual_increment <- (size2 - size1)/time
 DNM3_2006_2013$relative_gr      <- (log(size2) - log(size1))/time
-
-DNM3_2006_2013 <- filter(DNM3_2006_2013, DNM3_2006_2013$annual_increment >= 0
-                                           & DNM3_2006_2013$annual_increment < 7.5)
 
 summary(DNM3_2006_2013$annual_increment)
 summary(DNM3_2006_2013$relative_gr)
@@ -673,11 +604,9 @@ size1 <- DNM3_2006_2016$dbh.x
 DNM3_2006_2016$annual_increment <- (size2 - size1)/time
 DNM3_2006_2016$relative_gr      <- (log(size2) - log(size1))/time
 
-DNM3_2006_2016 <- filter(DNM3_2006_2016, DNM3_2006_2016$annual_increment >= 0
-                         & DNM3_2006_2016$annual_increment < 7.5)
-
 summary(DNM3_2006_2016$annual_increment)
 summary(DNM3_2006_2016$relative_gr)
+colnames(DNM3_2006_2016)
 
 # take a look at the values
 par(mfrow=c(1,2))
@@ -692,7 +621,7 @@ plot(DNM3_2006_2016$dbh.x, DNM3_2006_2016$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
-#DNM50 Large interval --------
+#DNM50 Large interval Unpooled--------
 DNM50 <- filter(growdata, plot == "DNM50_FGEO" )
 table(DNM50$censusID)
 table(DNM50$DFstatus)
@@ -725,10 +654,6 @@ size1 <- DNM50_2011_2019$dbh.x
 DNM50_2011_2019$annual_increment <- (size2 - size1)/time
 DNM50_2011_2019$relative_gr      <- (log(size2) - log(size1))/time
 
-DNM50_2011_2019 <-  filter(DNM50_2011_2019, DNM50_2011_2019$annual_increment >= 0
-                           & DNM50_2011_2019$annual_increment < 7.5)
-
-
 summary(DNM50_2011_2019$annual_increment)
 summary(DNM50_2011_2019$relative_gr)
 
@@ -744,6 +669,44 @@ plot(DNM50_2011_2019$dbh.x,DNM50_2011_2019$dbh.y, pch=19,
      xlab="DBH DNM50 2011 (cm)", ylab="DBH DNM50 2019 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+#DNM50 Large interval Pooled--------
+DNM50 <- filter(growdata, plot == "DNM50_FGEO" )
+table(DNM50$censusID)
+table(DNM50$DFstatus)
+
+census1 <- filter(growdata, plot == "DNM50_FGEO" & censusID == "census_2011_15")
+census2 <- filter(growdata, plot == "DNM50_FGEO" & censusID == "census_2019")
+
+census1$pool_stem_ID <- census1$stemID
+census2$pool_stem_ID <- census2$stemID
+table(growdata$plot)
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+DNM50_2011_2019p <- inner_join(census1, census2, by="pool_stem_ID")
+dim(DNM50_2011_2019p) 
+
+# calculate time difference and convert time from days to years  
+time <- (DNM50_2011_2019p$date.y-DNM50_2011_2019p$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- DNM50_2011_2019p$dbh.y
+size1 <- DNM50_2011_2019p$dbh.x
+
+# calculate growth rates: 
+DNM50_2011_2019p$annual_increment <- (size2 - size1)/time
+DNM50_2011_2019p$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(DNM50_2011_2019p$annual_increment)
+summary(DNM50_2011_2019p$relative_gr)
 
 #SPKA9 First interval --------
 SPKA9 <- filter(growdata, plot == "SPKA_09" )
@@ -776,9 +739,6 @@ size1 <- SPKA9_2001_2009$dbh.x
 # calculate growth rates: 
 SPKA9_2001_2009$annual_increment <- (size2 - size1)/time
 SPKA9_2001_2009$relative_gr      <- (log(size2) - log(size1))/time
-
-SPKA9_2001_2009 <- filter(SPKA9_2001_2009, SPKA9_2001_2009$annual_increment >= 0
-                          & SPKA9_2001_2009$annual_increment < 7.5)
 
 summary(SPKA9_2001_2009$annual_increment)
 summary(SPKA9_2001_2009$relative_gr)
@@ -828,9 +788,6 @@ size1 <- SPKA9_2009_2014$dbh.x
 SPKA9_2009_2014$annual_increment <- (size2 - size1)/time
 SPKA9_2009_2014$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKA9_2009_2014 <- filter(SPKA9_2009_2014, SPKA9_2009_2014$annual_increment >= 0
-                          & SPKA9_2009_2014$annual_increment < 7.5)
-
 summary(SPKA9_2009_2014$annual_increment)
 summary(SPKA9_2009_2014$relative_gr)
 
@@ -871,15 +828,6 @@ dim(census2)
 head(SPKA9_2001_2014)
 table(SPKA9_2001_2014$censusID.x)
 table(SPKA9_2001_2014$censusID.y)
-# notice that in 'SPKS08_2001_2009' dbh.x is dbh at census 1 and dbh.y is dbh at census 2
-
-# check the number of unique stems in each dataset and compare between datasets
-length(unique(census1$stemID)); dim(census1)
-length(unique(census2$stemID)); dim(census2)
-
-# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
-SPKA9_2001_2014 <- inner_join(census1, census2, by="stemID")
-dim(SPKA9_2001_2014) 
 
 # calculate time difference and convert time from days to years  
 time <- (SPKA9_2001_2014$date.y-SPKA9_2001_2014$date.x)/365
@@ -891,9 +839,6 @@ size1 <- SPKA9_2001_2014$dbh.x
 # calculate growth rates: 
 SPKA9_2001_2014$annual_increment <- (size2 - size1)/time
 SPKA9_2001_2014$relative_gr      <- (log(size2) - log(size1))/time
-
-SPKA9_2001_2014 <- filter(SPKA9_2001_2014, SPKA9_2001_2014$annual_increment >= 0
-                          & SPKA9_2001_2014$annual_increment < 7.5)
 
 summary(SPKA9_2001_2014$annual_increment)
 summary(SPKA9_2001_2014$relative_gr)
@@ -943,9 +888,6 @@ size1 <- SPKA10_2001_2009$dbh.x
 SPKA10_2001_2009$annual_increment <- (size2 - size1)/time
 SPKA10_2001_2009$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKA10_2001_2009 <- filter(SPKA10_2001_2009, SPKA10_2001_2009$annual_increment >= 0
-                           & SPKA10_2001_2009$annual_increment < 7.5)
-
 summary(SPKA10_2001_2009$annual_increment)
 summary(SPKA10_2001_2009$relative_gr)
 
@@ -994,9 +936,6 @@ size1 <- SPKA10_2009_2014$dbh.x
 SPKA10_2009_2014$annual_increment <- (size2 - size1)/time
 SPKA10_2009_2014$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKA10_2009_2014 <- filter(SPKA10_2009_2014, SPKA10_2009_2014$annual_increment >= 0
-                           & SPKA10_2009_2014$annual_increment < 7.5)
-
 summary(SPKA10_2009_2014$annual_increment)
 summary(SPKA10_2009_2014$relative_gr)
 
@@ -1037,15 +976,6 @@ dim(census2)
 head(SPKA10_2001_2014)
 table(SPKA10_2001_2014$censusID.x)
 table(SPKA10_2001_2014$censusID.y)
-# notice that in 'SPKS08_2001_2009' dbh.x is dbh at census 1 and dbh.y is dbh at census 2
-
-# check the number of unique stems in each dataset and compare between datasets
-length(unique(census1$stemID)); dim(census1)
-length(unique(census2$stemID)); dim(census2)
-
-# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
-SPKA10_2001_2014 <- inner_join(census1, census2, by="stemID")
-dim(SPKA10_2001_2014) 
 
 # calculate time difference and convert time from days to years  
 time <- (SPKA10_2001_2014$date.y-SPKA10_2001_2014$date.x)/365
@@ -1057,9 +987,6 @@ size1 <- SPKA10_2001_2014$dbh.x
 # calculate growth rates: 
 SPKA10_2001_2014$annual_increment <- (size2 - size1)/time
 SPKA10_2001_2014$relative_gr      <- (log(size2) - log(size1))/time
-
-SPKA10_2001_2014 <- filter(SPKA10_2001_2014, SPKA10_2001_2014$annual_increment >= 0
-                           & SPKA10_2001_2014$annual_increment < 7.5)
 
 summary(SPKA10_2001_2014$annual_increment)
 summary(SPKA10_2001_2014$relative_gr)
@@ -1109,9 +1036,6 @@ size1 <- SPKH4_2001_2008$dbh.x
 SPKH4_2001_2008$annual_increment <- (size2 - size1)/time
 SPKH4_2001_2008$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKH4_2001_2008 <- filter(SPKH4_2001_2008, SPKH4_2001_2008$annual_increment >= 0
-                          & SPKH4_2001_2008$annual_increment < 7.5)
-
 summary(SPKH4_2001_2008$annual_increment)
 summary(SPKH4_2001_2008$relative_gr)
 
@@ -1159,9 +1083,6 @@ size1 <- SPKH4_2008_2014$dbh.x
 SPKH4_2008_2014$annual_increment <- (size2 - size1)/time
 SPKH4_2008_2014$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKH4_2008_2014 <- filter(SPKH4_2008_2014, SPKH4_2008_2014$annual_increment >= 0
-                                             & SPKH4_2008_2014$annual_increment < 7.5)
-
 summary(SPKH4_2008_2014$annual_increment)
 summary(SPKH4_2008_2014$relative_gr)
 
@@ -1203,13 +1124,6 @@ dim(census2)
 head(SPKH4_2001_2014)
 table(SPKH4_2001_2014$censusID.x)
 table(SPKH4_2001_2014$censusID.y)
-# check the number of unique stems in each dataset and compare between datasets
-length(unique(census1$stemID)); dim(census1)
-length(unique(census2$stemID)); dim(census2)
-
-# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
-SPKH4_2001_2014 <- inner_join(census1, census2, by="stemID")
-dim(SPKH4_2001_2014) 
 
 # calculate time difference and convert time from days to years  
 time <- (SPKH4_2001_2014$date.y-SPKH4_2001_2014$date.x)/365
@@ -1221,9 +1135,6 @@ size1 <- SPKH4_2001_2014$dbh.x
 # calculate growth rates: 
 SPKH4_2001_2014$annual_increment <- (size2 - size1)/time
 SPKH4_2001_2014$relative_gr      <- (log(size2) - log(size1))/time
-
-SPKH4_2001_2014 <- filter(SPKH4_2001_2014, SPKH4_2001_2014$annual_increment >= 0
-                                             & SPKH4_2001_2014$annual_increment < 7.5)
 
 summary(SPKH4_2001_2014$annual_increment)
 summary(SPKH4_2001_2014$relative_gr)
@@ -1273,9 +1184,6 @@ size1 <- SPKH5_2001_2008$dbh.x
 SPKH5_2001_2008$annual_increment <- (size2 - size1)/time
 SPKH5_2001_2008$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKH5_2001_2008 <- filter(SPKH5_2001_2008, SPKH5_2001_2008$annual_increment >= 0
-                          & SPKH5_2001_2008$annual_increment < 7.5)
-
 summary(SPKH5_2001_2008$annual_increment)
 summary(SPKH5_2001_2008$relative_gr)
 
@@ -1324,9 +1232,6 @@ size1 <- SPKH5_2008_2014$dbh.x
 SPKH5_2008_2014$annual_increment <- (size2 - size1)/time
 SPKH5_2008_2014$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKH5_2008_2014 <- filter(SPKH5_2008_2014, SPKH5_2008_2014$annual_increment >= 0
-                          & SPKH5_2008_2014$annual_increment < 7.5)
-
 summary(SPKH5_2008_2014$annual_increment)
 summary(SPKH5_2008_2014$relative_gr)
 
@@ -1368,14 +1273,6 @@ head(SPKH5_2001_2014)
 table(SPKH5_2001_2014$censusID.x)
 table(SPKH5_2001_2014$censusID.y)
 
-# check the number of unique stems in each dataset and compare between datasets
-length(unique(census1$stemID)); dim(census1)
-length(unique(census2$stemID)); dim(census2)
-
-# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
-SPKH5_2001_2014 <- inner_join(census1, census2, by="stemID")
-dim(SPKH5_2001_2014) 
-
 # calculate time difference and convert time from days to years  
 time <- (SPKH5_2001_2014$date.y-SPKH5_2001_2014$date.x)/365
 
@@ -1386,9 +1283,6 @@ size1 <- SPKH5_2001_2014$dbh.x
 # calculate growth rates: 
 SPKH5_2001_2014$annual_increment <- (size2 - size1)/time
 SPKH5_2001_2014$relative_gr      <- (log(size2) - log(size1))/time
-
-SPKH5_2001_2014 <- filter(SPKH5_2001_2014, SPKH5_2001_2014$annual_increment >= 0
-                          & SPKH5_2001_2014$annual_increment < 7.5)
 
 summary(SPKH5_2001_2014$annual_increment)
 summary(SPKH5_2001_2014$relative_gr)
@@ -1436,9 +1330,6 @@ size1 <- SPKH30_2001_2010$dbh.x
 # calculate growth rates: 
 SPKH30_2001_2010$annual_increment <- (size2 - size1)/time
 SPKH30_2001_2010$relative_gr      <- (log(size2) - log(size1))/time
-
-SPKH30_2001_2010 <- filter(SPKH30_2001_2010, SPKH30_2001_2010$annual_increment >= 0
-                           & SPKH30_2001_2010$annual_increment < 7.5)
 
 summary(SPKH30_2001_2010$annual_increment)
 summary(SPKH30_2001_2010$relative_gr)
@@ -1488,9 +1379,6 @@ size1 <- SPKH30_2010_2015$dbh.x
 SPKH30_2010_2015$annual_increment <- (size2 - size1)/time
 SPKH30_2010_2015$relative_gr      <- (log(size2) - log(size1))/time
 
-SPKH30_2010_2015 <- filter(SPKH30_2010_2015, SPKH30_2010_2015$annual_increment >= 0
-                          & SPKH30_2010_2015$annual_increment < 7.5)
-
 summary(SPKH30_2010_2015$annual_increment)
 summary(SPKH30_2010_2015$relative_gr)
 
@@ -1533,14 +1421,6 @@ head(SPKH30_2001_2015)
 table(SPKH30_2001_2015$censusID.x)
 table(SPKH30_2001_2015$censusID.y)
 
-# check the number of unique stems in each dataset and compare between datasets
-length(unique(census1$stemID)); dim(census1)
-length(unique(census2$stemID)); dim(census2)
-
-# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
-SPKH30_2001_2015 <- inner_join(census1, census2, by="stemID")
-dim(SPKH30_2001_2015) 
-
 # calculate time difference and convert time from days to years  
 time <- (SPKH30_2001_2015$date.y-SPKH30_2001_2015$date.x)/365
 
@@ -1551,9 +1431,6 @@ size1 <- SPKH30_2001_2015$dbh.x
 # calculate growth rates: 
 SPKH30_2001_2015$annual_increment <- (size2 - size1)/time
 SPKH30_2001_2015$relative_gr      <- (log(size2) - log(size1))/time
-
-SPKH30_2001_2015 <- filter(SPKH30_2001_2015, SPKH30_2001_2015$annual_increment >= 0
-                           & SPKH30_2001_2015$annual_increment < 7.5)
 
 summary(SPKH30_2001_2015$annual_increment)
 summary(SPKH30_2001_2015$relative_gr)
@@ -1571,30 +1448,619 @@ plot(SPKH30_2001_2015$dbh.x,SPKH30_2001_2015$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+#LHP_clay first interval------------
+LHP <- filter(growdata, site == "LHP")
+table(LHP$plot)
+LHP_clay <- filter(growdata, plot=="LH_clay")
+table(LHP_clay$censusID)
+
+census1 <- filter(growdata, plot == "LH_clay" & censusID == "census_1991")
+census2 <- filter(growdata, plot == "LH_clay" & censusID == "census_1997")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_clay_1991_1997 <- inner_join(census1, census2, by="stemID")
+dim(LH_clay_1991_1997) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_clay_1991_1997$date.y-LH_clay_1991_1997$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_clay_1991_1997$dbh.y
+size1 <- LH_clay_1991_1997$dbh.x
+
+# calculate growth rates: 
+LH_clay_1991_1997$annual_increment <- (size2 - size1)/time
+LH_clay_1991_1997$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_clay_1991_1997)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_clay_1991_1997$annual_increment)
+summary(LH_clay_1991_1997$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_clay_1991_1997$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_clay_1991_1997$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_clay second interval------------
+table(LHP_clay$censusID)
+
+census1 <- filter(growdata, plot == "LH_clay" & censusID == "census_1997")
+census2 <- filter(growdata, plot == "LH_clay" & censusID == "census_2003")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_clay_1997_2003 <- inner_join(census1, census2, by="stemID")
+dim(LH_clay_1997_2003) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_clay_1997_2003$date.y-LH_clay_1997_2003$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_clay_1997_2003$dbh.y
+size1 <- LH_clay_1997_2003$dbh.x
+
+# calculate growth rates: 
+LH_clay_1997_2003$annual_increment <- (size2 - size1)/time
+LH_clay_1997_2003$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_clay_1997_2003)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_clay_1997_2003$annual_increment)
+summary(LH_clay_1997_2003$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_clay_1997_2003$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_clay_1997_2003$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_clay third interval------------
+table(LHP_clay$censusID)
+
+census1 <- filter(growdata, plot == "LH_clay" & censusID == "census_2003")
+census2 <- filter(growdata, plot == "LH_clay" & censusID == "census_2007_08")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_clay_2003_2008 <- inner_join(census1, census2, by="stemID")
+dim(LH_clay_2003_2008) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_clay_2003_2008$date.y-LH_clay_2003_2008$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_clay_2003_2008$dbh.y
+size1 <- LH_clay_2003_2008$dbh.x
+
+# calculate growth rates: 
+LH_clay_2003_2008$annual_increment <- (size2 - size1)/time
+LH_clay_2003_2008$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_clay_2003_2008)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_clay_2003_2008$annual_increment)
+summary(LH_clay_2003_2008$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_clay_2003_2008$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_clay_2003_2008$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_fineloam first interval------------
+LHP <- filter(growdata, site == "LHP")
+table(LHP$plot)
+LHP_fineloam <- filter(growdata, plot=="LH_fineloam")
+table(LHP_fineloam$censusID)
+
+census1 <- filter(growdata, plot == "LH_fineloam" & censusID == "census_1991")
+census2 <- filter(growdata, plot == "LH_fineloam" & censusID == "census_1997")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_fineloam_1991_1997 <- inner_join(census1, census2, by="stemID")
+dim(LH_fineloam_1991_1997) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_fineloam_1991_1997$date.y-LH_fineloam_1991_1997$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_fineloam_1991_1997$dbh.y
+size1 <- LH_fineloam_1991_1997$dbh.x
+
+# calculate growth rates: 
+LH_fineloam_1991_1997$annual_increment <- (size2 - size1)/time
+LH_fineloam_1991_1997$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_fineloam_1991_1997)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_fineloam_1991_1997$annual_increment)
+summary(LH_fineloam_1991_1997$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_fineloam_1991_1997$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_fineloam_1991_1997$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_fineloam second interval------------
+table(LHP_fineloam$censusID)
+
+census1 <- filter(growdata, plot == "LH_fineloam" & censusID == "census_1997")
+census2 <- filter(growdata, plot == "LH_fineloam" & censusID == "census_2003")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_fineloam_1997_2003 <- inner_join(census1, census2, by="stemID")
+dim(LH_fineloam_1997_2003) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_fineloam_1997_2003$date.y-LH_fineloam_1997_2003$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_fineloam_1997_2003$dbh.y
+size1 <- LH_fineloam_1997_2003$dbh.x
+
+# calculate growth rates: 
+LH_fineloam_1997_2003$annual_increment <- (size2 - size1)/time
+LH_fineloam_1997_2003$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_fineloam_1997_2003)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_fineloam_1997_2003$annual_increment)
+summary(LH_fineloam_1997_2003$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_fineloam_1997_2003$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_fineloam_1997_2003$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_fineloam third interval------------
+table(LHP_fineloam$censusID)
+
+census1 <- filter(growdata, plot == "LH_fineloam" & censusID == "census_2003")
+census2 <- filter(growdata, plot == "LH_fineloam" & censusID == "census_2007_08")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_fineloam_2003_2008 <- inner_join(census1, census2, by="stemID")
+dim(LH_fineloam_2003_2008) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_fineloam_2003_2008$date.y-LH_fineloam_2003_2008$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_fineloam_2003_2008$dbh.y
+size1 <- LH_fineloam_2003_2008$dbh.x
+
+# calculate growth rates: 
+LH_fineloam_2003_2008$annual_increment <- (size2 - size1)/time
+LH_fineloam_2003_2008$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_fineloam_2003_2008)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_fineloam_2003_2008$annual_increment)
+summary(LH_fineloam_2003_2008$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_fineloam_2003_2008$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_fineloam_2003_2008$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_loam first interval------------
+LHP <- filter(growdata, site == "LHP")
+table(LHP$plot)
+LHP_loam <- filter(growdata, plot=="LH_loam")
+table(LHP_loam$censusID)
+
+census1 <- filter(growdata, plot == "LH_loam" & censusID == "census_1991")
+census2 <- filter(growdata, plot == "LH_loam" & censusID == "census_1997")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_loam_1991_1997 <- inner_join(census1, census2, by="stemID")
+dim(LH_loam_1991_1997) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_loam_1991_1997$date.y-LH_loam_1991_1997$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_loam_1991_1997$dbh.y
+size1 <- LH_loam_1991_1997$dbh.x
+
+# calculate growth rates: 
+LH_loam_1991_1997$annual_increment <- (size2 - size1)/time
+LH_loam_1991_1997$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_loam_1991_1997)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_loam_1991_1997$annual_increment)
+summary(LH_loam_1991_1997$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_loam_1991_1997$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_loam_1991_1997$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_loam second interval------------
+table(LHP_loam$censusID)
+
+census1 <- filter(growdata, plot == "LH_loam" & censusID == "census_1997")
+census2 <- filter(growdata, plot == "LH_loam" & censusID == "census_2003")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_loam_1997_2003 <- inner_join(census1, census2, by="stemID")
+dim(LH_loam_1997_2003) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_loam_1997_2003$date.y-LH_loam_1997_2003$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_loam_1997_2003$dbh.y
+size1 <- LH_loam_1997_2003$dbh.x
+
+# calculate growth rates: 
+LH_loam_1997_2003$annual_increment <- (size2 - size1)/time
+LH_loam_1997_2003$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_loam_1997_2003)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_loam_1997_2003$annual_increment)
+summary(LH_loam_1997_2003$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_loam_1997_2003$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_loam_1997_2003$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_loam third interval------------
+table(LHP_loam$censusID)
+
+census1 <- filter(growdata, plot == "LH_loam" & censusID == "census_2003")
+census2 <- filter(growdata, plot == "LH_loam" & censusID == "census_2007_08")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_loam_2003_2008 <- inner_join(census1, census2, by="stemID")
+dim(LH_loam_2003_2008) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_loam_2003_2008$date.y-LH_loam_2003_2008$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_loam_2003_2008$dbh.y
+size1 <- LH_loam_2003_2008$dbh.x
+
+# calculate growth rates: 
+LH_loam_2003_2008$annual_increment <- (size2 - size1)/time
+LH_loam_2003_2008$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_loam_2003_2008)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_loam_2003_2008$annual_increment)
+summary(LH_loam_2003_2008$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_loam_2003_2008$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_loam_2003_2008$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_sandstone first interval------------
+LHP <- filter(growdata, site == "LHP")
+table(LHP$plot)
+LHP_sandstone <- filter(growdata, plot=="LH_sandstone")
+table(LHP_sandstone$censusID)
+
+census1 <- filter(growdata, plot == "LH_sandstone" & censusID == "census_1991")
+census2 <- filter(growdata, plot == "LH_sandstone" & censusID == "census_1997")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_sandstone_1991_1997 <- inner_join(census1, census2, by="stemID")
+dim(LH_sandstone_1991_1997) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_sandstone_1991_1997$date.y-LH_sandstone_1991_1997$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_sandstone_1991_1997$dbh.y
+size1 <- LH_sandstone_1991_1997$dbh.x
+
+# calculate growth rates: 
+LH_sandstone_1991_1997$annual_increment <- (size2 - size1)/time
+LH_sandstone_1991_1997$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_sandstone_1991_1997)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_sandstone_1991_1997$annual_increment)
+summary(LH_sandstone_1991_1997$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_sandstone_1991_1997$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_sandstone_1991_1997$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_sandstone second interval------------
+table(LHP_sandstone$censusID)
+
+census1 <- filter(growdata, plot == "LH_sandstone" & censusID == "census_1997")
+census2 <- filter(growdata, plot == "LH_sandstone" & censusID == "census_2003")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_sandstone_1997_2003 <- inner_join(census1, census2, by="stemID")
+dim(LH_sandstone_1997_2003) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_sandstone_1997_2003$date.y-LH_sandstone_1997_2003$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_sandstone_1997_2003$dbh.y
+size1 <- LH_sandstone_1997_2003$dbh.x
+
+# calculate growth rates: 
+LH_sandstone_1997_2003$annual_increment <- (size2 - size1)/time
+LH_sandstone_1997_2003$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_sandstone_1997_2003)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_sandstone_1997_2003$annual_increment)
+summary(LH_sandstone_1997_2003$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_sandstone_1997_2003$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_sandstone_1997_2003$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#LHP_sandstone third interval------------
+table(LHP_sandstone$censusID)
+
+census1 <- filter(growdata, plot == "LH_sandstone" & censusID == "census_2003")
+census2 <- filter(growdata, plot == "LH_sandstone" & censusID == "census_2007_08")
+
+table(census2$censusID)
+
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+LH_sandstone_2003_2008 <- inner_join(census1, census2, by="stemID")
+dim(LH_sandstone_2003_2008) 
+
+# calculate time difference and convert time from days to years  
+time <- (LH_sandstone_2003_2008$date.y-LH_sandstone_2003_2008$date.x)/365
+
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- LH_sandstone_2003_2008$dbh.y
+size1 <- LH_sandstone_2003_2008$dbh.x
+
+# calculate growth rates: 
+LH_sandstone_2003_2008$annual_increment <- (size2 - size1)/time
+LH_sandstone_2003_2008$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(LH_sandstone_2003_2008)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(LH_sandstone_2003_2008$annual_increment)
+summary(LH_sandstone_2003_2008$relative_gr )
+
+par(mfrow=c(1,2))
+hist(LH_sandstone_2003_2008$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(LH_sandstone_2003_2008$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+
+
 #Create Combined Dataset of all growth rates-----
 
 growthr <- rbind(SPKS08_2001_2009, SPKS08_2009_2014, DNM1_2006_2013, DNM1_2013_2016,
       DNM2_2006_2013, DNM2_2013_2016, DNM3_2006_2013, DNM3_2013_2016, DNM50_2011_2019, 
       SPKA9_2001_2009, SPKA9_2009_2014,SPKA10_2001_2009, SPKA10_2009_2014,
       SPKH4_2001_2008, SPKH4_2008_2014, SPKH5_2001_2008, 
-      SPKH5_2008_2014, SPKH30_2001_2010, SPKH30_2010_2015)
-#no DNM50!!!
-#Haha nevermind it just doesn't work :/
-growthl <- rbind(SPKS08_2001_2014, DNM1_2006_2016,
+      SPKH5_2008_2014, SPKH30_2001_2010, SPKH30_2010_2015,
+      LH_sandstone_2003_2008, LH_sandstone_1997_2003, LH_sandstone_1991_1997,
+      LH_clay_2003_2008, LH_clay_1997_2003, LH_clay_1991_1997,
+      LH_fineloam_2003_2008, LH_fineloam_1997_2003, LH_fineloam_1991_1997,
+      LH_loam_2003_2008, LH_loam_1997_2003, LH_loam_1991_1997)
+
+growthp <- rbind(SPKS08_2001_2014, DNM1_2006_2016,
                  DNM2_2006_2016, DNM3_2006_2016,
-                 SPKA9_2001_2014,
+                 DNM50_2011_2019p, SPKA9_2001_2014,
                  SPKA10_2001_2014, SPKH4_2001_2014, 
-                  SPKH5_2001_2014,SPKH30_2001_2015)
+                 SPKH5_2001_2014,SPKH30_2001_2015)
 
-library(ggplot2)
+colnames(SPKS08_2001_2014)
+colnames(DNM3_2006_2016)
+#Adding height info for plots---------
+#Height Equations------
+#use the Feldpausch et al 2011 equation with the Southeast Asia regional coefficients
+dbh2h_01 <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht){ # exclude hgt_ref here if using first dbh_crit eq.
+        #  dbh_crit <- exp((log(hgt_max)-b1Ht)/b2Ht)
+        dbh_crit <- exp(-0.5 / hgt_ref * (b2Ht - sqrt(b2Ht**2 - 4 * hgt_ref * (b1Ht - log(hgt_max)))))
+        h <- ifelse(dbh <= dbh_crit,
+                    exp(b1Ht + b2Ht * log(dbh)),
+                    exp(b1Ht + b2Ht * log(dbh_crit)))
+        return(h)
+}
+# CASE(3,4) ## Chave et al. 2014 - assuming environmental factor = 0 ## 
+dbh2h_34 <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht){
+        #  dbh_crit <- exp((log(hgt_max)-b1Ht)/b2Ht)
+        dbh_crit <- exp(-0.5 / hgt_ref * (b2Ht - sqrt(b2Ht**2 - 4 * hgt_ref * (b1Ht - log(hgt_max)))))
+        h <- ifelse(dbh <= dbh_crit,
+                    exp(b1Ht + b2Ht * log(dbh) + (hgt_ref * log(dbh)**2)),
+                    exp(b1Ht + b2Ht * log(dbh_crit) + (hgt_ref * log(dbh_crit)**2)))
+        return(h)
+}
 
+## Chave et al. 2014 - WITH environmental factor ##
+dbh2h_ChaveE <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht,E){
+        #  dbh_crit <- exp((log(hgt_max)-b1Ht)/b2Ht)
+        dbh_crit <- exp(-0.5 / hgt_ref * (b2Ht - sqrt(b2Ht**2 - 4 * hgt_ref * (b1Ht - log(hgt_max)))))
+        #h <- 0.893 - E + 0.760*log(dbh)-0.0340*(log(dbh)**2)
+        h <- ifelse(dbh <= dbh_crit,
+                    exp(b1Ht - E + b2Ht * log(dbh) + hgt_ref * log(dbh)**2),
+                    exp(b1Ht - E + b2Ht * log(dbh_crit) + hgt_ref * log(dbh_crit)**2))
+        return(h)
+}
+
+# Parameters-------
+#Feldspauch - -----
+b1Ht_SEA    = 0.5279284 * log(10) # Use for dbh2h_01
+# SAME AS: b1Ht_SEA = 1.2156
+b2Ht_SEA    = 0.5782 #"coefficient of ln(D)" # Use for dbh2h_01
+hgt_ref_SEA = -0.0114
+hgt_max_SEA = 100
+#Chave------
+b1Ht_34    =  0.893 # Use for dbh2h_34 & dbh2h_ChaveE
+b2Ht_34    =  0.76 # Use for dbh2h_34 & dbh2h_ChaveE
+hgt_ref_34 = -0.034 # Use for dbh2h_34 & dbh2h_ChaveE
+hgt_max = 100
+#E------library("raster")
+library("ncdf4")
+source("http://chave.ups-tlse.fr/pantropical_allometry/readlayers.r")
+# E = (0.178* TS - 0.938 & CWD - 6.61 * PS) * 10^3
+# DNM, LHP, SPK, PSO, ALP, CRA
+longitude=c(117.78994,114.033333,117.92806,102.3062,-73.4385,-70.2173)
+latitude=c(4.955965,4.20161,5.852336,2.973,-3.9603,-12.4402)
+coord=cbind(longitude,latitude); coord
+
+E = retrieve_raster("E", coord, format="nc"); E
+# Danum "E" value
+E_DNM = E[1]; E_DNM #-0.0365256
+# Lambir "E" value
+E_LHP = E[2]
+# Sepilok "E" value
+E_SPK = E[3]
+# Alpahuayo "E" value
+#E_ALP = E[4]; E_ALP #-0.09335928
+# Cicra "E" value
+#E_CRA = E[5]; E_CRA #-0.04474343
+colnames(growthr)
+#Calculate Heights-----
+#Feld
+growthr$heightFeld <- dbh2h_01(growthr$dbh.x, hgt_max_SEA, hgt_ref_SEA, b1Ht_SEA, b2Ht_SEA)
+table(growthr$heightFeld)
+#Chave
+growthr$heightCh <- dbh2h_34(growthr$dbh.x,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34)
+table(growthr$heightCh)
+#Chave with E
+# need to specify which "E" value to use - from above
+growthr$heightE <- dbh2h_ChaveE(growthr$dbh.x,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34,E_DNM)
+
+#Source Height Quantiles------
+source("heights.r")
+
+#Exclude Indets???? ASK------
+growthr <- filter(growthr, species.x != "Indet")
+growthr <- filter(growthr, species.y != "Indet")
+table(growthr$species.x)
+#quantile 90-------
+#Feld
+growthr$tree_type90F <- ifelse(growthr$species.x %in% c(emergent90Feld), "emrgnt", "non_emrgnt")
+
+#Chave w/o E
+growthr$tree_type90Ch <- ifelse(growthr$species.x %in% c(emergent90Ch), "emrgnt", "non_emrgnt")
+
+#Chave with E
+growthr$tree_type90E <- ifelse(growthr$species.x %in% c(emergent90E), "emrgnt", "non_emrgnt")
+
+
+#quantile 95-------
+#Feld
+growthr$tree_type95F <- ifelse(growthr$species.x %in% c(emergent95Feld), "emrgnt", "non_emrgnt")
+
+#Chave w/o E
+growthr$tree_type95Ch <- ifelse(growthr$species.x %in% c(emergent95Ch), "emrgnt", "non_emrgnt")
+
+#Chave with E
+growthr$tree_type95E <- ifelse(growthr$species.x %in% c(emergent95E), "emrgnt", "non_emrgnt")
+
+#quantile 99-------
+#Feld
+growthr$tree_type99F <- ifelse(growthr$species.x %in% c(emergent99Feld), "emrgnt", "non_emrgnt")
+
+#Chave w/o E
+growthr$tree_type99Ch <- ifelse(growthr$species.x %in% c(emergent99Ch), "emrgnt", "non_emrgnt")
+#Chave with E
+growthr$tree_type99E <- ifelse(growthr$species.x %in% c(emergent99E), "emrgnt", "non_emrgnt")
+
+
+#Unpooled Plots-------
+#Growth~Diameter-----
 ggplot() +
         geom_boxplot(growthr, mapping = aes(site.x, log(annual_increment)))
 ggplot() +
         geom_boxplot(growthr, mapping = aes(site.x, annual_increment))
 ggplot() +
-        geom_boxplot(growthr, mapping = aes(site.x, relative_gr))
-
+        geom_boxplot(growthr, mapping = aes(site.x, log(relative_gr)))
+      
 growthr$size_class <- 
         cut(growthr$dbh.y, breaks=c(0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,
                                     110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,max(growthr$dbh.y, na.rm=T)),
@@ -1603,17 +2069,1096 @@ growthr$size_class2 <-
         cut(growthr$dbh.y, breaks=c(0,10,20,30,40,50,60,70,80,90,100,
                                     110,120,130,140,150,160,170,180,190,200,210,max(growthr$dbh.y, na.rm=T)),
         )
-big <- filter(growthr, dbh.y >100)
-table(big$dbh.y)
 
 par(mfrow=c(1,2))
-plot(growthr$size_class, growthr$annual_increment, pch=19, 
+plot(growthr$size_class, log(growthr$annual_increment), pch=19, 
      xlab="DBH", ylab="annual increment", )
-plot(growthr$size_class2, growthr$annual_increment, pch=19, 
+plot(growthr$size_class2, log(growthr$annual_increment), pch=19, 
      xlab="DBH", ylab="annual increment", )
+
+par(mfrow=c(1,2))
+plot(growthr$size_class, log(growthr$relative_gr), pch=19, 
+     xlab="DBH", ylab="relative", )
+plot(growthr$size_class2, log(growthr$relative_gr), pch=19, 
+     xlab="DBH", ylab="relative", )
 
 table(growthr$site.x)
 
+#Growth~Height Definitions-------
+#height bins------
+growthr$heightFeld_class <- 
+        cut(growthr$heightFeld, breaks=c(0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,
+                                         110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,max(growthr$dbh.y, na.rm=T)),
+        )
+growthr$heightCh_class <- 
+        cut(growthr$heightCh, breaks=c(0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,
+                                       110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,max(growthr$dbh.y, na.rm=T)),
+        )
+growthr$heightE_class <- 
+        cut(growthr$heightE, breaks=c(0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,
+                                      110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,max(growthr$dbh.y, na.rm=T)),
+        )
+#Separate by site------
+table(growthr$site.x)
+DNM1=filter(growthr, site.x == "DNM1")
+DNM2=filter(growthr, site.x == "DNM2")
+DNM3=filter(growthr, site.x == "DNM3")
+DNM50=filter(growthr, site.x == "DNM50")
+LHP=filter(growthr, site.x == "LHP")
+SPKA=filter(growthr, site.x == "SPKA")
+SPKH=filter(growthr, site.x == "SPKH")
+SPKS=filter(growthr, site.x == "SPKS")
+
+DNM1nem90F <- filter(DNM1, tree_type90F == "non_emrgnt")
+DNM1nem95F <- filter(DNM1, tree_type95F == "non_emrgnt")
+DNM1nem99F <- filter(DNM1, tree_type99F == "non_emrgnt")
+DNM1nem90Ch <- filter(DNM1, tree_type90Ch == "non_emrgnt")
+DNM1nem95Ch <- filter(DNM1, tree_type95Ch == "non_emrgnt")
+DNM1nem99Ch <- filter(DNM1, tree_type99Ch == "non_emrgnt")
+DNM1nem90E <- filter(DNM1, tree_type90E == "non_emrgnt")
+DNM1nem95E <- filter(DNM1, tree_type95E == "non_emrgnt")
+DNM1nem99E <- filter(DNM1, tree_type99E == "non_emrgnt")
+
+DNM2nem90F <- filter(DNM2, tree_type90F == "non_emrgnt")
+DNM2nem95F <- filter(DNM2, tree_type95F == "non_emrgnt")
+DNM2nem99F <- filter(DNM2, tree_type99F == "non_emrgnt")
+DNM2nem90Ch <- filter(DNM2, tree_type90Ch == "non_emrgnt")
+DNM2nem95Ch <- filter(DNM2, tree_type95Ch == "non_emrgnt")
+DNM2nem99Ch <- filter(DNM2, tree_type99Ch == "non_emrgnt")
+DNM2nem90E <- filter(DNM2, tree_type90E == "non_emrgnt")
+DNM2nem95E <- filter(DNM2, tree_type95E == "non_emrgnt")
+DNM2nem99E <- filter(DNM2, tree_type99E == "non_emrgnt")
+
+DNM3nem90F <- filter(DNM3, tree_type90F == "non_emrgnt")
+DNM3nem95F <- filter(DNM3, tree_type95F == "non_emrgnt")
+DNM3nem99F <- filter(DNM3, tree_type99F == "non_emrgnt")
+DNM3nem90Ch <- filter(DNM3, tree_type90Ch == "non_emrgnt")
+DNM3nem95Ch <- filter(DNM3, tree_type95Ch == "non_emrgnt")
+DNM3nem99Ch <- filter(DNM3, tree_type99Ch == "non_emrgnt")
+DNM3nem90E <- filter(DNM3, tree_type90E == "non_emrgnt")
+DNM3nem95E <- filter(DNM3, tree_type95E == "non_emrgnt")
+DNM3nem99E <- filter(DNM3, tree_type99E == "non_emrgnt")
+
+DNM50nem90F <- filter(DNM50, tree_type90F == "non_emrgnt")
+DNM50nem95F <- filter(DNM50, tree_type95F == "non_emrgnt")
+DNM50nem99F <- filter(DNM50, tree_type99F == "non_emrgnt")
+DNM50nem90Ch <- filter(DNM50, tree_type90Ch == "non_emrgnt")
+DNM50nem95Ch <- filter(DNM50, tree_type95Ch == "non_emrgnt")
+DNM50nem99Ch <- filter(DNM50, tree_type99Ch == "non_emrgnt")
+DNM50nem90E <- filter(DNM50, tree_type90E == "non_emrgnt")
+DNM50nem95E <- filter(DNM50, tree_type95E == "non_emrgnt")
+DNM50nem99E <- filter(DNM50, tree_type99E == "non_emrgnt")
+
+LHPnem90F <- filter(LHP, tree_type90F == "non_emrgnt")
+LHPnem95F <- filter(LHP, tree_type95F == "non_emrgnt")
+LHPnem99F <- filter(LHP, tree_type99F == "non_emrgnt")
+LHPnem90Ch <- filter(LHP, tree_type90Ch == "non_emrgnt")
+LHPnem95Ch <- filter(LHP, tree_type95Ch == "non_emrgnt")
+LHPnem99Ch <- filter(LHP, tree_type99Ch == "non_emrgnt")
+LHPnem90E <- filter(LHP, tree_type90E == "non_emrgnt")
+LHPnem95E <- filter(LHP, tree_type95E == "non_emrgnt")
+LHPnem99E <- filter(LHP, tree_type99E == "non_emrgnt")
+
+SPKAnem90F <- filter(SPKA, tree_type90F == "non_emrgnt")
+SPKAnem95F <- filter(SPKA, tree_type95F == "non_emrgnt")
+SPKAnem99F <- filter(SPKA, tree_type99F == "non_emrgnt")
+SPKAnem90Ch <- filter(SPKA, tree_type90Ch == "non_emrgnt")
+SPKAnem95Ch <- filter(SPKA, tree_type95Ch == "non_emrgnt")
+SPKAnem99Ch <- filter(SPKA, tree_type99Ch == "non_emrgnt")
+SPKAnem90E <- filter(SPKA, tree_type90E == "non_emrgnt")
+SPKAnem95E <- filter(SPKA, tree_type95E == "non_emrgnt")
+SPKAnem99E <- filter(SPKA, tree_type99E == "non_emrgnt")
+
+SPKHnem90F <- filter(SPKH, tree_type90F == "non_emrgnt")
+SPKHnem95F <- filter(SPKH, tree_type95F == "non_emrgnt")
+SPKHnem99F <- filter(SPKH, tree_type99F == "non_emrgnt")
+SPKHnem90Ch <- filter(SPKH, tree_type90Ch == "non_emrgnt")
+SPKHnem95Ch <- filter(SPKH, tree_type95Ch == "non_emrgnt")
+SPKHnem99Ch <- filter(SPKH, tree_type99Ch == "non_emrgnt")
+SPKHnem90E <- filter(SPKH, tree_type90E == "non_emrgnt")
+SPKHnem95E <- filter(SPKH, tree_type95E == "non_emrgnt")
+SPKHnem99E <- filter(SPKH, tree_type99E == "non_emrgnt")
+
+SPKSnem90F <- filter(SPKS, tree_type90F == "non_emrgnt")
+SPKSnem95F <- filter(SPKS, tree_type95F == "non_emrgnt")
+SPKSnem99F <- filter(SPKS, tree_type99F == "non_emrgnt")
+SPKSnem90Ch <- filter(SPKS, tree_type90Ch == "non_emrgnt")
+SPKSnem95Ch <- filter(SPKS, tree_type95Ch == "non_emrgnt")
+SPKSnem99Ch <- filter(SPKS, tree_type99Ch == "non_emrgnt")
+SPKSnem90E <- filter(SPKS, tree_type90E == "non_emrgnt")
+SPKSnem95E <- filter(SPKS, tree_type95E == "non_emrgnt")
+SPKSnem99E <- filter(SPKS, tree_type99E == "non_emrgnt")
+
+
+growthrnem90F <- filter(growthr, tree_type90F == "non_emrgnt")
+growthrnem95F <- filter(growthr, tree_type95F == "non_emrgnt")
+growthrnem99F <- filter(growthr, tree_type99F == "non_emrgnt")
+growthrnem90Ch <- filter(growthr, tree_type90Ch == "non_emrgnt")
+growthrnem95Ch <- filter(growthr, tree_type95Ch == "non_emrgnt")
+growthrnem99Ch <- filter(growthr, tree_type99Ch == "non_emrgnt")
+growthrnem90E <- filter(growthr, tree_type90E == "non_emrgnt")
+growthrnem95E <- filter(growthr, tree_type95E == "non_emrgnt")
+growthrnem99E <- filter(growthr, tree_type99E == "non_emrgnt")
+#everything scatter plot-------
+#90th percentile
+#all
+growthr %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "chartreuse3")+
+        geom_point(data = growthrnem90F,color = "chartreuse4")+
+        geom_vline(xintercept = quantile90Feld, color="black")
+growthr %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "darkorchid2")+
+        geom_point(data = growthrnem90Ch,color = "darkorchid4")+
+        geom_vline(xintercept = quantile90Ch, color="black")
+growthr %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "deepskyblue2")+
+        geom_point(data = growthrnem90E,color = "deepskyblue4")+
+        geom_vline(xintercept = quantile90E, color="black")
+#95th percentile
+growthr %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "chartreuse3")+
+        geom_point(data = growthrnem95F,color = "chartreuse4")+
+        geom_vline(xintercept = quantile95Feld, color="black")
+growthr %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "darkorchid2")+
+        geom_point(data = growthrnem95Ch,color = "darkorchid4")+
+        geom_vline(xintercept = quantile95Ch, color="black")
+growthr %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "deepskyblue2")+
+        geom_point(data = growthrnem95E,color = "deepskyblue4")+
+        geom_vline(xintercept = quantile95E, color="black")
+#99th percentile
+growthr %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "chartreuse3")+
+        geom_point(data = growthrnem99F,color = "chartreuse4")+
+        geom_vline(xintercept = quantile99Feld, color="green")
+growthr %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "darkorchid2")+
+        geom_point(data = growthrnem99Ch,color = "darkorchid4")+
+        geom_vline(xintercept = quantile99Ch, color="black")
+growthr %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "deepskyblue2")+
+        geom_point(data = growthrnem99E,color = "deepskyblue4")+
+        geom_vline(xintercept = quantile99E, color="black")
+#everything box plot-------
+#annual increment
+growthr %>%
+        ggplot(aes(heightFeld_class, annual_increment))+
+        geom_boxplot(color = "blue")
+growthr %>%
+        ggplot(aes(heightCh_class, annual_increment))+
+        geom_boxplot(color = "blue")
+growthr %>%
+        ggplot(aes(heightE_class, annual_increment))+
+        geom_boxplot(color = "blue")
+#rel growth
+growthr %>%
+        ggplot(aes(heightFeld_class, relative_gr))+
+        geom_boxplot(color = "blue")
+growthr %>%
+        ggplot(aes(heightCh_class, relative_gr))+
+        geom_boxplot(color = "blue")
+growthr %>%
+        ggplot(aes(heightE_class, relative_gr))+
+        geom_boxplot(color = "blue")
+#emergents and non emergents separated-------
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type90F))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type90Ch))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type90E))+
+        geom_boxplot()
+
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type95F))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type95Ch))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type95E))+
+        geom_boxplot()
+
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type99F))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type99Ch))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type99E))+
+        geom_boxplot()
+#annual increment
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type90F))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type90Ch))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type90E))+
+        geom_boxplot()
+
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type95F))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type95Ch))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type95E))+
+        geom_boxplot()
+
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type99F))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type99Ch))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type99E))+
+        geom_boxplot()
+
+#annual increment
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type90F))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type90Ch))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type90E))+
+        geom_boxplot()
+
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type95F))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type95Ch))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type95E))+
+        geom_boxplot()
+
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type99F))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type99Ch))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type99E))+
+        geom_boxplot()
+#Some plots----
+DNM1 %>%
+        ggplot(aes(x=dbh.y, y=log(annual_increment), fill=tree_type90F))+
+        geom_boxplot()
+DNM1 %>%
+        ggplot(aes(x=dbh.y, y=log(annual_increment), fill=tree_type90Ch))+
+        geom_boxplot()
+DNM1 %>%
+        ggplot(aes(x=dbh.y, y=log(annual_increment), fill=tree_type90E))+
+        geom_boxplot()
+DNM1 %>%
+        ggplot(aes(x=dbh.y, y=log(annual_increment), fill=tree_type95F))+
+        geom_boxplot()
+DNM1 %>%
+        ggplot(aes(x=dbh.y, y=log(annual_increment), fill=tree_type95Ch))+
+        geom_boxplot()
+DNM1 %>%
+        ggplot(aes(x=dbh.y, y=log(annual_increment), fill=tree_type95E))+
+        geom_boxplot()
+DNM1 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99F))+
+        geom_boxplot()
+DNM1 %>%
+        ggplot(aes(x=heightCh_class, y=log(annual_increment), fill=tree_type99Ch))+
+        geom_boxplot()
+DNM1 %>%
+        ggplot(aes(x=heightE_class, y=log(annual_increment), fill=tree_type99E))+
+        geom_boxplot()
+DNM50 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99F))+
+        geom_boxplot()
+DNM50 %>%
+        ggplot(aes(x=heightCh_class, y=log(annual_increment), fill=tree_type99Ch))+
+        geom_boxplot()
+DNM50 %>%
+        ggplot(aes(x=heightE_class, y=log(annual_increment), fill=tree_type99E))+
+        geom_boxplot()
+
+
+par(mfrow=c(1,3))
+DNM2 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99F))+
+        geom_boxplot()
+DNM2 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99Ch))+
+        geom_boxplot()
+DNM2 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99E))+
+        geom_boxplot()
+
+par(mfrow=c(1,3))
+DNM3 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99F))+
+        geom_boxplot()
+DNM3 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99Ch))+
+        geom_boxplot()
+DNM3 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99E))+
+        geom_boxplot()
+par(mfrow=c(1,3))
+DNM50 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99F))+
+        geom_boxplot()
+DNM50 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99Ch))+
+        geom_boxplot()
+DNM50 %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99E))+
+        geom_boxplot()
+par(mfrow=c(1,3))
+LHP %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99F))+
+        geom_boxplot()
+LHP %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99Ch))+
+        geom_boxplot()
+LHP %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99E))+
+        geom_boxplot()
+par(mfrow=c(1,3))
+SPKA %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99F))+
+        geom_boxplot()
+SPKA %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99Ch))+
+        geom_boxplot()
+SPKA %>%
+        ggplot(aes(x=heightFeld_class, y=log(annual_increment), fill=tree_type99E))+
+        geom_boxplot()
+
+#DNM1 Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+
+ggplot(aes(heightFeld_class, annual_increment))+
+        geom_boxplot(color = "blue")+
+        geom_boxplot(data = DNM1em90F,mapping = aes(heightFeld_class, annual_increment), color="red")+
+        geom_vline(xintercept = quantile90Feld)
+
+#Feldpausch Heights 95th percentile
+DNM1 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM1nem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 99th percentile
+DNM1 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM1nem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Feld) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+DNM1 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM1nem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 95th percentile
+DNM1 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM1nem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 99th percentile
+DNM1 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM1nem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Ch) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+DNM1 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM1nem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 95th percentile
+DNM1 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM1nem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 99th percentile
+DNM1 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM1nem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99E) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#DNM2 Plot------
+DNM2 %>%
+        ggplot(aes(x=dbh.y, y=log(annual_increment), fill=tree_type99E))+
+        geom_boxplot()
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+DNM2 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM2nem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 95th percentile
+DNM2 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM2nem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 99th percentile
+DNM2 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM2nem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Feld) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+DNM2 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM2nem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 95th percentile
+DNM2 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM2nem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 99th percentile
+DNM2 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM2nem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Ch) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+DNM2 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM2nem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 95th percentile
+DNM2 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM2nem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 99th percentile
+DNM2 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM2nem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99E) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#DNM3 Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+DNM3 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 95th percentile
+DNM3 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 99th percentile
+DNM3 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Feld) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+DNM3 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 95th percentile
+DNM3 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 99th percentile
+DNM3 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Ch) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+DNM3 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 95th percentile
+DNM3 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 99th percentile
+DNM3 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99E) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#DNM50 Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+DNM50 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 95th percentile
+DNM50 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 99th percentile
+DNM50 %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM3nem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Feld) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+DNM50 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM50nem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 95th percentile
+DNM50 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM50nem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 99th percentile
+DNM50 %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM50nem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Ch) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+DNM50 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM50nem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 95th percentile
+DNM50 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM50nem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 99th percentile
+DNM50 %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = DNM50nem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99E) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#LHP Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+LHP %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = LHPnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 95th percentile
+LHP %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = LHPnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 99th percentile
+LHP %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = LHPnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Feld) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+LHP %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = LHPnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 95th percentile
+LHP %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = LHPnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 99th percentile
+LHP %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = LHPnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Ch) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+LHP %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = LHPnem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 95th percentile
+LHP %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = LHPnem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 99th percentile
+LHP %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = LHPnem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99E) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#SPKA Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+SPKA %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKAnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 95th percentile
+SPKA %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKAnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 99th percentile
+SPKA %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKAnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Feld) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+SPKA %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKAnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 95th percentile
+SPKA %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKAnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 99th percentile
+SPKA %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKAnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Ch) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+SPKA %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKAnem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 95th percentile
+SPKA %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKAnem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 99th percentile
+SPKA %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKAnem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99E) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#SPKH Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+SPKH %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKHnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 95th percentile
+SPKH %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKHnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 99th percentile
+SPKH %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKHnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Feld) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+SPKH %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKHnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 95th percentile
+SPKH %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKHnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 99th percentile
+SPKH %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKHnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Ch) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+SPKH %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKHnem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 95th percentile
+SPKH %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKHnem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 99th percentile
+SPKH %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKHnem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99E) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#SPKS Plot------
+#Feld-----
+par(mfrow=c(3,1))
+#Feldpausch Heights 90th percentile
+SPKS %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKSnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 95th percentile
+SPKS %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKSnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Feld)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Feldpausch Heights 99th percentile
+SPKS %>%
+        ggplot(aes(heightFeld, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKSnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Feld) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w/o E-----
+par(mfrow=c(3,1))
+#Chave Heights 90th percentile
+SPKS %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKSnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 95th percentile
+SPKS %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKSnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95Ch)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave Heights 99th percentile
+SPKS %>%
+        ggplot(aes(heightCh, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKSnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99Ch) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave w E-----
+par(mfrow=c(3,1))
+#Chave E Heights 90th percentile
+SPKS %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKSnem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile90E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 95th percentile
+SPKS %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKSnem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile95E)+
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+#Chave E Heights 99th percentile
+SPKS %>%
+        ggplot(aes(heightE, annual_increment))+
+        geom_point(color = "red")+
+        geom_point(data = SPKSnem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_vline(xintercept = quantile99E) +
+        scale_x_continuous(trans = 'log') +
+        scale_y_continuous(trans = 'log')
+
+
+#sapling stuff that I could probs delete----------
 DNM <- filter(growthr, plot.x == "DNM1_01" | plot.x == "DNM2_02" | plot.x == "DNM3_03" | plot.x == "DNM50_FGEO")
 DNMsap <- filter(DNM, dbh.x >= 1 & dbh.x <= 4.9 & dbh.y >= 1 & dbh.y <= 4.9)
 table(DNM$site.x)
@@ -1642,6 +3187,8 @@ table(SPKS$site.x)
 table(SPKS)
 summary(SPKS$annual_increment)
 summary(SPKS$relative_gr)
+
+
 
 write.csv(growthr, here("Desktop", "Research", "R", "Data", "growth_rates.csv"))
 
