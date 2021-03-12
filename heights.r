@@ -15,6 +15,10 @@ hdata <- filter(hdata, census == "01_census_2016" | census == "02_census_2016" |
                   census == "census_2007_08" | census == "10_census_2014" |
                   census == "30_census_2015" | census == "08_census_2014")
 
+#----------------------------------------------------------------------#
+#-----------------------Calculate Heights-------------------------------
+#----------------------------------------------------------------------#
+
 #Height Equations------
 #use the Feldpausch et al 2011 equation with the Southeast Asia regional coefficients
 dbh2h_01 <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht){ # exclude hgt_ref here if using first dbh_crit eq.
@@ -90,8 +94,9 @@ table(hdata$heightCh)
 # need to specify which "E" value to use - from above
 hdata$heightE <- dbh2h_ChaveE(hdata$dbh,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34,E_DNM)
 
-
-#Quantiles------
+#----------------------------------------------------------------------#
+#-----------------------Calculate Quantiles-----------------------------
+#----------------------------------------------------------------------#
 table(hdata$species)
 table(hdata$heightCh)
 summary(hdata)
@@ -113,16 +118,12 @@ quantile90dbh <-quantile(hdata$dbh, probs = 0.90, na.rm = TRUE)
 quantile95dbh <-quantile(hdata$dbh, probs = 0.95, na.rm = TRUE)
 quantile99dbh <-quantile(hdata$dbh, probs = 0.99, na.rm = TRUE)
 
-#DBH Plot-------
-hdata %>%
-  ggplot(hdata, mapping = aes(x=dbh))+
-  geom_histogram()+
-  geom_vline(xintercept = quantile90dbh) +
-  geom_vline(xintercept = quantile95dbh) +
-  geom_vline(xintercept = quantile99dbh)
-
 #Remove Indets--------
 hdata <- filter(hdata, species != "Indet")
+
+#----------------------------------------------------------------------#
+#------------Adding Emergent/Non-emergent Labeling----------------------
+#----------------------------------------------------------------------#
 #quantile 90-------
 #Feld
 emergent90Feld <- filter(hdata, dbh >= quantile90Feld)
@@ -207,7 +208,37 @@ table(emergent99E)
 
 hdata$tree_type99E <- ifelse(hdata$species %in% c(emergent99E), "emrgnt", "non_emrgnt")
 
-#Plots------
+#------------------DBH Definitions---------------------------
+#90th percentile-----
+emergent90dbh <- filter(hdata, dbh >= quantile90dbh)
+table(emergent90dbh$dbh)
+
+emergent90dbh <- unique(emergent90dbh$species)
+table(emergent90dbh)
+
+hdata$tree_type90dbh <- ifelse(hdata$species %in% c(emergent90dbh), "emrgnt", "non_emrgnt")
+
+#95th percentile-----
+emergent95dbh <- filter(hdata, dbh >= quantile95dbh)
+table(emergent95dbh$dbh)
+
+emergent95dbh <- unique(emergent95dbh$species)
+table(emergent95dbh)
+
+hdata$tree_type95dbh <- ifelse(hdata$species %in% c(emergent95dbh), "emrgnt", "non_emrgnt")
+
+#99th percentile-----
+emergent99dbh <- filter(hdata, dbh >= quantile99dbh)
+table(emergent99dbh$dbh)
+
+emergent99dbh <- unique(emergent99dbh$species)
+table(emergent99dbh)
+
+hdata$tree_type99dbh <- ifelse(hdata$species %in% c(emergent99dbh), "emrgnt", "non_emrgnt")
+
+#----------------------------------------------------------------------#
+#-------------------------Plot Parameters-------------------------------
+#----------------------------------------------------------------------#
 #Separate by site------
 table(hdata$site)
 DNM1=filter(hdata, site == "DNM1")
@@ -310,6 +341,13 @@ hdatanem90E <- filter(hdata, tree_type90E == "non_emrgnt")
 hdatanem95E <- filter(hdata, tree_type95E == "non_emrgnt")
 hdatanem99E <- filter(hdata, tree_type99E == "non_emrgnt")
 
+hdata90nemdbh <- filter(hdata, tree_type90dbh == "non_emrgnt")
+hdata95nemdbh <- filter(hdata, tree_type95dbh == "non_emrgnt")
+hdata99nemdbh <- filter(hdata, tree_type99dbh == "non_emrgnt")
+
+#----------------------------------------------------------------------#
+#-------------------------Random Plots----------------------------------
+#----------------------------------------------------------------------#
 #Everything Plot------
 hdata %>%
   ggplot(aes(dbh, heightFeld, colour= "Height Defintion"))+
@@ -1576,5 +1614,154 @@ hdata %>%
   geom_col(position="stack", stat="identity")
 hdata %>%
   ggplot(hdata, mapping = aes(fill=tree_type99E, y=stem_BA, x=site))+
+  geom_col(position="stack", stat="identity")
+table(hdata$site)
+#----------------------------------------------------------------------#
+#--------------------------------Maps------------------------------------
+#----------------------------------------------------------------------#
+#DNM1-----
+emapdat <- filter(DNM1, dbh >= quantile99dbh)
+nonmapdat <- filter(DNM1, dbh < quantile99dbh)
+summary(nonmapdat)
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
+  geom_point(color="red") 
+
+#DNM2-----
+emapdat <- filter(DNM1, dbh >= quantile99dbh)
+nonmapdat <- filter(DNM1, dbh < quantile99dbh)
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
+  geom_point(color="red") 
+
+#DNM3-----
+emapdat <- filter(DNM3, dbh >= quantile99dbh)
+nonmapdat <- filter(DNM3, dbh < quantile99dbh)
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
+  geom_point(color="red") 
+
+#DNM50-----
+emapdat <- filter(DNM50, dbh >= quantile99dbh)
+nonmapdat <- filter(DNM50, dbh < quantile99dbh)
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
+  geom_point(color="red") 
+
+#LHP-----
+emapdat <- filter(LHP, dbh >= quantile99dbh)
+nonmapdat <- filter(LHP, dbh < quantile99dbh)
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
+  geom_point(color="red") 
+
+#SPKA-----
+emapdat <- filter(SPKA, dbh >= quantile99dbh)
+nonmapdat <- filter(SPKA, dbh < quantile99dbh)
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
+  geom_point(color="red") 
+
+#SPKH-----
+emapdat <- filter(SPKH, dbh >= quantile99dbh)
+nonmapdat <- filter(SPKH, dbh < quantile99dbh)
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
+  geom_point(color="red")
+
+#SPKS-----
+emapdat <- filter(SPKS, dbh >= quantile99dbh)
+nonmapdat <- filter(SPKS, dbh < quantile99dbh)
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
+  geom_point(color="red")
+
+#----------------------------------------------------------------------#
+#-------------------Plots for manuscript-------------------------------
+#----------------------------------------------------------------------#
+#DBH Histogram-------
+hdata %>%
+  ggplot(hdata, mapping = aes(x=dbh))+
+  geom_histogram()+
+  geom_vline(xintercept = quantile90dbh) +
+  geom_vline(xintercept = quantile95dbh) +
+  geom_vline(xintercept = quantile99dbh)
+
+#All three height calculations on one plot
+hdata %>%
+  ggplot(aes(dbh, heightFeld, colour= "Height Defintion"))+
+  geom_point(aes(dbh, heightFeld), color="chartreuse3")+
+  geom_point(aes(dbh, heightCh), color="darkorchid3")+
+  geom_point(aes(dbh, heightE), color="deepskyblue3")+
+  geom_hline(yintercept = quantile90Feld, color="chartreuse4")+
+  annotate("text", y= quantile90Feld+2,x=230,label=round(quantile90Feld, digits=3))+
+  geom_hline(yintercept = quantile95Feld, color="chartreuse4")+
+  annotate("text", y= quantile95Feld+2,x=230,label=round(quantile95Feld, digits=3))+
+  geom_hline(size=1, yintercept = quantile99Feld, color="chartreuse4")+
+  annotate("text", y= quantile99Feld+2,x=230,label=round(quantile99Feld, digits=3))+
+  geom_vline(xintercept = quantile90dbh, color="black")+
+  annotate("text", x= quantile90dbh+5,y=5,label=round(quantile90dbh, digits=3))+
+  geom_vline(xintercept = quantile95dbh, color="black")+
+  annotate("text", x= quantile95dbh+7,y=5,label=round(quantile95dbh, digits=3))+
+  geom_vline(size=1, xintercept = quantile99dbh, color="black")+
+  annotate("text", x= quantile99dbh+5,y=5,label=round(quantile99dbh, digits=3))+
+  xlab("DBH")+
+  ylab("Height")
+
+#99th percentile DBH and All Height Calculations Plot with Emergent species colored darker
+hdata %>%
+  ggplot(aes(dbh, heightFeld))+
+  geom_point(aes(dbh, heightFeld), color="chartreuse3")+
+  geom_point(data = hdata99nemdbh,mapping = aes(dbh, heightFeld), color="chartreuse4")+
+  geom_point(aes(dbh, heightCh), color="darkorchid3")+
+  geom_point(data = hdata99nemdbh,mapping = aes(dbh, heightCh), color="darkorchid4")+
+  geom_point(aes(dbh, heightE), color="deepskyblue3")+
+  geom_point(data = hdata99nemdbh,mapping = aes(dbh, heightE), color="deepskyblue4")+
+  geom_vline(xintercept = quantile99dbh, color="black")+
+  xlab("DBH")+
+  ylab("Height")
+  
+#Same plot as last one, but with only Feld Height Calculation
+hdata %>%
+  ggplot(aes(dbh, heightFeld))+
+  geom_point(aes(dbh, heightFeld), color="chartreuse3")+
+  geom_point(data = hdata99nemdbh,mapping = aes(dbh, heightFeld), color="chartreuse4")+
+  geom_vline(xintercept = quantile99dbh, color="black")+
+  xlab("DBH")+
+  ylab("Height")
+
+#Stem_BA---
+allplotdat <- hdata %>% group_by(site) %>% summarize(n_stems=n(), plot_BA = sum(stem_BA, na.rm=T, 
+                                                                         mean_stem_BA = mean(stem_BA, na.rm=T)))
+
+emhdata <- filter(hdata, tree_type99F == "emrgnt")
+emplotdat <- emhdata %>% group_by(site) %>% summarize(n_stems=n(), plot_BA = sum(stem_BA, na.rm=T, 
+                                                                             mean_stem_BA = mean(stem_BA, na.rm=T)))
+plotdat <- inner_join(allplotdat, emplotdat, by="site")
+
+plotdat$area <- c(1,1,1,50,52,8,12,4)
+
+plotdat$stemBAha <- plotdat$plot_BA.x/plotdat$area
+plotdat$stemBAhaEM <- plotdat$plot_BA.y/plotdat$area
+
+plotdat$stemdens <- plotdat$n_stems.x/plotdat$area
+plotdat$stemdensEM <- plotdat$n_stems.y/plotdat$area
+
+#Stem_BAs plot------
+plotdat %>%
+  ggplot(plotdat, mapping = aes(fill=stemBAhaEM, y=stemBAha, x=site))+
+  geom_col(position="stack")
+
+#Stem density plot------
+plotdat %>%
+  ggplot(plotdat, mapping = aes(fill=stemdensEM, y=stemdens, x=site))+
   geom_col(position="stack", stat="identity")
 
