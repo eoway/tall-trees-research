@@ -40,3 +40,9 @@ Data cleaning is separated into N(4) different data cleaning protocols:
 	- exclude broken below
 	- keep all other (i.e., don't exclude based on outlier growth rates, etc.)
 
+
+## Manuscript Plots:
+- located at the end of the heights.r and growth_rates_NH_EO_NH.r scripts
+- first run heights.r and then run growth_rates_NH_EO_NH.r
+	- You don't have to necessarily run the whole heights script, just the portion before "Random Plots"
+
