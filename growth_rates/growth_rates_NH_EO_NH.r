@@ -3,10 +3,18 @@ library(dplyr)
 library(tidyverse)
 library(here)
 library(skimr)
+#-------------------------------------------------------------------#
+#----------------First Run Heights.r script!------------------------#
+#-------------------------------------------------------------------#
+
 #Load Data----------
 growdata <- read_csv(here("Elsa Clean", "growth_dat.csv"))
 
 growdata <- filter(growdata, dbh >= 10)
+
+#---------------------------------------------------------------------------#
+#--------------------------Growth Rate Calcutlations------------------------
+#---------------------------------------------------------------------------#
 
 #SPKS08 first interval------------
 
@@ -1936,9 +1944,10 @@ growthp <- rbind(SPKS08_2001_2014, DNM1_2006_2016,
                  SPKA10_2001_2014, SPKH4_2001_2014, 
                  SPKH5_2001_2014,SPKH30_2001_2015)
 
-colnames(SPKS08_2001_2014)
-colnames(DNM3_2006_2016)
-#Adding height info for plots---------
+
+#---------------------------------------------------------------------------#
+#--------------------------Add Height info to growthr------------------------
+#---------------------------------------------------------------------------#
 #Height Equations------
 #use the Feldpausch et al 2011 equation with the Southeast Asia regional coefficients
 dbh2h_01 <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht){ # exclude hgt_ref here if using first dbh_crit eq.
@@ -2005,84 +2014,64 @@ E_SPK = E[3]
 colnames(growthr)
 #Calculate Heights-----
 #Feld
-growthr$heightFeld <- dbh2h_01(growthr$dbh.x, hgt_max_SEA, hgt_ref_SEA, b1Ht_SEA, b2Ht_SEA)
+growthr$heightFeld <- dbh2h_01(growthr$dbh.y, hgt_max_SEA, hgt_ref_SEA, b1Ht_SEA, b2Ht_SEA)
 table(growthr$heightFeld)
 #Chave
-growthr$heightCh <- dbh2h_34(growthr$dbh.x,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34)
+growthr$heightCh <- dbh2h_34(growthr$dbh.y,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34)
 table(growthr$heightCh)
 #Chave with E
 # need to specify which "E" value to use - from above
-growthr$heightE <- dbh2h_ChaveE(growthr$dbh.x,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34,E_DNM)
+growthr$heightE <- dbh2h_ChaveE(growthr$dbh.y,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34,E_DNM)
 
 #Source Height Quantiles------
 source("heights.r")
 
 #Exclude Indets???? ASK------
-growthr <- filter(growthr, species.x != "Indet")
 growthr <- filter(growthr, species.y != "Indet")
-table(growthr$species.x)
 #quantile 90-------
 #Feld
-growthr$tree_type90F <- ifelse(growthr$species.x %in% c(emergent90Feld), "emrgnt", "non_emrgnt")
+growthr$tree_type90F <- ifelse(growthr$species.y %in% c(emergent90Feld), "emrgnt", "non_emrgnt")
 
 #Chave w/o E
-growthr$tree_type90Ch <- ifelse(growthr$species.x %in% c(emergent90Ch), "emrgnt", "non_emrgnt")
+growthr$tree_type90Ch <- ifelse(growthr$species.y %in% c(emergent90Ch), "emrgnt", "non_emrgnt")
 
 #Chave with E
-growthr$tree_type90E <- ifelse(growthr$species.x %in% c(emergent90E), "emrgnt", "non_emrgnt")
+growthr$tree_type90E <- ifelse(growthr$species.y %in% c(emergent90E), "emrgnt", "non_emrgnt")
 
 
 #quantile 95-------
 #Feld
-growthr$tree_type95F <- ifelse(growthr$species.x %in% c(emergent95Feld), "emrgnt", "non_emrgnt")
+growthr$tree_type95F <- ifelse(growthr$species.y %in% c(emergent95Feld), "emrgnt", "non_emrgnt")
 
 #Chave w/o E
-growthr$tree_type95Ch <- ifelse(growthr$species.x %in% c(emergent95Ch), "emrgnt", "non_emrgnt")
+growthr$tree_type95Ch <- ifelse(growthr$species.y %in% c(emergent95Ch), "emrgnt", "non_emrgnt")
 
 #Chave with E
-growthr$tree_type95E <- ifelse(growthr$species.x %in% c(emergent95E), "emrgnt", "non_emrgnt")
+growthr$tree_type95E <- ifelse(growthr$species.y %in% c(emergent95E), "emrgnt", "non_emrgnt")
 
 #quantile 99-------
 #Feld
-growthr$tree_type99F <- ifelse(growthr$species.x %in% c(emergent99Feld), "emrgnt", "non_emrgnt")
+growthr$tree_type99F <- ifelse(growthr$species.y %in% c(emergent99Feld), "emrgnt", "non_emrgnt")
 
 #Chave w/o E
-growthr$tree_type99Ch <- ifelse(growthr$species.x %in% c(emergent99Ch), "emrgnt", "non_emrgnt")
+growthr$tree_type99Ch <- ifelse(growthr$species.y %in% c(emergent99Ch), "emrgnt", "non_emrgnt")
 #Chave with E
-growthr$tree_type99E <- ifelse(growthr$species.x %in% c(emergent99E), "emrgnt", "non_emrgnt")
+growthr$tree_type99E <- ifelse(growthr$species.y %in% c(emergent99E), "emrgnt", "non_emrgnt")
+
+#DBH------
+#90th percentile-----
+growthr$tree_type90dbh <- ifelse(growthr$species.y %in% c(emergent90dbh), "emrgnt", "non_emrgnt")
+
+#95th percentile-----
+growthr$tree_type95dbh <- ifelse(growthr$species.y %in% c(emergent95dbh), "emrgnt", "non_emrgnt")
+
+#99th percentile-----
+growthr$tree_type99dbh <- ifelse(growthr$species.y %in% c(emergent99dbh), "emrgnt", "non_emrgnt")
 
 
-#Unpooled Plots-------
-#Growth~Diameter-----
-ggplot() +
-        geom_boxplot(growthr, mapping = aes(site.x, log(annual_increment)))
-ggplot() +
-        geom_boxplot(growthr, mapping = aes(site.x, annual_increment))
-ggplot() +
-        geom_boxplot(growthr, mapping = aes(site.x, log(relative_gr)))
-      
-growthr$size_class <- 
-        cut(growthr$dbh.y, breaks=c(0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,
-                                    110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,max(growthr$dbh.y, na.rm=T)),
-        )
-growthr$size_class2 <- 
-        cut(growthr$dbh.y, breaks=c(0,10,20,30,40,50,60,70,80,90,100,
-                                    110,120,130,140,150,160,170,180,190,200,210,max(growthr$dbh.y, na.rm=T)),
-        )
-
-par(mfrow=c(1,2))
-plot(growthr$size_class, log(growthr$annual_increment), pch=19, 
-     xlab="DBH", ylab="annual increment", )
-plot(growthr$size_class2, log(growthr$annual_increment), pch=19, 
-     xlab="DBH", ylab="annual increment", )
-
-par(mfrow=c(1,2))
-plot(growthr$size_class, log(growthr$relative_gr), pch=19, 
-     xlab="DBH", ylab="relative", )
-plot(growthr$size_class2, log(growthr$relative_gr), pch=19, 
-     xlab="DBH", ylab="relative", )
-
-table(growthr$site.x)
+#---------------------------------------------------------------------------#
+#-------------------------Plot Variables-------------------------------------
+#---------------------------------------------------------------------------#
 
 #Growth~Height Definitions-------
 #height bins------
@@ -2109,145 +2098,182 @@ SPKA=filter(growthr, site.x == "SPKA")
 SPKH=filter(growthr, site.x == "SPKH")
 SPKS=filter(growthr, site.x == "SPKS")
 
-DNM1nem90F <- filter(DNM1, tree_type90F == "non_emrgnt")
-DNM1nem95F <- filter(DNM1, tree_type95F == "non_emrgnt")
-DNM1nem99F <- filter(DNM1, tree_type99F == "non_emrgnt")
-DNM1nem90Ch <- filter(DNM1, tree_type90Ch == "non_emrgnt")
-DNM1nem95Ch <- filter(DNM1, tree_type95Ch == "non_emrgnt")
-DNM1nem99Ch <- filter(DNM1, tree_type99Ch == "non_emrgnt")
-DNM1nem90E <- filter(DNM1, tree_type90E == "non_emrgnt")
-DNM1nem95E <- filter(DNM1, tree_type95E == "non_emrgnt")
-DNM1nem99E <- filter(DNM1, tree_type99E == "non_emrgnt")
 
-DNM2nem90F <- filter(DNM2, tree_type90F == "non_emrgnt")
-DNM2nem95F <- filter(DNM2, tree_type95F == "non_emrgnt")
-DNM2nem99F <- filter(DNM2, tree_type99F == "non_emrgnt")
-DNM2nem90Ch <- filter(DNM2, tree_type90Ch == "non_emrgnt")
-DNM2nem95Ch <- filter(DNM2, tree_type95Ch == "non_emrgnt")
-DNM2nem99Ch <- filter(DNM2, tree_type99Ch == "non_emrgnt")
-DNM2nem90E <- filter(DNM2, tree_type90E == "non_emrgnt")
-DNM2nem95E <- filter(DNM2, tree_type95E == "non_emrgnt")
-DNM2nem99E <- filter(DNM2, tree_type99E == "non_emrgnt")
+DNM1GRnem90F <- filter(DNM1, tree_type90F == "non_emrgnt")
+DNM1GRnem95F <- filter(DNM1, tree_type95F == "non_emrgnt")
+DNM1GRnem99F <- filter(DNM1, tree_type99F == "non_emrgnt")
+DNM1GRnem90Ch <- filter(DNM1, tree_type90Ch == "non_emrgnt")
+DNM1GRnem95Ch <- filter(DNM1, tree_type95Ch == "non_emrgnt")
+DNM1GRnem99Ch <- filter(DNM1, tree_type99Ch == "non_emrgnt")
+DNM1GRnem90E <- filter(DNM1, tree_type90E == "non_emrgnt")
+DNM1GRnem95E <- filter(DNM1, tree_type95E == "non_emrgnt")
+DNM1GRnem99E <- filter(DNM1, tree_type99E == "non_emrgnt")
 
-DNM3nem90F <- filter(DNM3, tree_type90F == "non_emrgnt")
-DNM3nem95F <- filter(DNM3, tree_type95F == "non_emrgnt")
-DNM3nem99F <- filter(DNM3, tree_type99F == "non_emrgnt")
-DNM3nem90Ch <- filter(DNM3, tree_type90Ch == "non_emrgnt")
-DNM3nem95Ch <- filter(DNM3, tree_type95Ch == "non_emrgnt")
-DNM3nem99Ch <- filter(DNM3, tree_type99Ch == "non_emrgnt")
-DNM3nem90E <- filter(DNM3, tree_type90E == "non_emrgnt")
-DNM3nem95E <- filter(DNM3, tree_type95E == "non_emrgnt")
-DNM3nem99E <- filter(DNM3, tree_type99E == "non_emrgnt")
+DNM2GRnem90F <- filter(DNM2, tree_type90F == "non_emrgnt")
+DNM2GRnem95F <- filter(DNM2, tree_type95F == "non_emrgnt")
+DNM2GRnem99F <- filter(DNM2, tree_type99F == "non_emrgnt")
+DNM2GRnem90Ch <- filter(DNM2, tree_type90Ch == "non_emrgnt")
+DNM2GRnem95Ch <- filter(DNM2, tree_type95Ch == "non_emrgnt")
+DNM2GRnem99Ch <- filter(DNM2, tree_type99Ch == "non_emrgnt")
+DNM2GRnem90E <- filter(DNM2, tree_type90E == "non_emrgnt")
+DNM2GRnem95E <- filter(DNM2, tree_type95E == "non_emrgnt")
+DNM2GRnem99E <- filter(DNM2, tree_type99E == "non_emrgnt")
 
-DNM50nem90F <- filter(DNM50, tree_type90F == "non_emrgnt")
-DNM50nem95F <- filter(DNM50, tree_type95F == "non_emrgnt")
-DNM50nem99F <- filter(DNM50, tree_type99F == "non_emrgnt")
-DNM50nem90Ch <- filter(DNM50, tree_type90Ch == "non_emrgnt")
-DNM50nem95Ch <- filter(DNM50, tree_type95Ch == "non_emrgnt")
-DNM50nem99Ch <- filter(DNM50, tree_type99Ch == "non_emrgnt")
-DNM50nem90E <- filter(DNM50, tree_type90E == "non_emrgnt")
-DNM50nem95E <- filter(DNM50, tree_type95E == "non_emrgnt")
-DNM50nem99E <- filter(DNM50, tree_type99E == "non_emrgnt")
+DNM3GRnem90F <- filter(DNM3, tree_type90F == "non_emrgnt")
+DNM3GRnem95F <- filter(DNM3, tree_type95F == "non_emrgnt")
+DNM3GRnem99F <- filter(DNM3, tree_type99F == "non_emrgnt")
+DNM3GRnem90Ch <- filter(DNM3, tree_type90Ch == "non_emrgnt")
+DNM3GRnem95Ch <- filter(DNM3, tree_type95Ch == "non_emrgnt")
+DNM3GRnem99Ch <- filter(DNM3, tree_type99Ch == "non_emrgnt")
+DNM3GRnem90E <- filter(DNM3, tree_type90E == "non_emrgnt")
+DNM3GRnem95E <- filter(DNM3, tree_type95E == "non_emrgnt")
+DNM3GRnem99E <- filter(DNM3, tree_type99E == "non_emrgnt")
 
-LHPnem90F <- filter(LHP, tree_type90F == "non_emrgnt")
-LHPnem95F <- filter(LHP, tree_type95F == "non_emrgnt")
-LHPnem99F <- filter(LHP, tree_type99F == "non_emrgnt")
-LHPnem90Ch <- filter(LHP, tree_type90Ch == "non_emrgnt")
-LHPnem95Ch <- filter(LHP, tree_type95Ch == "non_emrgnt")
-LHPnem99Ch <- filter(LHP, tree_type99Ch == "non_emrgnt")
-LHPnem90E <- filter(LHP, tree_type90E == "non_emrgnt")
-LHPnem95E <- filter(LHP, tree_type95E == "non_emrgnt")
-LHPnem99E <- filter(LHP, tree_type99E == "non_emrgnt")
+DNM50GRnem90F <- filter(DNM50, tree_type90F == "non_emrgnt")
+DNM50GRnem95F <- filter(DNM50, tree_type95F == "non_emrgnt")
+DNM50GRnem99F <- filter(DNM50, tree_type99F == "non_emrgnt")
+DNM50GRnem90Ch <- filter(DNM50, tree_type90Ch == "non_emrgnt")
+DNM50GRnem95Ch <- filter(DNM50, tree_type95Ch == "non_emrgnt")
+DNM50GRnem99Ch <- filter(DNM50, tree_type99Ch == "non_emrgnt")
+DNM50GRnem90E <- filter(DNM50, tree_type90E == "non_emrgnt")
+DNM50GRnem95E <- filter(DNM50, tree_type95E == "non_emrgnt")
+DNM50GRnem99E <- filter(DNM50, tree_type99E == "non_emrgnt")
 
-SPKAnem90F <- filter(SPKA, tree_type90F == "non_emrgnt")
-SPKAnem95F <- filter(SPKA, tree_type95F == "non_emrgnt")
-SPKAnem99F <- filter(SPKA, tree_type99F == "non_emrgnt")
-SPKAnem90Ch <- filter(SPKA, tree_type90Ch == "non_emrgnt")
-SPKAnem95Ch <- filter(SPKA, tree_type95Ch == "non_emrgnt")
-SPKAnem99Ch <- filter(SPKA, tree_type99Ch == "non_emrgnt")
-SPKAnem90E <- filter(SPKA, tree_type90E == "non_emrgnt")
-SPKAnem95E <- filter(SPKA, tree_type95E == "non_emrgnt")
-SPKAnem99E <- filter(SPKA, tree_type99E == "non_emrgnt")
+LHPGRnem90F <- filter(LHP, tree_type90F == "non_emrgnt")
+LHPGRnem95F <- filter(LHP, tree_type95F == "non_emrgnt")
+LHPGRnem99F <- filter(LHP, tree_type99F == "non_emrgnt")
+LHPGRnem90Ch <- filter(LHP, tree_type90Ch == "non_emrgnt")
+LHPGRnem95Ch <- filter(LHP, tree_type95Ch == "non_emrgnt")
+LHPGRnem99Ch <- filter(LHP, tree_type99Ch == "non_emrgnt")
+LHPGRnem90E <- filter(LHP, tree_type90E == "non_emrgnt")
+LHPGRnem95E <- filter(LHP, tree_type95E == "non_emrgnt")
+LHPGRnem99E <- filter(LHP, tree_type99E == "non_emrgnt")
 
-SPKHnem90F <- filter(SPKH, tree_type90F == "non_emrgnt")
-SPKHnem95F <- filter(SPKH, tree_type95F == "non_emrgnt")
-SPKHnem99F <- filter(SPKH, tree_type99F == "non_emrgnt")
-SPKHnem90Ch <- filter(SPKH, tree_type90Ch == "non_emrgnt")
-SPKHnem95Ch <- filter(SPKH, tree_type95Ch == "non_emrgnt")
-SPKHnem99Ch <- filter(SPKH, tree_type99Ch == "non_emrgnt")
-SPKHnem90E <- filter(SPKH, tree_type90E == "non_emrgnt")
-SPKHnem95E <- filter(SPKH, tree_type95E == "non_emrgnt")
-SPKHnem99E <- filter(SPKH, tree_type99E == "non_emrgnt")
+SPKAGRnem90F <- filter(SPKA, tree_type90F == "non_emrgnt")
+SPKAGRnem95F <- filter(SPKA, tree_type95F == "non_emrgnt")
+SPKAGRnem99F <- filter(SPKA, tree_type99F == "non_emrgnt")
+SPKAGRnem90Ch <- filter(SPKA, tree_type90Ch == "non_emrgnt")
+SPKAGRnem95Ch <- filter(SPKA, tree_type95Ch == "non_emrgnt")
+SPKAGRnem99Ch <- filter(SPKA, tree_type99Ch == "non_emrgnt")
+SPKAGRnem90E <- filter(SPKA, tree_type90E == "non_emrgnt")
+SPKAGRnem95E <- filter(SPKA, tree_type95E == "non_emrgnt")
+SPKAGRnem99E <- filter(SPKA, tree_type99E == "non_emrgnt")
 
-SPKSnem90F <- filter(SPKS, tree_type90F == "non_emrgnt")
-SPKSnem95F <- filter(SPKS, tree_type95F == "non_emrgnt")
-SPKSnem99F <- filter(SPKS, tree_type99F == "non_emrgnt")
-SPKSnem90Ch <- filter(SPKS, tree_type90Ch == "non_emrgnt")
-SPKSnem95Ch <- filter(SPKS, tree_type95Ch == "non_emrgnt")
-SPKSnem99Ch <- filter(SPKS, tree_type99Ch == "non_emrgnt")
-SPKSnem90E <- filter(SPKS, tree_type90E == "non_emrgnt")
-SPKSnem95E <- filter(SPKS, tree_type95E == "non_emrgnt")
-SPKSnem99E <- filter(SPKS, tree_type99E == "non_emrgnt")
+SPKHGRnem90F <- filter(SPKH, tree_type90F == "non_emrgnt")
+SPKHGRnem95F <- filter(SPKH, tree_type95F == "non_emrgnt")
+SPKHGRnem99F <- filter(SPKH, tree_type99F == "non_emrgnt")
+SPKHGRnem90Ch <- filter(SPKH, tree_type90Ch == "non_emrgnt")
+SPKHGRnem95Ch <- filter(SPKH, tree_type95Ch == "non_emrgnt")
+SPKHGRnem99Ch <- filter(SPKH, tree_type99Ch == "non_emrgnt")
+SPKHGRnem90E <- filter(SPKH, tree_type90E == "non_emrgnt")
+SPKHGRnem95E <- filter(SPKH, tree_type95E == "non_emrgnt")
+SPKHGRnem99E <- filter(SPKH, tree_type99E == "non_emrgnt")
+
+SPKSGRnem90F <- filter(SPKS, tree_type90F == "non_emrgnt")
+SPKSGRnem95F <- filter(SPKS, tree_type95F == "non_emrgnt")
+SPKSGRnem99F <- filter(SPKS, tree_type99F == "non_emrgnt")
+SPKSGRnem90Ch <- filter(SPKS, tree_type90Ch == "non_emrgnt")
+SPKSGRnem95Ch <- filter(SPKS, tree_type95Ch == "non_emrgnt")
+SPKSGRnem99Ch <- filter(SPKS, tree_type99Ch == "non_emrgnt")
+SPKSGRnem90E <- filter(SPKS, tree_type90E == "non_emrgnt")
+SPKSGRnem95E <- filter(SPKS, tree_type95E == "non_emrgnt")
+SPKSGRnem99E <- filter(SPKS, tree_type99E == "non_emrgnt")
 
 
-growthrnem90F <- filter(growthr, tree_type90F == "non_emrgnt")
-growthrnem95F <- filter(growthr, tree_type95F == "non_emrgnt")
-growthrnem99F <- filter(growthr, tree_type99F == "non_emrgnt")
-growthrnem90Ch <- filter(growthr, tree_type90Ch == "non_emrgnt")
-growthrnem95Ch <- filter(growthr, tree_type95Ch == "non_emrgnt")
-growthrnem99Ch <- filter(growthr, tree_type99Ch == "non_emrgnt")
-growthrnem90E <- filter(growthr, tree_type90E == "non_emrgnt")
-growthrnem95E <- filter(growthr, tree_type95E == "non_emrgnt")
-growthrnem99E <- filter(growthr, tree_type99E == "non_emrgnt")
+growthrGRnem90F <- filter(growthr, tree_type90F == "non_emrgnt")
+growthrGRnem95F <- filter(growthr, tree_type95F == "non_emrgnt")
+growthrGRnem99F <- filter(growthr, tree_type99F == "non_emrgnt")
+growthrGRnem90Ch <- filter(growthr, tree_type90Ch == "non_emrgnt")
+growthrGRnem95Ch <- filter(growthr, tree_type95Ch == "non_emrgnt")
+growthrGRnem99Ch <- filter(growthr, tree_type99Ch == "non_emrgnt")
+growthrGRnem90E <- filter(growthr, tree_type90E == "non_emrgnt")
+growthrGRnem95E <- filter(growthr, tree_type95E == "non_emrgnt")
+growthrGRnem99E <- filter(growthr, tree_type99E == "non_emrgnt")
+
+growthrGRnem99dbh <- filter(growthr, tree_type99dbh == "non_emrgnt")
+
+#---------------------------------------------------------------------------#
+#--------------------------Random Plots-------------------------------------
+#---------------------------------------------------------------------------#
+#Unpooled Plots-------
+#Growth~Diameter-----
+ggplot() +
+        geom_boxplot(growthr, mapping = aes(site.x, log(annual_increment)))
+ggplot() +
+        geom_boxplot(growthr, mapping = aes(site.x, annual_increment))
+ggplot() +
+        geom_boxplot(growthr, mapping = aes(site.x, log(relative_gr)))
+
+growthr$size_class <- 
+        cut(growthr$dbh.y, breaks=c(0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,
+                                    110,115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,200,205,max(growthr$dbh.y, na.rm=T)),
+        )
+growthr$size_class2 <- 
+        cut(growthr$dbh.y, breaks=c(0,10,20,30,40,50,60,70,80,90,100,
+                                    110,120,130,140,150,160,170,180,190,200,210,max(growthr$dbh.y, na.rm=T)),
+        )
+
+par(mfrow=c(1,2))
+plot(growthr$size_class, log(growthr$annual_increment), pch=19, 
+     xlab="DBH", ylab="annual increment", )
+plot(growthr$size_class2, log(growthr$annual_increment), pch=19, 
+     xlab="DBH", ylab="annual increment", )
+
+par(mfrow=c(1,2))
+plot(growthr$size_class, log(growthr$relative_gr), pch=19, 
+     xlab="DBH", ylab="relative", )
+plot(growthr$size_class2, log(growthr$relative_gr), pch=19, 
+     xlab="DBH", ylab="relative", )
+
 #everything scatter plot-------
 #90th percentile
 #all
 growthr %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "chartreuse3")+
-        geom_point(data = growthrnem90F,color = "chartreuse4")+
+        geom_point(data = growthrGRnem90F,color = "chartreuse4")+
         geom_vline(xintercept = quantile90Feld, color="black")
 growthr %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "darkorchid2")+
-        geom_point(data = growthrnem90Ch,color = "darkorchid4")+
+        geom_point(data = growthrGRnem90Ch,color = "darkorchid4")+
         geom_vline(xintercept = quantile90Ch, color="black")
 growthr %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "deepskyblue2")+
-        geom_point(data = growthrnem90E,color = "deepskyblue4")+
+        geom_point(data = growthrGRnem90E,color = "deepskyblue4")+
         geom_vline(xintercept = quantile90E, color="black")
 #95th percentile
 growthr %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "chartreuse3")+
-        geom_point(data = growthrnem95F,color = "chartreuse4")+
+        geom_point(data = growthrGRnem95F,color = "chartreuse4")+
         geom_vline(xintercept = quantile95Feld, color="black")
 growthr %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "darkorchid2")+
-        geom_point(data = growthrnem95Ch,color = "darkorchid4")+
+        geom_point(data = growthrGRnem95Ch,color = "darkorchid4")+
         geom_vline(xintercept = quantile95Ch, color="black")
 growthr %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "deepskyblue2")+
-        geom_point(data = growthrnem95E,color = "deepskyblue4")+
+        geom_point(data = growthrGRnem95E,color = "deepskyblue4")+
         geom_vline(xintercept = quantile95E, color="black")
 #99th percentile
 growthr %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "chartreuse3")+
-        geom_point(data = growthrnem99F,color = "chartreuse4")+
+        geom_point(data = growthrGRnem99F,color = "chartreuse4")+
         geom_vline(xintercept = quantile99Feld, color="green")
 growthr %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "darkorchid2")+
-        geom_point(data = growthrnem99Ch,color = "darkorchid4")+
+        geom_point(data = growthrGRnem99Ch,color = "darkorchid4")+
         geom_vline(xintercept = quantile99Ch, color="black")
 growthr %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "deepskyblue2")+
-        geom_point(data = growthrnem99E,color = "deepskyblue4")+
+        geom_point(data = growthrGRnem99E,color = "deepskyblue4")+
         geom_vline(xintercept = quantile99E, color="black")
 #everything box plot-------
 #annual increment
@@ -2466,7 +2492,7 @@ ggplot(aes(heightFeld_class, annual_increment))+
 DNM1 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM1nem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM1GRnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2475,7 +2501,7 @@ DNM1 %>%
 DNM1 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM1nem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM1GRnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Feld) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2486,7 +2512,7 @@ par(mfrow=c(3,1))
 DNM1 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM1nem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM1GRnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2495,7 +2521,7 @@ DNM1 %>%
 DNM1 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM1nem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM1GRnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2504,7 +2530,7 @@ DNM1 %>%
 DNM1 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM1nem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM1GRnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Ch) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2515,7 +2541,7 @@ par(mfrow=c(3,1))
 DNM1 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM1nem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM1GRnem90E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2524,7 +2550,7 @@ DNM1 %>%
 DNM1 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM1nem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM1GRnem95E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2533,7 +2559,7 @@ DNM1 %>%
 DNM1 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM1nem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM1GRnem99E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99E) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2548,7 +2574,7 @@ par(mfrow=c(3,1))
 DNM2 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM2nem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM2GRnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2557,7 +2583,7 @@ DNM2 %>%
 DNM2 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM2nem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM2GRnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2566,7 +2592,7 @@ DNM2 %>%
 DNM2 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM2nem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM2GRnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Feld) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2577,7 +2603,7 @@ par(mfrow=c(3,1))
 DNM2 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM2nem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM2GRnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2586,7 +2612,7 @@ DNM2 %>%
 DNM2 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM2nem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM2GRnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2595,7 +2621,7 @@ DNM2 %>%
 DNM2 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM2nem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM2GRnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Ch) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2606,7 +2632,7 @@ par(mfrow=c(3,1))
 DNM2 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM2nem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM2GRnem90E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2615,7 +2641,7 @@ DNM2 %>%
 DNM2 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM2nem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM2GRnem95E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2624,7 +2650,7 @@ DNM2 %>%
 DNM2 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM2nem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM2GRnem99E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99E) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2636,7 +2662,7 @@ par(mfrow=c(3,1))
 DNM3 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2645,7 +2671,7 @@ DNM3 %>%
 DNM3 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2654,7 +2680,7 @@ DNM3 %>%
 DNM3 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Feld) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2665,7 +2691,7 @@ par(mfrow=c(3,1))
 DNM3 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2674,7 +2700,7 @@ DNM3 %>%
 DNM3 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2683,7 +2709,7 @@ DNM3 %>%
 DNM3 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Ch) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2694,7 +2720,7 @@ par(mfrow=c(3,1))
 DNM3 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem90E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2703,7 +2729,7 @@ DNM3 %>%
 DNM3 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem95E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2712,7 +2738,7 @@ DNM3 %>%
 DNM3 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem99E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99E) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2724,7 +2750,7 @@ par(mfrow=c(3,1))
 DNM50 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2733,7 +2759,7 @@ DNM50 %>%
 DNM50 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2742,7 +2768,7 @@ DNM50 %>%
 DNM50 %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM3nem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = DNM3GRnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Feld) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2753,7 +2779,7 @@ par(mfrow=c(3,1))
 DNM50 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM50nem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM50GRnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2762,7 +2788,7 @@ DNM50 %>%
 DNM50 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM50nem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM50GRnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2771,7 +2797,7 @@ DNM50 %>%
 DNM50 %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM50nem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = DNM50GRnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Ch) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2782,7 +2808,7 @@ par(mfrow=c(3,1))
 DNM50 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM50nem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM50GRnem90E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2791,7 +2817,7 @@ DNM50 %>%
 DNM50 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM50nem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM50GRnem95E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2800,7 +2826,7 @@ DNM50 %>%
 DNM50 %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = DNM50nem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = DNM50GRnem99E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99E) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2812,7 +2838,7 @@ par(mfrow=c(3,1))
 LHP %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = LHPnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = LHPGRnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2821,7 +2847,7 @@ LHP %>%
 LHP %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = LHPnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = LHPGRnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2830,7 +2856,7 @@ LHP %>%
 LHP %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = LHPnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = LHPGRnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Feld) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2841,7 +2867,7 @@ par(mfrow=c(3,1))
 LHP %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = LHPnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = LHPGRnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2850,7 +2876,7 @@ LHP %>%
 LHP %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = LHPnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = LHPGRnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2859,7 +2885,7 @@ LHP %>%
 LHP %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = LHPnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = LHPGRnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Ch) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2870,7 +2896,7 @@ par(mfrow=c(3,1))
 LHP %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = LHPnem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = LHPGRnem90E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2879,7 +2905,7 @@ LHP %>%
 LHP %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = LHPnem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = LHPGRnem95E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2888,7 +2914,7 @@ LHP %>%
 LHP %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = LHPnem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = LHPGRnem99E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99E) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2900,7 +2926,7 @@ par(mfrow=c(3,1))
 SPKA %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKAnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = SPKAGRnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2909,7 +2935,7 @@ SPKA %>%
 SPKA %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKAnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = SPKAGRnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2918,7 +2944,7 @@ SPKA %>%
 SPKA %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKAnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = SPKAGRnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Feld) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2929,7 +2955,7 @@ par(mfrow=c(3,1))
 SPKA %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKAnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = SPKAGRnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2938,7 +2964,7 @@ SPKA %>%
 SPKA %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKAnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = SPKAGRnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2947,7 +2973,7 @@ SPKA %>%
 SPKA %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKAnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = SPKAGRnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Ch) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2958,7 +2984,7 @@ par(mfrow=c(3,1))
 SPKA %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKAnem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = SPKAGRnem90E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2967,7 +2993,7 @@ SPKA %>%
 SPKA %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKAnem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = SPKAGRnem95E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2976,7 +3002,7 @@ SPKA %>%
 SPKA %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKAnem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = SPKAGRnem99E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99E) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2988,7 +3014,7 @@ par(mfrow=c(3,1))
 SPKH %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKHnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = SPKHGRnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -2997,7 +3023,7 @@ SPKH %>%
 SPKH %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKHnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = SPKHGRnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3006,7 +3032,7 @@ SPKH %>%
 SPKH %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKHnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = SPKHGRnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Feld) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3017,7 +3043,7 @@ par(mfrow=c(3,1))
 SPKH %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKHnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = SPKHGRnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3026,7 +3052,7 @@ SPKH %>%
 SPKH %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKHnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = SPKHGRnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3035,7 +3061,7 @@ SPKH %>%
 SPKH %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKHnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = SPKHGRnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Ch) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3046,7 +3072,7 @@ par(mfrow=c(3,1))
 SPKH %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKHnem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = SPKHGRnem90E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3055,7 +3081,7 @@ SPKH %>%
 SPKH %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKHnem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = SPKHGRnem95E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3064,7 +3090,7 @@ SPKH %>%
 SPKH %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKHnem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = SPKHGRnem99E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99E) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3076,7 +3102,7 @@ par(mfrow=c(3,1))
 SPKS %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKSnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = SPKSGRnem90F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3085,7 +3111,7 @@ SPKS %>%
 SPKS %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKSnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = SPKSGRnem95F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Feld)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3094,7 +3120,7 @@ SPKS %>%
 SPKS %>%
         ggplot(aes(heightFeld, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKSnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
+        geom_point(data = SPKSGRnem99F,mapping = aes(heightFeld, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Feld) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3105,7 +3131,7 @@ par(mfrow=c(3,1))
 SPKS %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKSnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = SPKSGRnem90Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3114,7 +3140,7 @@ SPKS %>%
 SPKS %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKSnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = SPKSGRnem95Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95Ch)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3123,7 +3149,7 @@ SPKS %>%
 SPKS %>%
         ggplot(aes(heightCh, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKSnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
+        geom_point(data = SPKSGRnem99Ch,mapping = aes(heightCh, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99Ch) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3134,7 +3160,7 @@ par(mfrow=c(3,1))
 SPKS %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKSnem90E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = SPKSGRnem90E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile90E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3143,7 +3169,7 @@ SPKS %>%
 SPKS %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKSnem95E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = SPKSGRnem95E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile95E)+
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
@@ -3152,43 +3178,56 @@ SPKS %>%
 SPKS %>%
         ggplot(aes(heightE, annual_increment))+
         geom_point(color = "red")+
-        geom_point(data = SPKSnem99E,mapping = aes(heightE, annual_increment), color="blue")+
+        geom_point(data = SPKSGRnem99E,mapping = aes(heightE, annual_increment), color="blue")+
         geom_vline(xintercept = quantile99E) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
 
+#----------------------------------------------------------------------#
+#-------------------Plots for manuscript-------------------------------
+#----------------------------------------------------------------------#
+bincheck <- filter(growthr, dbh.y>=124 & dbh.y<134)
+bincheck <- filter(growthr, dbh.y>=134 & dbh.y<156)
+bincheck <- filter(growthr, dbh.y>=156 & dbh.y<300)
+#Binned Box Plots
+growthr$size_class <- 
+        cut(growthr$dbh.y, breaks=c(seq(0,116,by=4), 124, 134, 156, 300)
+        )
+plot(growthr$size_class, log(growthr$annual_increment), pch=19, 
+     xlab="DBH", ylab="annual increment", )
 
-#sapling stuff that I could probs delete----------
-DNM <- filter(growthr, plot.x == "DNM1_01" | plot.x == "DNM2_02" | plot.x == "DNM3_03" | plot.x == "DNM50_FGEO")
-DNMsap <- filter(DNM, dbh.x >= 1 & dbh.x <= 4.9 & dbh.y >= 1 & dbh.y <= 4.9)
-table(DNM$site.x)
-table(DNM$dbh.y)
-summary(DNM$annual_increment)
-summary(DNM$relative_gr)
-summary(DNM$relative_gr)
+plot(growthr$size_class, log(growthr$relative_gr), pch=19, 
+     xlab="DBH", ylab="relative growth", )
 
-SPKA <- filter(growthr, site.x == "SPKA")
-SPKAsap <- filter(SPKA, dbh.x >= 1 & dbh.x <= 4.9 & dbh.y >= 1 & dbh.y <= 4.9)
-table(SPKA$site.x)
-table(SPKA$dbh.y)
-summary(SPKA$annual_increment)
-summary(SPKA$relative_gr)
+#Site and Growth Rate Box Plots ASK ABOUT ANOVA!
+ggplot() +
+        geom_boxplot(growthr, mapping = aes(site.x, log(annual_increment)))
+an_gr.aov <- aov(annual_increment ~ site.x, data = growthr)
+summary(an_gr.aov)
+ggplot() +
+        geom_boxplot(growthr, mapping = aes(site.x, log(relative_gr)))
+rel_gr.aov <- aov(relative_gr ~ site.x, data = growthr)
+summary(rel_gr.aov)
+#DBH and Growth Rate Scatter Plot
+growthr %>%
+        ggplot(aes(dbh.y, log(annual_increment)))+
+        geom_point(color = "chartreuse3")+
+        geom_point(data = growthrGRnem99dbh,color = "chartreuse4")+
+        geom_vline(xintercept = quantile99dbh, color="black")
+growthr %>%
+        ggplot(aes(dbh.y, log(relative_gr)))+
+        geom_point(color = "chartreuse3")+
+        geom_point(data = growthrGRnem99dbh,color = "chartreuse4")+
+        geom_vline(xintercept = quantile99dbh, color="black")
 
-SPKH <- filter(growthr, site.x == "SPKH")
-SPKHsap <- filter(SPKH, dbh.x >= 1 & dbh.x <= 4.9 & dbh.y >= 1 & dbh.y <= 4.9)
-table(SPKH$site.x)
-table(SPKH$dbh.y)
-summary(SPKH$annual_increment)
-summary(SPKH$relative_gr)
-
-SPKS <- filter(growthr, site.x == "SPKS")
-SPKSsap <- filter(SPKS, dbh.x >= 1 & dbh.x <= 4.9 & dbh.y >= 1 & dbh.y <= 4.9)
-table(SPKS$site.x)
-table(SPKS)
-summary(SPKS$annual_increment)
-summary(SPKS$relative_gr)
+#Box Plots Separated by emergent definitions
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type99dbh))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type99dbh))+
+        geom_boxplot()
 
 
 
-write.csv(growthr, here("Desktop", "Research", "R", "Data", "growth_rates.csv"))
 
