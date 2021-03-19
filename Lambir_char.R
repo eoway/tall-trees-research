@@ -58,6 +58,8 @@ lambir4 <- lambir.stem4
 #---------------------------------------------------------------------------------------------#
 lambir4$index <- as.factor(lambir4$quadrat); lambir4$index <- as.numeric(lambir4$index)
 
+length(unique(lambir4$index))
+
 lam4 = merge(lambir4, lambir.habs, by = "index", all.x=T)
 #---------------------------------------------------------------------------------------------#
 

@@ -4,8 +4,8 @@ library(skimr)
 library(dplyr)
 library(stringr)
 library(ggplot2)
-
-hdata <- read_csv(here("Elsa Clean", "main_dat.csv"))
+setwd("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+hdata <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
 
 #Latest Censuses
 hdata <- filter(hdata, dbh >= 10)
@@ -236,6 +236,17 @@ table(emergent99dbh)
 
 hdata$tree_type99dbh <- ifelse(hdata$species %in% c(emergent99dbh), "emrgnt", "non_emrgnt")
 
+#----------------------------------------------------------------------#
+#--------------------------Elsa Help------------------------------------
+#How do I make a third category for emergent individuals?
+#----------------------------------------------------------------------#
+hdata$tree_type99dbhmap <- ifelse(hdata$species %in% c(emergent99dbh), "emrgnt", "non_emrgnt")
+
+  
+table(hdata$tree_type99dbh)
+#----------------------------------------------------------------------#
+#Can stop running code here if you just want to make manuscript plots (see section at the bottom for manuscript plot code)-------------------------------
+#----------------------------------------------------------------------#
 #----------------------------------------------------------------------#
 #-------------------------Plot Parameters-------------------------------
 #----------------------------------------------------------------------#
@@ -1619,70 +1630,73 @@ table(hdata$site)
 #----------------------------------------------------------------------#
 #--------------------------------Maps------------------------------------
 #----------------------------------------------------------------------#
+#----------------------------------------------------------------------#
+#--------------------------Elsa Help------------------------------------
+#Map Scripts (pertain to first Elsa Help, where I just need a third category)
+#----------------------------------------------------------------------#
 #DNM1-----
 emapdat <- filter(DNM1, dbh >= quantile99dbh)
-nonmapdat <- filter(DNM1, dbh < quantile99dbh)
-summary(nonmapdat)
-emapdat %>%
+DNM1 %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
-  geom_point(color="red") 
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
 
 #DNM2-----
-emapdat <- filter(DNM1, dbh >= quantile99dbh)
-nonmapdat <- filter(DNM1, dbh < quantile99dbh)
-emapdat %>%
+emapdat <- filter(DNM2, dbh >= quantile99dbh)
+DNM2 %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
-  geom_point(color="red") 
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
 
 #DNM3-----
 emapdat <- filter(DNM3, dbh >= quantile99dbh)
-nonmapdat <- filter(DNM3, dbh < quantile99dbh)
-emapdat %>%
+DNM3 %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
-  geom_point(color="red") 
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
 
 #DNM50-----
 emapdat <- filter(DNM50, dbh >= quantile99dbh)
-nonmapdat <- filter(DNM50, dbh < quantile99dbh)
-emapdat %>%
+DNM50 %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
-  geom_point(color="red") 
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
 
 #LHP-----
 emapdat <- filter(LHP, dbh >= quantile99dbh)
-nonmapdat <- filter(LHP, dbh < quantile99dbh)
-emapdat %>%
+LHP %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
-  geom_point(color="red") 
-
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
+SPKA
 #SPKA-----
 emapdat <- filter(SPKA, dbh >= quantile99dbh)
-nonmapdat <- filter(SPKA, dbh < quantile99dbh)
-emapdat %>%
+SPKA %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
-  geom_point(color="red") 
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
 
 #SPKH-----
 emapdat <- filter(SPKH, dbh >= quantile99dbh)
-nonmapdat <- filter(SPKH, dbh < quantile99dbh)
-emapdat %>%
+SPKH %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
-  geom_point(color="red")
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
 
 #SPKS-----
 emapdat <- filter(SPKS, dbh >= quantile99dbh)
-nonmapdat <- filter(SPKS, dbh < quantile99dbh)
-emapdat %>%
+SPKS %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(nonmapdat, mapping = aes(y=plot_y, x=plot_x), color="darkgreen")+
-  geom_point(color="red")
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
 
 #----------------------------------------------------------------------#
 #-------------------Plots for manuscript-------------------------------
@@ -1715,53 +1729,59 @@ hdata %>%
   annotate("text", x= quantile99dbh+5,y=5,label=round(quantile99dbh, digits=3))+
   xlab("DBH")+
   ylab("Height")
+#----- PLOT COLOR PALETTE -----
+
 
 #99th percentile DBH and All Height Calculations Plot with Emergent species colored darker
+#----------------------------------------------------------------------#
+#--------------------------Elsa Help------------------------------------
+#How do I change colors so that each line is different and each set of emergents are different?
+#----------------------------------------------------------------------#
 hdata %>%
   ggplot(aes(dbh, heightFeld))+
-  geom_point(aes(dbh, heightFeld), color="chartreuse3")+
-  geom_point(data = hdata99nemdbh,mapping = aes(dbh, heightFeld), color="chartreuse4")+
-  geom_point(aes(dbh, heightCh), color="darkorchid3")+
-  geom_point(data = hdata99nemdbh,mapping = aes(dbh, heightCh), color="darkorchid4")+
-  geom_point(aes(dbh, heightE), color="deepskyblue3")+
-  geom_point(data = hdata99nemdbh,mapping = aes(dbh, heightE), color="deepskyblue4")+
+  geom_point(aes(col=tree_type99F))+
+  geom_point(aes(col=tree_type99Ch, dbh, heightCh))+
+  geom_point(aes(col=tree_type99E, dbh, heightE))+
   geom_vline(xintercept = quantile99dbh, color="black")+
   xlab("DBH")+
-  ylab("Height")
+  ylab("Height")+
+  theme_classic()
   
 #Same plot as last one, but with only Feld Height Calculation
 hdata %>%
-  ggplot(aes(dbh, heightFeld))+
-  geom_point(aes(dbh, heightFeld), color="chartreuse3")+
-  geom_point(data = hdata99nemdbh,mapping = aes(dbh, heightFeld), color="chartreuse4")+
+  ggplot(aes(dbh, heightFeld, col=tree_type99F))+
+  geom_point()+
   geom_vline(xintercept = quantile99dbh, color="black")+
   xlab("DBH")+
   ylab("Height")
 
 #Stem_BA---
-allplotdat <- hdata %>% group_by(site) %>% summarize(n_stems=n(), plot_BA = sum(stem_BA, na.rm=T, 
+plotdata <- filter(hdata, DFstatus == "A")
+table(plotdata$DFstatus)
+plotdat <- plotdata %>% group_by(site, tree_type99dbh) %>% summarize(n_stems=n(), plot_BA = sum(stem_BA, na.rm=T, 
                                                                          mean_stem_BA = mean(stem_BA, na.rm=T)))
 
-emhdata <- filter(hdata, tree_type99F == "emrgnt")
-emplotdat <- emhdata %>% group_by(site) %>% summarize(n_stems=n(), plot_BA = sum(stem_BA, na.rm=T, 
-                                                                             mean_stem_BA = mean(stem_BA, na.rm=T)))
-plotdat <- inner_join(allplotdat, emplotdat, by="site")
+plotdat$area <- c(1,1,1,1,1,1,50,50,52,52,8,8,12,12,4,4)
 
-plotdat$area <- c(1,1,1,50,52,8,12,4)
+plotdat$stemBAha <- plotdat$plot_BA/plotdat$area
 
-plotdat$stemBAha <- plotdat$plot_BA.x/plotdat$area
-plotdat$stemBAhaEM <- plotdat$plot_BA.y/plotdat$area
-
-plotdat$stemdens <- plotdat$n_stems.x/plotdat$area
-plotdat$stemdensEM <- plotdat$n_stems.y/plotdat$area
-
+plotdat$stemdens <- plotdat$n_stems/plotdat$area
+table(LHP$DFstatus)
+table(DNM50$DFstatus)
+#re
+#plotdat$cluster <- factor(plot_dat2$cluster, levels=c("nonemrgnt","emrgnt"),
+                            #labels=c("Nonemergent","Emergent" ))
+#----------------------------------------------------------------------#
+#--------------------------Elsa Help------------------------------------
+#Sepiloks densities are weird
+#----------------------------------------------------------------------#
 #Stem_BAs plot------
 plotdat %>%
-  ggplot(plotdat, mapping = aes(fill=stemBAhaEM, y=stemBAha, x=site))+
+  ggplot(plotdat, mapping = aes(fill=tree_type99dbh, y=stemBAha, x=site))+
   geom_col(position="stack")
 
 #Stem density plot------
 plotdat %>%
-  ggplot(plotdat, mapping = aes(fill=stemdensEM, y=stemdens, x=site))+
-  geom_col(position="stack", stat="identity")
+  ggplot(plotdat, mapping = aes(fill=tree_type99dbh, y=stemdens, x=site))+
+  geom_col(position="stack")
 

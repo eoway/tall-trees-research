@@ -8,7 +8,7 @@ library(skimr)
 #-------------------------------------------------------------------#
 
 #Load Data----------
-growdata <- read_csv(here("Elsa Clean", "growth_dat.csv"))
+growdata <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/growth_dat.csv")
 
 growdata <- filter(growdata, dbh >= 10)
 
@@ -3203,6 +3203,7 @@ plot(growthr$size_class, log(growthr$relative_gr), pch=19,
 ggplot() +
         geom_boxplot(growthr, mapping = aes(site.x, log(annual_increment)))
 an_gr.aov <- aov(annual_increment ~ site.x, data = growthr)
+an_gr.aov
 summary(an_gr.aov)
 ggplot() +
         geom_boxplot(growthr, mapping = aes(site.x, log(relative_gr)))
