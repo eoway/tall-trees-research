@@ -163,7 +163,7 @@ plot(topo_20m)
 #elev_rast_20m$index <- 1:ncell(elev_rast_20m)
 
 
-#Every 25th entry is NA for soils stuff?????-----------------------------ELSA HALP---------------------------
+#Every 25th entry is NA for soils stuff?????-----------------------------ELSA---------------------------
 elev_rast_20m$index <- c(seq(26,1378,by=26),seq(25,1377,by=26),seq(24,1376,by=26),
                          seq(23,1375,by=26),seq(22,1374,by=26),seq(21,1373,by=26),
                          seq(20,1372,by=26),seq(19,1371,by=26),seq(18,1370,by=26),
@@ -210,55 +210,35 @@ plot(elev_rast_20m$elev, col=r2)
   #geom_point(data=test, aes(x,y, col=soil), size=6) + 
   #theme_classic() + 
   #theme(legend.position="bottom")
-
-#The Great Merge-------------
-lam4$quadrat <- as.character(lam4$index)
-lambir <- inner_join(lam4, test, by="quadrat")
-lambir <- subset(lambir, select = -c(dbh.y, HabType.y, soil.y))
-
-lambir <- rename(lambir, dbh = dbh.x, HabType = HabType.x, soil = soil.x)
-
-
 #---------------------------------------------------------------------------------------------#
-#lhc_dat <- subset(elev_soil, soil == "Clay")
-#lhs_dat <- subset(elev_soil, soil == "Sandy_loam")
+#The Great Merge-------------
+#---------------------------------------------------------------------------------------------#
+lam4$quadrat <- as.character(lam4$index)
+lambir <- inner_join(lam4, elev_soil, by="index")
+lambir <- subset(lambir, select = -c(HabType.y, soil.y))
+lambir <- rename(lambir, HabType = HabType.x, soil = soil.x)
 
-# ggplot() + 
-#   geom_point(data=lhc_dat, aes(x,y, col=soil), size=6) + 
-#   theme_classic()
-# ggplot() + 
-#   geom_point(data=lhs_dat, aes(x,y, col=soil), size=6) + 
-#   theme_classic()
-
-#hist(lhc_dat$elev)
-#hist(lhs_dat$elev)
-
-#mean(lhc_dat$elev, na.rm=T); sd(lhc_dat$elev, na.rm=T)
-#median(lhc_dat$elev, na.rm=T); sd(lhc_dat$elev, na.rm=T)
-#mean(lhs_dat$elev, na.rm=T); sd(lhs_dat$elev, na.rm=T)
-#median(lhs_dat$elev, na.rm=T); sd(lhs_dat$elev, na.rm=T)
-
-#mean(lhc_dat$slope, na.rm=T); sd(lhc_dat$slope, na.rm=T)
-#median(lhc_dat$slope, na.rm=T); sd(lhc_dat$slope, na.rm=T)
-#mean(lhs_dat$slope, na.rm=T); sd(lhs_dat$slope, na.rm=T)
-#median(lhs_dat$slope, na.rm=T); sd(lhs_dat$slope, na.rm=T)
-
-#mean(lhc_dat$aspect, na.rm=T); sd(lhc_dat$aspect, na.rm=T)
-#mean(lhs_dat$aspect, na.rm=T); sd(lhs_dat$aspect, na.rm=T)
+heightmetrics <- lam4 %>% group_by(quadrat, HabType, soil) %>% summarize( 
+                                                                dbhmean = mean(dbh, na.rm=T),
+                                                                heightmean = mean(height, na.rm=T),
+                                                                heightmedian = median(height, na.rm=T),
+                                                                height99 = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                heightmax = max(height,na.rm=T))
+lambir_all <- inner_join(lambir, heightmetrics, by= "quadrat")
 
 #---------------------------------------------------------------------------------------------#
 # ALL LAMBIR
 #---------------------------------------------------------------------------------------------#
-cellStats(elev_rast, mean); cellStats(elev_rast, sd)
+#cellStats(elev_rast, mean); cellStats(elev_rast, sd)
 
-cellStats(Lambir_slope_aspect_TPI$slope, mean)
-cellStats(Lambir_slope_aspect_TPI$slope, sd)
+#cellStats(Lambir_slope_aspect_TPI$slope, mean)
+#cellStats(Lambir_slope_aspect_TPI$slope, sd)
 
-cellStats(Lambir_slope_aspect_TPI$aspect, mean)
-cellStats(Lambir_slope_aspect_TPI$aspect, sd)
+#cellStats(Lambir_slope_aspect_TPI$aspect, mean)
+#cellStats(Lambir_slope_aspect_TPI$aspect, sd)
 
-cellStats(Lambir_slope_aspect_TPI$aspect, mean)
-cellStats(Lambir_slope_aspect_TPI$aspect, sd)
+#cellStats(Lambir_slope_aspect_TPI$aspect, mean)
+#cellStats(Lambir_slope_aspect_TPI$aspect, sd)
 #---------------------------------------------------------------------------------------------#
 # calculated TWI in ArcMAP
 #---------------------------------------------------------------------------------------------#
@@ -320,12 +300,6 @@ ggplot() +
   geom_point(data=twi_soil, aes(x,y, col=soil), size=6) + 
   theme_classic()
 #---------------------------------------------------------------------------------------------#
-lhc_dat <- subset(twi_soil, soil == "Clay")
-lhs_dat <- subset(twi_soil, soil == "Sandy_loam")
-
-mean(lhc_dat$Lambir_TWI, na.rm=T); sd(lhc_dat$Lambir_TWI, na.rm=T)
-mean(lhs_dat$Lambir_TWI, na.rm=T); sd(lhs_dat$Lambir_TWI, na.rm=T)
-#---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
 #DNM_50_TWI <- mask(Danum_TWI, DNM_50); DNM_50_TWI <- crop(DNM_50_TWI, DNM_50, snap="out"); plot(DNM_50_TWI, col=rev(r2))
@@ -339,20 +313,4 @@ mean(lhs_dat$Lambir_TWI, na.rm=T); sd(lhs_dat$Lambir_TWI, na.rm=T)
 #cellStats(SPKS_fp_TWI, mean); cellStats(SPKS_fp_TWI, sd)
 #cellStats(SPKH_fp_TWI, mean); cellStats(SPKH_fp_TWI, sd)
 #---------------------------------------------------------------------------------#
-#---------------------------------------------------------------------------------#
-
-
-
-#---------------------------------------------------------------------------------------------#
-# Use fgeo package to calculate slope & aspect
-#---------------------------------------------------------------------------------------------#
-# lhp_elev <- fgeo_elevation(lam_elev$col)
-# lhp_topo <- fgeo_topography(lhp_elev, gridsize=5, xdim=lam_elev$xdim, ydim=lam_elev$ydim)
-# summary(lhp_topo)
-# dim(lhp_topo)
-#---------------------------------------------------------------------------------------------#
-
-#---------------------------------------------------------------------------------#
-#---------------------------------------------------------------------------------#
-## calculate slope, aspect, TPI from ground data (2m)
 #---------------------------------------------------------------------------------#
