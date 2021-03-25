@@ -1760,15 +1760,38 @@ hdata %>%
 #--------------------------Elsa Help------------------------------------
 #How do I change colors so that each line is different and each set of emergents are different?
 #----------------------------------------------------------------------#
+
+# for colors, see ggnewscale (https://github.com/eliocamp/ggnewscale)
+# i just came across it and it works beautifully for this
+library(ggnewscale)
+
+# also, remember that tree_type99dbhmap is determined based on my arbitrary size threshold of dbh = 100
+# once you update it to quantile99dbh, the colors will correspond to the vertical line in this plot
+
 hdata %>%
   ggplot(aes(dbh, heightFeld))+
-  geom_point(aes(col=tree_type99F))+
-  geom_point(aes(col=tree_type99Ch, dbh, heightCh))+
-  geom_point(aes(col=tree_type99E, dbh, heightE))+
+  geom_point(aes(col=tree_type99dbhmap))+
+  scale_color_manual("Feldpausch allom", values=c("green","chartreuse","darkgreen")) + 
+  new_scale_color() + # from ggnewscale - everything after this requires a new color scale
+  geom_point(aes(col=tree_type99dbhmap, dbh, heightCh))+
+  scale_color_manual("Chave allom", values=c("#1d91c0","#41b6c4","#253494")) + 
+  new_scale_color() +
+  geom_point(aes(col=tree_type99dbhmap, dbh, heightE))+
+  scale_color_manual("Chave+E allom", values=c("#7a0177","#ae017e","#810f7c")) + 
   geom_vline(xintercept = quantile99dbh, color="black")+
   xlab("DBH")+
   ylab("Height")+
-  theme_classic()
+  theme_classic() 
+
+# hdata %>%
+#   ggplot(aes(dbh, heightFeld))+
+#   geom_point(aes(col=tree_type99F))+
+#   geom_point(aes(col=tree_type99Ch, dbh, heightCh))+
+#   geom_point(aes(col=tree_type99E, dbh, heightE))+
+#   geom_vline(xintercept = quantile99dbh, color="black")+
+#   xlab("DBH")+
+#   ylab("Height")+
+#   theme_classic()
 
 #Same plot as last one, but with only Feld Height Calculation
 hdata %>%
