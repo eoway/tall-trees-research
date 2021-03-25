@@ -4,8 +4,9 @@ library(skimr)
 library(dplyr)
 library(stringr)
 library(ggplot2)
-setwd("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
-hdata <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+#setwd("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+#hdata <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+hdata <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv") #EO
 
 #Latest Censuses
 hdata <- filter(hdata, dbh >= 10)
@@ -240,10 +241,25 @@ hdata$tree_type99dbh <- ifelse(hdata$species %in% c(emergent99dbh), "emrgnt", "n
 #--------------------------Elsa Help------------------------------------
 #How do I make a third category for emergent individuals?
 #----------------------------------------------------------------------#
-hdata$tree_type99dbhmap <- ifelse(hdata$species %in% c(emergent99dbh), "emrgnt", "non_emrgnt")
-
-  
+# use a nested ifelse statement with two conditions (emergent status & DBH) that reads as follows: 
+# if an observation has tree_type99dbh == "emrgnt" and dbh >= some defined size == emrgnt_tree
+# else, if an observation has tree_type99dbh == "emrgnt" and dbh < some defined size == emrgnt_spp
+# else == non_emrgnt
+size_threhold = 100 # replace 100 with whatever threshold you want (e.g. quantile99dbh) 
+hdata$tree_type99dbhmap <- ifelse(hdata$tree_type99dbh == "emrgnt" & hdata$dbh >= size_threhold, "emrgnt_tree",
+                                  ifelse(hdata$tree_type99dbh == "emrgnt" & hdata$dbh < size_threhold, "emrgnt_spp","non_emrgnt"))
 table(hdata$tree_type99dbh)
+table(hdata$tree_type99dbhmap)
+# if you compare the two tables above, non_emergent should have the same number of observations for both variables
+# tree_type99dbhmap splits tree_type99dbh == emrgnt into two variables now
+
+ggplot(hdata, aes(x=tree_type99dbh, y=dbh, fill=tree_type99dbh)) + 
+  geom_boxplot() + 
+  theme_classic() + theme(legend.position = c(0.8, 0.8))
+
+ggplot(hdata, aes(x=tree_type99dbhmap, y=dbh, fill=tree_type99dbhmap)) + 
+  geom_boxplot() + 
+  theme_classic() + theme(legend.position = c(0.8, 0.8))
 #----------------------------------------------------------------------#
 #Can stop running code here if you just want to make manuscript plots (see section at the bottom for manuscript plot code)-------------------------------
 #----------------------------------------------------------------------#
@@ -1746,7 +1762,7 @@ hdata %>%
   xlab("DBH")+
   ylab("Height")+
   theme_classic()
-  
+
 #Same plot as last one, but with only Feld Height Calculation
 hdata %>%
   ggplot(aes(dbh, heightFeld, col=tree_type99F))+
@@ -1759,7 +1775,7 @@ hdata %>%
 plotdata <- filter(hdata, DFstatus == "A")
 table(plotdata$DFstatus)
 plotdat <- plotdata %>% group_by(site, tree_type99dbh) %>% summarize(n_stems=n(), plot_BA = sum(stem_BA, na.rm=T, 
-                                                                         mean_stem_BA = mean(stem_BA, na.rm=T)))
+                                                                                                mean_stem_BA = mean(stem_BA, na.rm=T)))
 
 plotdat$area <- c(1,1,1,1,1,1,50,50,52,52,8,8,12,12,4,4)
 
@@ -1770,7 +1786,7 @@ table(LHP$DFstatus)
 table(DNM50$DFstatus)
 #re
 #plotdat$cluster <- factor(plot_dat2$cluster, levels=c("nonemrgnt","emrgnt"),
-                            #labels=c("Nonemergent","Emergent" ))
+#labels=c("Nonemergent","Emergent" ))
 #----------------------------------------------------------------------#
 #--------------------------Elsa Help------------------------------------
 #Sepiloks densities are weird
