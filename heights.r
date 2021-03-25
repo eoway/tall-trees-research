@@ -1650,13 +1650,20 @@ table(hdata$site)
 #--------------------------Elsa Help------------------------------------
 #Map Scripts (pertain to first Elsa Help, where I just need a third category)
 #----------------------------------------------------------------------#
+# filter all using: tree_type99dbhmap instead of tree_type99dbh
 #DNM1-----
-emapdat <- filter(DNM1, dbh >= quantile99dbh)
 DNM1 %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(aes(col=tree_type99dbh))+
-  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=tree_type99dbhmap))+
+  geom_point(size=3, alpha=0.7) +
+  scale_color_manual("tree type", values=c("darkorange","red","grey50")) + 
   theme_classic()
+
+# emapdat <- filter(DNM1, dbh >= tree_type99dbhmap)
+# DNM1 %>%
+#   ggplot(mapping = aes(y=plot_y, x=plot_x))+
+#   geom_point(aes(col=tree_type99dbhmap))+
+#   geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+#   theme_classic()
 
 #DNM2-----
 emapdat <- filter(DNM2, dbh >= quantile99dbh)
