@@ -832,9 +832,9 @@ sep_10_2014$plot <- rep("SPKA_10",length(sep_10_2014$DBH_mm))
 
 #*# CHECK #*#
 #sep_12_2008$census <- rep("12_census_2008",length(sep_12_2008$DBH_mm))
-#sep_12_2008$plot <- rep("SPKS_12",length(sep_12_2008$DBH_mm))
+#sep_12_2008$plot <- rep("SPKA_12",length(sep_12_2008$DBH_mm))
 sep_12_2013$census <- rep("12_census_2013",length(sep_12_2013$DBH_mm))
-sep_12_2013$plot <- rep("SPKS_12",length(sep_12_2013$DBH_mm))
+sep_12_2013$plot <- rep("SPKA_12",length(sep_12_2013$DBH_mm))
 #*# CHECK #*#
 
 
@@ -1314,25 +1314,25 @@ dim(DNM50_cleaned)[[1]]/dim(DNM50_2011_2019)[[1]]*100
 # 4368 stems removed (98% stems retained) 
 #---------------------------------------------------------------------------------------------#
 
-# take a look at the values
-par(mfrow=c(1,2))
-hist(DNM50_2011_2019$relative_gr, xlab="Relative growth rate (% yr-1)", col="grey", main="")
-hist(DNM50_2011_2019$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
-
-hist(DNM50_cleaned$relative_gr, xlab="Relative growth rate (% yr-1)", col="grey", main="")
-hist(DNM50_cleaned$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
-
-#DNM50 Plot----------
-# look at the change in DBH from census 1 to census 2
-par(mfrow=c(1,2))
-plot(DNM50_2011_2019$dbh.x,DNM50_2011_2019$dbh.y, pch=19,
-     xlab="DBH DNM50 2011 (cm)", ylab="DBH DNM50 2019 (cm)")
-abline(0,1, col="red", lwd=2)
-
-plot(DNM50_cleaned$dbh.x,DNM50_cleaned$dbh.y, pch=19, 
-     xlab="DBH DNM50 2011 (cm)", ylab="DBH DNM50 2019 (cm)")
-#add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
-abline(0,1, col="red", lwd=2) 
+### take a look at the values
+# par(mfrow=c(1,2))
+# hist(DNM50_2011_2019$relative_gr, xlab="Relative growth rate (% yr-1)", col="grey", main="")
+# hist(DNM50_2011_2019$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+# 
+# hist(DNM50_cleaned$relative_gr, xlab="Relative growth rate (% yr-1)", col="grey", main="")
+# hist(DNM50_cleaned$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+# 
+# #DNM50 Plot----------
+# # look at the change in DBH from census 1 to census 2
+# par(mfrow=c(1,2))
+# plot(DNM50_2011_2019$dbh.x,DNM50_2011_2019$dbh.y, pch=19,
+#      xlab="DBH DNM50 2011 (cm)", ylab="DBH DNM50 2019 (cm)")
+# abline(0,1, col="red", lwd=2)
+# 
+# plot(DNM50_cleaned$dbh.x,DNM50_cleaned$dbh.y, pch=19, 
+#      xlab="DBH DNM50 2011 (cm)", ylab="DBH DNM50 2019 (cm)")
+# #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
+# abline(0,1, col="red", lwd=2) 
 #---------------------------------------------------------------------------------------------#
 
 DNM50_include_keep <- DNM50_include[!DNM50_include$stemID %in% DNM50_drop$stemID, ] 
