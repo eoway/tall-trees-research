@@ -549,6 +549,11 @@ dat_sep04 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_04_
 dat_sep05 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_05_PlotDump.xlsx", sheet=2, skip=1)
 dat_sep30 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_30_PlotDump.xlsx", sheet=2, skip=1)
 
+dat_sep06_03 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_06_Census_15_PlotDump.xlsx", sheet=2)
+dat_sep06_14 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_06_Census_16_PlotDump.xlsx", sheet=2)
+#dat_sep07_08 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_07_Census_9_PlotDump.xlsx", sheet=2, skip=1)
+#dat_sep07_13 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_07_Census_10_PlotDump.xlsx", sheet=2, skip=1)
+
 dat_sep08 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_08_PlotDump.xlsx", sheet=2, skip=1)
 dat_sep08 <- filter(dat_sep08, T1 != "-"); dim(dat_sep08); head(dat_sep08$T1) # get rid of NA rows where T1 = '-'
 summary(dat_sep08)
@@ -556,10 +561,51 @@ summary(dat_sep08)
 dat_sep09 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_09_PlotDump.xlsx", sheet=2, skip=1)
 dat_sep10 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_10_PlotDump.xlsx", sheet=2, skip=1)
 
+#dat_sep12_08 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_12_Census_9_PlotDump.xlsx", sheet=2, skip=1)
+#dat_sep12_13 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/SEP_12_Census_10_PlotDump.xlsx", sheet=2, skip=1)
+# Combine above into dat_sep12 & update code below 
+
 dat_dnm01 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/DAN_01_PlotDump.xlsx", sheet=2, skip=1)
 dat_dnm02 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/DAN_02_PlotDump.xlsx", sheet=2, skip=1)
 dat_dnm03 <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Data/DAN_03_PlotDump.xlsx", sheet=2, skip=1)
 #---------------------------------------------------------------------------------------------#
+
+
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+## TWO TEMP DATASETS ## SEP 07 and SEP 12
+#---------------------------------------------------------------------------------------------#
+temp_fp_dat <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/temp_dat/SEP_AdSIndividuals_data_2021-04-01.xlsx", sheet=2)
+temp_fp_dat_wd <- read_excel("G:/My Drive/Harvard/Plot_Data/Forest_Plots/temp_dat/SEP07SEP12_Wood_Density.xlsx", sheet=1)
+
+dat_combine <- left_join(temp_fp_dat, temp_fp_dat_wd, by = "TreeID")
+
+dat_sep07_08 <- subset(dat_combine, `Plot Code` == "SEP-07" & `Census No` == 9)
+dat_sep07_13 <- subset(dat_combine, `Plot Code` == "SEP-07" & `Census No` == 10)
+dat_sep12_13 <- subset(dat_combine, `Plot Code` == "SEP-12" & `Census No` == 10)
+
+
+dat_all07_08 <- select(dat_sep07_08,'Sub Plot T1','X','Y',Family,Genus,Species,'TreeID')
+dat_all07_08$IDlevel <- rep("WDSpecies", length(dat_all07_08$TreeID))
+dat_all07_08_select <- cbind(dat_all07_08, dat_sep07_08$WD, dat_sep07_08$POM)
+colnames(dat_all07_08_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
+dat_all07_08_select$quadrat <- as.factor(paste0(dat_all07_08_select$subplot_ID,'_sep07'))
+
+dat_all07_13 <- select(dat_sep07_13,'Sub Plot T1','X','Y',Family,Genus,Species,'TreeID')
+dat_all07_13$IDlevel <- rep("WDSpecies", length(dat_all07_13$TreeID))
+dat_all07_13_select <- cbind(dat_all07_13, dat_sep07_13$WD, dat_sep07_13$POM)
+colnames(dat_all07_13_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
+dat_all07_13_select$quadrat <- as.factor(paste0(dat_all07_13_select$subplot_ID,'_sep07'))
+
+dat_all12_13 <- select(dat_sep12_13,'Sub Plot T1','X','Y',Family,Genus,Species,'TreeID')
+dat_all12_13$IDlevel <- rep("WDSpecies", length(dat_all12_13$TreeID))
+dat_all12_13_select <- cbind(dat_all12_13, dat_sep12_13$WD, dat_sep12_13$POM)
+colnames(dat_all12_13_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
+dat_all12_13_select$quadrat <- as.factor(paste0(dat_all12_13_select$subplot_ID,'_sep12'))
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+
+
 
 #---------------------------------------------------------------------------------------------#
 # separate first columns that apply to each census
@@ -589,6 +635,28 @@ dat_all30_select$quadrat <- as.factor(paste0(dat_all30_select$subplot_ID,'_sep30
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
+dat_all06_03_select <- select(dat_sep06_03,'Sub Plot T1',X,Y,Family,Genus,Species,'TreeID','WD Type','WD',"POM")
+colnames(dat_all06_03_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
+dat_all06_03_select$quadrat <- as.factor(paste0(dat_all06_03_select$subplot_ID,'_sep06'))
+dat_all06_14_select <- select(dat_sep06_14,'Sub Plot T1',X,Y,Family,Genus,Species,'TreeID','WD Type','WD',"POM")
+colnames(dat_all06_14_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
+dat_all06_14_select$quadrat <- as.factor(paste0(dat_all06_14_select$subplot_ID,'_sep06'))
+#---------------------------------------------------------------------------------------------#
+
+
+
+#*# CHECK #*# SKIP WHILE USING TEMP
+#---------------------------------------------------------------------------------------------#
+dat_all07 <- select(dat_sep07, c('Tree ID':'WD Type','POM...22'))
+dat_all07$genus <- word(dat_all07$Species); dat_all07$species <- word(dat_all07$Species, 2)
+dat_all07_select <- select(dat_all07,'T1',X,Y,Family,genus,species,'Tree ID','WD Type','WD',"POM...22")
+colnames(dat_all07_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
+dat_all07_select$quadrat <- as.factor(paste0(dat_all07_select$subplot_ID,'_sep08'))
+#---------------------------------------------------------------------------------------------#
+#*# CHECK #*# SKIP WHILE USING TEMP
+
+
+#---------------------------------------------------------------------------------------------#
 dat_all08 <- select(dat_sep08, c('Tree ID':'WD Type','POM...22'))
 dat_all08$genus <- word(dat_all08$Species); dat_all08$species <- word(dat_all08$Species, 2)
 dat_all08_select <- select(dat_all08,'T1',X,Y,Family,genus,species,'Tree ID','WD Type','WD',"POM...22")
@@ -611,6 +679,18 @@ dat_all10_select <- select(dat_all10,'T1',X,Y,Family,genus,species,'Tree ID','WD
 colnames(dat_all10_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
 dat_all10_select$quadrat <- as.factor(paste0(dat_all10_select$subplot_ID,'_sep10'))
 #---------------------------------------------------------------------------------------------#
+
+
+#*# CHECK #*# SKIP WHILE USING TEMP
+#---------------------------------------------------------------------------------------------#
+dat_all12 <- select(dat_sep12, c('Tree ID':'WD Type','POM...22'))
+dat_all12$genus <- word(dat_all12$Species); dat_all12$species <- word(dat_all12$Species, 2)
+dat_all12_select <- select(dat_all12,'T1',X,Y,Family,genus,species,'Tree ID','WD Type','WD',"POM...22")
+colnames(dat_all12_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
+dat_all12_select$quadrat <- as.factor(paste0(dat_all12_select$subplot_ID,'_sep10'))
+#---------------------------------------------------------------------------------------------#
+#*# CHECK #*# SKIP WHILE USING TEMP
+
 
 #---------------------------------------------------------------------------------------------#
 dat_all01 <- select(dat_dnm01, c('Tree ID':'WD Type','POM...22'))
@@ -649,6 +729,26 @@ sep_30_2001 <- select(dat_sep30, 'DBH1...16','F1...23'); colnames(sep_30_2001) <
 sep_30_2010 <- select(dat_sep30, 'DBH1...36','F1...43'); colnames(sep_30_2010) <- c("DBH_mm","DFstatus")
 sep_30_2015 <- select(dat_sep30, 'DBH1...56','F1...63'); colnames(sep_30_2015) <- c("DBH_mm","DFstatus")
 
+
+sep_06_2003 <- select(dat_sep06_03, 'D1','F1'); colnames(sep_06_2003) <- c("DBH_mm","DFstatus")
+sep_06_2014 <- select(dat_sep06_14, 'D1','F1'); colnames(sep_06_2014) <- c("DBH_mm","DFstatus")
+
+#---------------------------------------------------------------------------------------------#
+# TEMP SEP-07 & SEP-12
+#---------------------------------------------------------------------------------------------#
+sep_07_2008 <- select(dat_sep07_08, 'D1','F1'); colnames(sep_07_2008) <- c("DBH_mm","DFstatus")
+sep_07_2013 <- select(dat_sep07_13, 'D1','F1'); colnames(sep_07_2013) <- c("DBH_mm","DFstatus")
+
+sep_12_2013 <- select(dat_sep12_13, 'D1','F1'); colnames(sep_12_2013) <- c("DBH_mm","DFstatus")
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+
+#*# CHECK #*# SKIP WHILE USING TEMP
+sep_07_2008 <- select(dat_sep07_08, 'DBH1...16','F1...23'); colnames(sep_07_2008) <- c("DBH_mm","DFstatus")
+sep_07_2013 <- select(dat_sep07_13, 'DBH1...36','F1...43'); colnames(sep_07_2013) <- c("DBH_mm","DFstatus")
+#*# CHECK #*# SKIP WHILE USING TEMP
+
+
 sep_08_2001 <- select(dat_sep08, 'DBH1...16','F1...23'); colnames(sep_08_2001) <- c("DBH_mm","DFstatus")
 sep_08_2009 <- select(dat_sep08, 'DBH1...36','F1...43'); colnames(sep_08_2009) <- c("DBH_mm","DFstatus")
 sep_08_2014 <- select(dat_sep08, 'DBH1...56','F1...63'); colnames(sep_08_2014) <- c("DBH_mm","DFstatus")
@@ -659,6 +759,13 @@ sep_09_2014 <- select(dat_sep09, 'DBH1...56','F1...63'); colnames(sep_09_2014) <
 sep_10_2000 <- select(dat_sep10, 'DBH1...16','F1...23'); colnames(sep_10_2000) <- c("DBH_mm","DFstatus")
 sep_10_2009 <- select(dat_sep10, 'DBH1...36','F1...43'); colnames(sep_10_2009) <- c("DBH_mm","DFstatus")
 sep_10_2014 <- select(dat_sep10, 'DBH1...56','F1...63'); colnames(sep_10_2014) <- c("DBH_mm","DFstatus")
+
+
+#*# CHECK #*# SKIP WHILE USING TEMP
+sep_12_2008 <- select(dat_sep12, 'DBH1...36','F1...43'); colnames(sep_12_2008) <- c("DBH_mm","DFstatus")
+sep_12_2013 <- select(dat_sep12, 'DBH1...56','F1...63'); colnames(sep_12_2013) <- c("DBH_mm","DFstatus")
+#*# CHECK #*# SKIP WHILE USING TEMP
+
 
 dnm_01_2006 <- select(dat_dnm01, 'DBH1...16','F1...23'); colnames(dnm_01_2006) <- c("DBH_mm","DFstatus")
 dnm_01_2013 <- select(dat_dnm01, 'DBH1...36','F1...43'); colnames(dnm_01_2013) <- c("DBH_mm","DFstatus")
@@ -693,6 +800,15 @@ sep_30_2010$plot <- rep("SPKH_30",length(sep_30_2010$DBH_mm))
 sep_30_2015$census <- rep("30_census_2015",length(sep_30_2015$DBH_mm))
 sep_30_2015$plot <- rep("SPKH_30",length(sep_30_2015$DBH_mm))
 
+
+sep_06_2003$census <- rep("06_census_2003",length(sep_06_2003$DBH_mm))
+sep_06_2003$plot <- rep("SPKS_06",length(sep_06_2003$DBH_mm))
+sep_06_2014$census <- rep("06_census_2014",length(sep_06_2014$DBH_mm))
+sep_06_2014$plot <- rep("SPKS_06",length(sep_06_2014$DBH_mm))
+sep_07_2008$census <- rep("07_census_2008",length(sep_07_2008$DBH_mm))
+sep_07_2008$plot <- rep("SPKS_07",length(sep_07_2008$DBH_mm))
+sep_07_2013$census <- rep("07_census_2013",length(sep_07_2013$DBH_mm))
+sep_07_2013$plot <- rep("SPKS_07",length(sep_07_2013$DBH_mm))
 sep_08_2001$census <- rep("08_census_2001",length(sep_08_2001$DBH_mm))
 sep_08_2001$plot <- rep("SPKS_08",length(sep_08_2001$DBH_mm))
 sep_08_2009$census <- rep("08_census_2009",length(sep_08_2009$DBH_mm))
@@ -712,6 +828,15 @@ sep_10_2009$census <- rep("10_census_2009",length(sep_10_2009$DBH_mm))
 sep_10_2009$plot <- rep("SPKA_10",length(sep_10_2009$DBH_mm))
 sep_10_2014$census <- rep("10_census_2014",length(sep_10_2014$DBH_mm))
 sep_10_2014$plot <- rep("SPKA_10",length(sep_10_2014$DBH_mm))
+
+
+#*# CHECK #*#
+#sep_12_2008$census <- rep("12_census_2008",length(sep_12_2008$DBH_mm))
+#sep_12_2008$plot <- rep("SPKS_12",length(sep_12_2008$DBH_mm))
+sep_12_2013$census <- rep("12_census_2013",length(sep_12_2013$DBH_mm))
+sep_12_2013$plot <- rep("SPKS_12",length(sep_12_2013$DBH_mm))
+#*# CHECK #*#
+
 
 dnm_01_2006$census <- rep("01_census_2006",length(dnm_01_2006$DBH_mm))
 dnm_01_2006$plot <- rep("DNM1_01",length(dnm_01_2006$DBH_mm))
@@ -746,6 +871,10 @@ sep_30_2001 <- bind_cols(dat_all30_select,sep_30_2001)
 sep_30_2010 <- bind_cols(dat_all30_select,sep_30_2010)
 sep_30_2015 <- bind_cols(dat_all30_select,sep_30_2015)
 
+sep_06_2003 <- bind_cols(dat_all06_03_select,sep_06_2003)
+sep_06_2014 <- bind_cols(dat_all06_14_select,sep_06_2014)
+sep_07_2008 <- bind_cols(dat_all07_08_select,sep_07_2008)
+sep_07_2013 <- bind_cols(dat_all07_13_select,sep_07_2013)
 sep_08_2001 <- bind_cols(dat_all08_select,sep_08_2001)
 sep_08_2009 <- bind_cols(dat_all08_select,sep_08_2009)
 sep_08_2014 <- bind_cols(dat_all08_select,sep_08_2014)
@@ -756,6 +885,13 @@ sep_09_2014 <- bind_cols(dat_all09_select,sep_09_2014)
 sep_10_2000 <- bind_cols(dat_all10_select,sep_10_2000)
 sep_10_2009 <- bind_cols(dat_all10_select,sep_10_2009)
 sep_10_2014 <- bind_cols(dat_all10_select,sep_10_2014)
+
+
+#*# CHECK #*#
+#sep_12_2008 <- bind_cols(dat_all12_13_select,sep_12_2008)
+sep_12_2013 <- bind_cols(dat_all12_13_select,sep_12_2013)
+#*# CHECK #*#
+
 
 dnm_01_2006 <- bind_cols(dat_all01_select,dnm_01_2006)
 dnm_01_2013 <- bind_cols(dat_all01_select,dnm_01_2013)
@@ -778,14 +914,15 @@ SEP_H$stemID <- SEP_H$treeID
 SEP_H <- select(SEP_H, -subplot_ID)
 SEP_H <- select(SEP_H, -DBH_mm)
 
-SEP_S <- bind_rows(sep_08_2001,sep_08_2009,sep_08_2014) 
+SEP_S <- bind_rows(sep_06_2003,sep_06_2014,sep_07_2008,sep_07_2013,sep_08_2001,sep_08_2009,sep_08_2014) 
 SEP_S$site <- rep("SPKS",length(SEP_S$DBH_mm))
 SEP_S$dbh <- SEP_S$DBH_mm * .1
 SEP_S$stemID <- SEP_S$treeID
 SEP_S <- select(SEP_S, -subplot_ID)
 SEP_S <- select(SEP_S, -DBH_mm)
 
-SEP_A <- bind_rows(sep_09_2000,sep_09_2009,sep_09_2014,sep_10_2000,sep_10_2009,sep_10_2014) 
+SEP_A <- bind_rows(sep_09_2000,sep_09_2009,sep_09_2014,sep_10_2000,sep_10_2009,sep_10_2014,sep_12_2013) 
+#SEP_A <- bind_rows(sep_09_2000,sep_09_2009,sep_09_2014,sep_10_2000,sep_10_2009,sep_10_2014,sep_12_2008,sep_12_2013) 
 SEP_A$site <- rep("SPKA",length(SEP_A$DBH_mm))
 SEP_A$dbh <- SEP_A$DBH_mm * .1
 SEP_A$stemID <- SEP_A$treeID
@@ -952,8 +1089,10 @@ firstcleandata$DFstatus <- gsub("bmn", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("biz", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("bim", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("bgz", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bfq", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("bfg", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("bem", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("bei", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("bdg", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("bcz", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("bcn", "A", firstcleandata$DFstatus)
@@ -995,10 +1134,14 @@ firstcleandata$DFstatus <- gsub("dh", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("dm", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("dn", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("dq", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("dz", "A", firstcleandata$DFstatus)
 
+firstcleandata$DFstatus <- gsub("ef", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("eg", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("eh", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("em", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("fg", "A", firstcleandata$DFstatus)
+firstcleandata$DFstatus <- gsub("fl", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("fz", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("gz", "A", firstcleandata$DFstatus)
 firstcleandata$DFstatus <- gsub("gq", "A", firstcleandata$DFstatus)
@@ -1384,6 +1527,11 @@ SPKA1009$stemID[duplicated(SPKA1009$stemID)]
 SPKA1014 <- filter(SPKA, census == "10_census_2014")
 SPKA1014$stemID[duplicated(SPKA1014$stemID)]
 
+SPKA1208 <- filter(SPKA, census == "12_census_2008")
+SPKA1208$stemID[duplicated(SPKA1208$stemID)]
+SPKA1213 <- filter(SPKA, census == "12_census_2013")
+SPKA1213$stemID[duplicated(SPKA1213$stemID)]
+
 #Check for Strange Taxonomic Entries--------
 table(SPKA$family)
 table(SPKA$genus)
@@ -1424,6 +1572,18 @@ table(SPKH$species)
 # SPKS8
 #---------------------------------------------------------------------------------------------#
 table(SPKS$census)
+
+SPKS603 <- filter(SPKS, census == "06_census_2003")
+SPKS603$stemID[duplicated(SPKS603$stemID)]
+SPKS614 <- filter(SPKS, census == "06_census_2014")
+SPKS614$stemID[duplicated(SPKS614$stemID)]
+SPKS708 <- filter(SPKS, census == "07_census_2008")
+SPKS708$stemID[duplicated(SPKS708$stemID)]
+SPKS713 <- filter(SPKS, census == "07_census_2013")
+SPKS713$stemID[duplicated(SPKS713$stemID)]
+
+
+
 SPKS801 <- filter(SPKS, census == "08_census_2001")
 SPKS801$stemID[duplicated(SPKS801$stemID)]
 SPKS809 <- filter(SPKS, census == "08_census_2009")
