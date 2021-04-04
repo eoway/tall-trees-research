@@ -44,9 +44,12 @@ DNM2   <- filter(clean_dat, plot == "DNM2_02")
 DNM3   <- filter(clean_dat, plot == "DNM3_03")
 SPKA9  <- filter(clean_dat, plot == "SPKA_09")
 SPKA10 <- filter(clean_dat, plot == "SPKA_10")
+#SPKA12 <- filter(clean_dat, plot == "SPKA_12")
 SPKH4  <- filter(clean_dat, plot == "SPKH_04")
 SPKH5  <- filter(clean_dat, plot == "SPKH_05")
 SPKH30 <- filter(clean_dat, plot == "SPKH_30")
+SPKS6  <- filter(clean_dat, plot == "SPKS_06")
+SPKS7  <- filter(clean_dat, plot == "SPKS_07")
 SPKS8  <- filter(clean_dat, plot == "SPKS_08")
 #---------------------------------------------------------------------------------------------#
 
@@ -740,6 +743,64 @@ SPKH30_keep <- rbind(SPKH3001_keep, SPKH3010_keep, SPKH3015_keep)
 
 
 #---------------------------------------------------------------------------------------------#
+# SPKS6
+#---------------------------------------------------------------------------------------------#
+table(SPKS6$census)
+
+SPKS603 <- filter(SPKS6, census == "06_census_2003")
+SPKS603$treeID[duplicated(SPKS603$treeID)]
+
+SPKS603 <- SPKS603[order(SPKS603$treeID, -SPKS603$dbh),]
+SPKS603_keep <- SPKS603[!duplicated(SPKS603$treeID),]
+length(SPKS603$dbh); length(SPKS603_keep$dbh)
+max(SPKS603$dbh, na.rm=T); max(SPKS603_keep$dbh, na.rm=T)
+#---------------------------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------------------------#
+SPKS614 <- filter(SPKS6, census == "06_census_2014")
+SPKS614$treeID[duplicated(SPKS614$treeID)]
+
+SPKS614 <- SPKS614[order(SPKS614$treeID, -SPKS614$dbh),]
+SPKS614_keep <- SPKS614[!duplicated(SPKS614$treeID),]
+length(SPKS614$dbh); length(SPKS614_keep$dbh)
+max(SPKS614$dbh, na.rm=T); max(SPKS614_keep$dbh, na.rm=T)
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+SPKS6_keep <- rbind(SPKS603_keep, SPKS614_keep)
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+
+
+#---------------------------------------------------------------------------------------------#
+# SPKS7
+#---------------------------------------------------------------------------------------------#
+table(SPKS7$census)
+
+SPKS708 <- filter(SPKS7, census == "07_census_2008")
+SPKS708$treeID[duplicated(SPKS708$treeID)]
+
+SPKS708 <- SPKS708[order(SPKS708$treeID, -SPKS708$dbh),]
+SPKS708_keep <- SPKS708[!duplicated(SPKS708$treeID),]
+length(SPKS708$dbh); length(SPKS708_keep$dbh)
+max(SPKS708$dbh, na.rm=T); max(SPKS708_keep$dbh, na.rm=T)
+#---------------------------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------------------------#
+SPKS713 <- filter(SPKS7, census == "07_census_2013")
+SPKS713$treeID[duplicated(SPKS713$treeID)]
+
+SPKS713 <- SPKS713[order(SPKS713$treeID, -SPKS713$dbh),]
+SPKS713_keep <- SPKS713[!duplicated(SPKS713$treeID),]
+length(SPKS713$dbh); length(SPKS713_keep$dbh)
+max(SPKS713$dbh, na.rm=T); max(SPKS713_keep$dbh, na.rm=T)
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+SPKS7_keep <- rbind(SPKS708_keep, SPKS713_keep)
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+
+
+#---------------------------------------------------------------------------------------------#
 # SPKS8
 #---------------------------------------------------------------------------------------------#
 table(SPKS8$census)
@@ -781,8 +842,9 @@ SPKS8_keep <- rbind(SPKS801_keep, SPKS809_keep, SPKS814_keep)
 #---------------------------------------------------------------------------------------------#
 # Combine all plots
 #---------------------------------------------------------------------------------------------#
+## ADD SPKA12_keep
 cleandata <- rbind(LHP_keep, DNM50_keep, DNM1_keep, DNM2_keep, DNM3_keep, SPKA9_keep,
-                   SPKA10_keep, SPKH4_keep, SPKH5_keep, SPKH30_keep, SPKS8_keep)
+                   SPKA10_keep, SPKH4_keep, SPKH5_keep, SPKH30_keep, SPKS6_keep, SPKS7_keep, SPKS8_keep)
 cleandata$dbh <- ifelse(cleandata$dbh == '-Inf',NA, cleandata$dbh)
 #---------------------------------------------------------------------------------------------#
 
