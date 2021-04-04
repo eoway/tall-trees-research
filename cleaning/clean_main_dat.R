@@ -647,11 +647,11 @@ dat_all06_14_select$quadrat <- as.factor(paste0(dat_all06_14_select$subplot_ID,'
 
 #*# CHECK #*# SKIP WHILE USING TEMP
 #---------------------------------------------------------------------------------------------#
-dat_all07 <- select(dat_sep07, c('Tree ID':'WD Type','POM...22'))
-dat_all07$genus <- word(dat_all07$Species); dat_all07$species <- word(dat_all07$Species, 2)
-dat_all07_select <- select(dat_all07,'T1',X,Y,Family,genus,species,'Tree ID','WD Type','WD',"POM...22")
-colnames(dat_all07_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
-dat_all07_select$quadrat <- as.factor(paste0(dat_all07_select$subplot_ID,'_sep08'))
+# dat_all07 <- select(dat_sep07, c('Tree ID':'WD Type','POM...22'))
+# dat_all07$genus <- word(dat_all07$Species); dat_all07$species <- word(dat_all07$Species, 2)
+# dat_all07_select <- select(dat_all07,'T1',X,Y,Family,genus,species,'Tree ID','WD Type','WD',"POM...22")
+# colnames(dat_all07_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
+# dat_all07_select$quadrat <- as.factor(paste0(dat_all07_select$subplot_ID,'_sep08'))
 #---------------------------------------------------------------------------------------------#
 #*# CHECK #*# SKIP WHILE USING TEMP
 
@@ -683,11 +683,11 @@ dat_all10_select$quadrat <- as.factor(paste0(dat_all10_select$subplot_ID,'_sep10
 
 #*# CHECK #*# SKIP WHILE USING TEMP
 #---------------------------------------------------------------------------------------------#
-dat_all12 <- select(dat_sep12, c('Tree ID':'WD Type','POM...22'))
-dat_all12$genus <- word(dat_all12$Species); dat_all12$species <- word(dat_all12$Species, 2)
-dat_all12_select <- select(dat_all12,'T1',X,Y,Family,genus,species,'Tree ID','WD Type','WD',"POM...22")
-colnames(dat_all12_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
-dat_all12_select$quadrat <- as.factor(paste0(dat_all12_select$subplot_ID,'_sep10'))
+# dat_all12 <- select(dat_sep12, c('Tree ID':'WD Type','POM...22'))
+# dat_all12$genus <- word(dat_all12$Species); dat_all12$species <- word(dat_all12$Species, 2)
+# dat_all12_select <- select(dat_all12,'T1',X,Y,Family,genus,species,'Tree ID','WD Type','WD',"POM...22")
+# colnames(dat_all12_select) <- c("subplot_ID","plot_x","plot_y","family","genus","species","treeID","IDlevel","mean_wd","hom")
+# dat_all12_select$quadrat <- as.factor(paste0(dat_all12_select$subplot_ID,'_sep10'))
 #---------------------------------------------------------------------------------------------#
 #*# CHECK #*# SKIP WHILE USING TEMP
 
@@ -744,8 +744,8 @@ sep_12_2013 <- select(dat_sep12_13, 'D1','F1'); colnames(sep_12_2013) <- c("DBH_
 #---------------------------------------------------------------------------------------------#
 
 #*# CHECK #*# SKIP WHILE USING TEMP
-sep_07_2008 <- select(dat_sep07_08, 'DBH1...16','F1...23'); colnames(sep_07_2008) <- c("DBH_mm","DFstatus")
-sep_07_2013 <- select(dat_sep07_13, 'DBH1...36','F1...43'); colnames(sep_07_2013) <- c("DBH_mm","DFstatus")
+# sep_07_2008 <- select(dat_sep07_08, 'DBH1...16','F1...23'); colnames(sep_07_2008) <- c("DBH_mm","DFstatus")
+# sep_07_2013 <- select(dat_sep07_13, 'DBH1...36','F1...43'); colnames(sep_07_2013) <- c("DBH_mm","DFstatus")
 #*# CHECK #*# SKIP WHILE USING TEMP
 
 
@@ -762,8 +762,8 @@ sep_10_2014 <- select(dat_sep10, 'DBH1...56','F1...63'); colnames(sep_10_2014) <
 
 
 #*# CHECK #*# SKIP WHILE USING TEMP
-sep_12_2008 <- select(dat_sep12, 'DBH1...36','F1...43'); colnames(sep_12_2008) <- c("DBH_mm","DFstatus")
-sep_12_2013 <- select(dat_sep12, 'DBH1...56','F1...63'); colnames(sep_12_2013) <- c("DBH_mm","DFstatus")
+# sep_12_2008 <- select(dat_sep12, 'DBH1...36','F1...43'); colnames(sep_12_2008) <- c("DBH_mm","DFstatus")
+# sep_12_2013 <- select(dat_sep12, 'DBH1...56','F1...63'); colnames(sep_12_2013) <- c("DBH_mm","DFstatus")
 #*# CHECK #*# SKIP WHILE USING TEMP
 
 
@@ -971,8 +971,10 @@ forest_plots_clean$stem_BA <- 0.00007854 * forest_plots_clean$dbh^2
 #---------------------------------------------------------------------------------------------#
 # Calculate Julian Date
 #---------------------------------------------------------------------------------------------#
-census <- read_csv("G:/My Drive/Harvard/Tall_trees_Borneo_project/Data/Census_Dates.csv")
-julians <- census %>% select(census, Mid_date, JulianDate)
+census <- read_csv("G:/My Drive/Harvard/Plot_Data/Forest_Plots/Census_Dates.csv")
+julians <- census %>% select(census, Mid_date)
+julians$date <- as.Date(julians$Mid_date, format = "%d-%B-%y")
+julians$JulianDate <- julian(julians$date, origin = 0)
 
 forest_plots_clean <- left_join(forest_plots_clean, julians, by = "census")
 
@@ -1569,7 +1571,7 @@ table(SPKH$genus)
 table(SPKH$species)
 
 #---------------------------------------------------------------------------------------------#
-# SPKS8
+# SPKS6 SPK7 SPK8
 #---------------------------------------------------------------------------------------------#
 table(SPKS$census)
 
@@ -1581,8 +1583,6 @@ SPKS708 <- filter(SPKS, census == "07_census_2008")
 SPKS708$stemID[duplicated(SPKS708$stemID)]
 SPKS713 <- filter(SPKS, census == "07_census_2013")
 SPKS713$stemID[duplicated(SPKS713$stemID)]
-
-
 
 SPKS801 <- filter(SPKS, census == "08_census_2001")
 SPKS801$stemID[duplicated(SPKS801$stemID)]
@@ -1597,6 +1597,8 @@ table(SPKS$genus)
 table(SPKS$species)
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
+
+
 
 
 #---------------------------------------------------------------------------------------------#
