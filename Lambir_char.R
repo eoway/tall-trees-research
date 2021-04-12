@@ -29,8 +29,10 @@ pal <- bpy.colors(99)
 #---------------------------------------------------------------------------------------------#
 load("lambir.stem4.RData")
 load("lambir.elev.RData")
+load("CTFSElev_lambir.RData")
 load("lambir.habs.Rdata")
 #load("stem4.RM3a.Rdata")
+
 
 # load("Harvard/Plot_Data/CTFS_ForestGEO/Data/lambir.spptable.RData")
 # data from Sabrina Russo - spp categorized as light demanding or shade tolerant
@@ -76,6 +78,7 @@ names(lam_elev) #xdim = 1040m; ydim = 500m
 #---------------------------------------------------------------------------------------------#
 lhp_elev_df <- lam_elev
 head(lhp_elev_df)
+dim(lhp_elev_df)
 lhp_elev_df$ID <- seq(1:length(lhp_elev_df$elev))
 
 ggplot() + 
@@ -164,7 +167,6 @@ plot(topo_20m)
 # assign 20m quadrat IDs vertically to match Lambir quadrats....
 #elev_rast_20m$index <- 1:ncell(elev_rast_20m)
 
-
 #Every 25th entry is NA for soils stuff?????-----------------------------ELSA---------------------------
 elev_rast_20m$index <- c(seq(26,1378,by=26),seq(25,1377,by=26),seq(24,1376,by=26),
                          seq(23,1375,by=26),seq(22,1374,by=26),seq(21,1373,by=26),
@@ -176,7 +178,10 @@ elev_rast_20m$index <- c(seq(26,1378,by=26),seq(25,1377,by=26),seq(24,1376,by=26
                          seq(5,1357,by=26),seq(4,1356,by=26),seq(3,1355,by=26),
                          seq(2,1354,by=26),seq(1,1353,by=26))
 
-#plot(elev_rast_20m$elev)
+plot(elev_rast_20m)
+elev_rast_20m
+summary(elev_rast)
+summary(elev_rast_20m_df)
 plot(elev_rast_20m$index)
 length(unique(elev_rast_20m$index))
 #---------------------------------------------------------------------------------------------#
@@ -227,6 +232,10 @@ heightmetrics <- lam4 %>% group_by(quadrat, HabType, soil) %>% summarize(
                                                                 height99 = quantile(height, probs = 0.99, na.rm = TRUE),
                                                                 heightmax = max(height,na.rm=T))
 lambir_all <- inner_join(lambir, heightmetrics, by= "quadrat")
+lambir_all <- subset(lambir_all, select = -c(HabType.y, soil.y))
+lambir_all <- rename(lambir_all, HabType = HabType.x, soil = soil.x)
+
+
 
 #---------------------------------------------------------------------------------------------#
 # ALL LAMBIR
@@ -258,7 +267,8 @@ lambir_all <- inner_join(lambir, heightmetrics, by= "quadrat")
 # [3] Use Raster Calculator to calculate TWI = Ln(flow accumulation / slope)
 #Danum_TWI = raster("Harvard/CAO_data/GIS/Danum_TWI.tif"); plot(Danum_TWI)
 #Sepilok_TWI = raster("Harvard/CAO_data/GIS/Sepilok_TWI.tif"); plot(Sepilok_TWI)
-Lambir_TWI = raster("Harvard/CAO_data/GIS/Lambir_TWI.tif"); plot(Lambir_TWI)
+library(rgdal)
+Lambir_TWI = raster("Lambir_TWI.tif"); plot(Lambir_TWI)
 #---------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------#
 cellStats(Lambir_TWI, mean); cellStats(Lambir_TWI, sd)
@@ -282,6 +292,7 @@ TWI_20m$index <- c(seq(26,1378,by=26),seq(25,1377,by=26),seq(24,1376,by=26),
 #plot(elev_rast_20m$elev)
 plot(TWI_20m$index)
 length(unique(TWI_20m$index))
+
 #---------------------------------------------------------------------------------------------#
 
 #---------------------------------------------------------------------------------------------#
@@ -301,6 +312,11 @@ plot(TWI_20m$Lambir_TWI, col=r2)
 ggplot() + 
   geom_point(data=twi_soil, aes(x,y, col=soil), size=6) + 
   theme_classic()
+
+lambir_topo <- inner_join(lambir_all, twi_soil, by="index")
+lambir_topo <- subset(lambir_topo, select = -c(HabType.y, soil.y,x.y,y.y))
+lambir_topo <- rename(lambir_topo, HabType = HabType.x, soil = soil.x, x=x.x, y=y.x)
+write.csv(lambir_topo, here("Desktop","Research","HCRP","Lambir Data", "lam_topo.csv"))
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
