@@ -3,8 +3,9 @@ library(ISLR)
 
 lam_data <- read_csv(here("Desktop","Research","HCRP","Lambir Data", "lam_topo.csv"))
 
-lam_stat$soil <-as.factor(lam_stat$soil)
-#Add quadrat level emergent labelling
+
+#Add quadrat level emergent labeling
+source("~/Documents/GitHub/tall-trees-research/heights.r")
 dbh99 <- quantile99dbh #from heights.r
 lam_data$tree_type <- ifelse(lam_data$dbh>=dbh99, "emrgnt", "nonemrgnt")
 table(lam_data$tree_type)
@@ -19,16 +20,181 @@ table(lam_data$quad_type)
 
 lam_stat <- lam_data %>% group_by(quadrat,quad_type,dbhmean,heightmean,heightmedian,height99,heightmax,HabType,
                                   slope,aspect,tpi,elev,Lambir_TWI,soil)  %>%  summarise()
-
+lam_stat$soil <-as.factor(lam_stat$soil)
 table(lam_stat$quad_type)
 lam_stat$bitype <- ifelse(lam_stat$quad_type=="emrgnt", 1,0)
 table(lam_stat$bitype)
 
-mylogit <- glm(bitype~slope, data=lam_stat, family="binomial")
-summary(mylogit)
-plot(mylogit) %>%
-  abline()
-#Multiple Logistic Regression
+#Multiple Logistic Regression---------
+twi3 <- glm(bitype~Lambir_TWI+I(Lambir_TWI^3), data=lam_stat, family="binomial")
+summary(twi3)
+
+
+bielev <- glm(bitype~elev, data=lam_stat, family="binomial")
+summary(bielev)
+plot(lam_stat$elev, lam_stat$bitype)
+
+bitpi <- glm(bitype~tpi, data=lam_stat, family="binomial")
+summary(bitpi)
+plot(lam_stat$tpi, lam_stat$bitype)
+
+biaspect <- glm(bitype~aspect, data=lam_stat, family="binomial")
+summary(biaspect)
+plot(lam_stat$aspect, lam_stat$bitype)
+
+bislope <- glm(bitype~slope, data=lam_stat, family="binomial")
+summary(bislope)
+plot(lam_stat$slope, lam_stat$bitype)
+
+bitwi <- glm(bitype~Lambir_TWI, data=lam_stat, family="binomial")
+summary(bitwi)
+plot(lam_stat$Lambir_TWI, lam_stat$bitype)
+
+bisoil <- glm(bitype~soil, data=lam_stat, family="binomial")
+summary(bisoil)
+
+#Random Effects
+#Just Ints--------
+library(lme4)
+#Height 99~Elevation: 
+lmer.h99elev <- lmer(height99~elev+(1|soil), data=lam_stat)
+summary(lmer.h99elev)
+AIC(lmer.h99elev)
+names(lmer.h99elev)
+confint(lmer.h99elev)
+predict(lmer.h99elev, data.frame(elev=c(5,10,15)), 
+        interval="confidence")
+par(mfrow=c(1,1))
+plot(lmer.h99elev)
+plot(lam_stat$elev,lam_stat$height99)
+
+#Height 99~TPI: 
+lmer.h99tpi <- lmer(height99~tpi+(1|soil), data=lam_stat)
+summary(lmer.h99tpi)
+AIC(lmer.h99tpi)
+confint(lmer.h99tpi)
+predict(lmer.h99tpi, data.frame(elev=c(5,10,15)), 
+        interval="confidence")
+plot(lmer.h99tpi)
+plot(lam_stat$tpi,lam_stat$height99)
+
+#Height 99~aspect: 
+lmer.h99aspect <- lmer(height99~aspect+(1|soil), data=lam_stat)
+summary(lmer.h99aspect)
+AIC(lmer.h99aspect)
+confint(lmer.h99aspect)
+predict(lmer.h99aspect, data.frame(elev=c(5,10,15)), 
+        interval="confidence")
+plot(lmer.h99aspect)
+plot(lam_stat$aspect,lam_stat$height99)
+
+#Height 99~slope: 
+lmer.h99slope <- lmer(height99~slope+(1|soil), data=lam_stat)
+summary(lmer.h99slope)
+AIC(lmer.h99slope)
+confint(lmer.h99slope)
+predict(lmer.h99slope, data.frame(elev=c(5,10,15)), 
+        interval="confidence")
+plot(lmer.h99slope)
+plot(lam_stat$slope,lam_stat$height99)
+
+#Height 99~TWI: 
+lmer.h99twi <- lmer(height99~Lambir_TWI+(1|soil), data=lam_stat)
+summary(lmer.h99twi)
+AIC(lmer.h99twi)
+confint(lmer.h99twi)
+predict(lmer.h99twi, data.frame(twi=c(5,10,15)), 
+        interval="confidence")
+par(mfrow=c(1,1))
+plot(lmer.h99twi)
+plot(lam_stat$Lambir_TWI,lam_stat$height99)
+
+
+#Height 99~TWI+TPI: 
+lmer.h99twitpi <- lmer(height99~Lambir_TWI+tpi+(1|soil), data=lam_stat)
+summary(lmer.h99twitpi)
+AIC(lmer.h99twitpi)
+confint(lmer.h99twitpi)
+predict(lmer.h99twitpi, data.frame(twi=c(5,10,15)), 
+        interval="confidence")
+par(mfrow=c(1,1))
+plot(lmer.h99twitpi)
+plot(lam_stat$Lambir_TWI,lam_stat$height99)
+
+#Height 99~TWI*TPI: 
+lmer.h99twitpi1 <- lmer(height99~Lambir_TWI*tpi+(1|soil), data=lam_stat)
+summary(lmer.h99twitpi1)
+AIC(lmer.h99twitpi1)
+confint(lmer.h99twitpi1)
+predict(lmer.h99twitpi1, data.frame(twi=c(5,10,15)), 
+        interval="confidence")
+par(mfrow=c(1,1))
+plot(lmer.h99twitpi1)
+plot(lam_stat$Lambir_TWI,lam_stat$height99)
+
+#Height 99~TWI+TPI: 
+lmer.h99slopeaspect <- lmer(height99~slope+aspect+(1|soil), data=lam_stat)
+summary(lmer.h99slopeaspect)
+AIC(lmer.h99slopeaspect)
+confint(lmer.h99slopeaspect)
+predict(lmer.h99slopeaspect, data.frame(slope=c(5,10,15)), 
+        interval="confidence")
+par(mfrow=c(1,1))
+plot(lmer.h99slopeaspect)
+plot(lam_stat$Lambir_slope,lam_stat$height99)
+
+#Ints and Only--------
+#Height 99~Elevation: 
+lmer.h99elev1 <- lmer(height99~elev +(1|soil)+ (0 + elev|soil), data=lam_stat)
+summary(lmer.h99elev1)
+AIC(lmer.h99elev1)
+confint(lmer.h99elev1)
+predict(lmer.h99elev1, data.frame(elev=c(5,10,15)), 
+        interval="confidence")
+par(mfrow=c(1,1))
+plot(lmer.h99elev1)
+plot(lam_stat$elev,lam_stat$height99)
+
+#Height 99~TPI: 
+lmer.h99tpi1 <- lmer(height99~tpi+(1|soil)+ (0 + tpi|soil), data=lam_stat)
+summary(lmer.h99tpi1)
+AIC(lmer.h99tpi1)
+confint(lmer.h99tpi1)
+predict(lmer.h99tpi1, data.frame(elev=c(5,10,15)), 
+        interval="confidence")
+plot(lmer.h99tpi1)
+plot(lam_stat$tpi,lam_stat$height99)
+
+#Height 99~aspect: 
+lmer.h99aspect1 <- lmer(height99~aspect+(1|soil)+ (0 + aspect|soil), data=lam_stat)
+summary(lmer.h99aspect1)
+AIC(lmer.h99aspect1)
+confint(lmer.h99aspect1)
+predict(lmer.h99aspect1, data.frame(elev=c(5,10,15)), 
+        interval="confidence")
+plot(lmer.h99aspect1)
+plot(lam_stat$aspect,lam_stat$height99)
+
+#Height 99~slope: 
+lmer.h99slope1 <- lmer(height99~slope+(1|soil)+ (0 + slope|soil), data=lam_stat)
+summary(lmer.h99slope1)
+AIC(lmer.h99slope1)
+confint(lmer.h99slope1)
+predict(lmer.h99slope1, data.frame(elev=c(5,10,15)), 
+        interval="confidence")
+plot(lmer.h99slope1)
+plot(lam_stat$slope,lam_stat$height99)
+
+#Height 99~TWI: 
+lmer.h99twi1 <- lmer(height99~Lambir_TWI+(1|soil)+ (0 + Lambir_TWI|soil), data=lam_stat)
+summary(lmer.h99twi1)
+AIC(lmer.h99twi1)
+confint(lmer.h99twi1)
+predict(lmer.h99twi1, data.frame(twi=c(5,10,15)), 
+        interval="confidence")
+par(mfrow=c(1,1))
+plot(lmer.h99twi1)
+plot(lam_stat$Lambir_TWI,lam_stat$height99)
 
 #Random Effect Model
 library(nlme)
@@ -36,10 +202,16 @@ heightelev <- lme(height99~elev, random=~1|soil, data=lam_stat, method="REML")
 summary(heightelev)
 plot(heightelev) %>%
   abline()
-
+hist(lam_data$elev)
 library(lme4)
-heightelev <- lmer(height99~elev+(1|soil), data=lam_stat)
+colnames(lam_data)
+lam_data$quadrat_group <- as.factor(lam_data$quadrat)
+heightelev <- lmer(height99~elev+(1|quadrat_group), data=lam_data)
+#if hist(lam_dat) or hist(lamstat) are skewed- log transform them
+hist(lam_data$height99)
+hist(lam_stat$height99)
 summary(heightelev)
+str(lam_data$quadrat)
 confint(heightelev)
 
 ranef(heightelev)$soil %>% head(4)
