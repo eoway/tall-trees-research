@@ -64,10 +64,8 @@ length(unique(lambir4$index))
 
 lam4 = merge(lambir4, lambir.habs, by = "index", all.x=T)
 #---------------------------------------------------------------------------------------------#
-
 #ggplot(lam4, aes(gx, gy, fill=soil)) + 
   #geom_point()
-
 
 #---------------------------------------------------------------------------------------------#
 # LAMBIR ELEVATION DATA
@@ -221,6 +219,8 @@ plot(elev_rast_20m$elev, col=r2)
 #The Great Merge-------------
 #---------------------------------------------------------------------------------------------#
 lam4$quadrat <- as.character(lam4$index)
+lam4 <- filter(lam4, dbh>=10)
+
 lambir <- inner_join(lam4, elev_soil, by="index")
 lambir <- subset(lambir, select = -c(HabType.y, soil.y))
 lambir <- rename(lambir, HabType = HabType.x, soil = soil.x)
@@ -273,6 +273,7 @@ Lambir_TWI = raster("Lambir_TWI.tif"); plot(Lambir_TWI)
 #---------------------------------------------------------------------------------#
 cellStats(Lambir_TWI, mean); cellStats(Lambir_TWI, sd)
 
+
 TWI_20m <- aggregate(Lambir_TWI, fact=4)
 res(TWI_20m)
 plot(TWI_20m)
@@ -316,6 +317,7 @@ ggplot() +
 lambir_topo <- inner_join(lambir_all, twi_soil, by="index")
 lambir_topo <- subset(lambir_topo, select = -c(HabType.y, soil.y,x.y,y.y))
 lambir_topo <- rename(lambir_topo, HabType = HabType.x, soil = soil.x, x=x.x, y=y.x)
+summary(lambir_topo)
 write.csv(lambir_topo, here("Desktop","Research","HCRP","Lambir Data", "lam_topo.csv"))
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
