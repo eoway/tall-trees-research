@@ -51,119 +51,6 @@ summary(growdata$dbh)
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
-#---------------------------------------------------------------------------------------------#
-# SPKS08 first interval
-#---------------------------------------------------------------------------------------------#
-census1 <- filter(growdata, plot == "SPKS_08" & censusID == "08_census_2001")
-census2 <- filter(growdata, plot == "SPKS_08" & censusID == "08_census_2009")
-table(growdata$plot)
-table(census2$censusID)
-summary(census1)
-
-# check the number of unique stems in each dataset and compare between datasets
-length(unique(census1$stemID)); dim(census1)
-length(unique(census2$stemID)); dim(census2)
-
-# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
-SPKS08_2001_2009 <- inner_join(census1, census2, by="stemID")
-dim(SPKS08_2001_2009) 
-# notice that in 'SPKS08_2001_2009' dbh.x is dbh at census 1 and dbh.y is dbh at census 2
-
-# calculate time difference and convert time from days to years  
-time <- (SPKS08_2001_2009$date.y-SPKS08_2001_2009$date.x)/365
-# assign dbh at time 1 (size1) and time 2 (size2)
-size2 <- SPKS08_2001_2009$dbh.y
-size1 <- SPKS08_2001_2009$dbh.x
-
-# calculate growth rates: 
-SPKS08_2001_2009$annual_increment <- (size2 - size1)/time
-SPKS08_2001_2009$relative_gr      <- (log(size2) - log(size1))/time
-
-summary(SPKS08_2001_2009)
-# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
-summary(SPKS08_2001_2009$annual_increment)
-summary(SPKS08_2001_2009$relative_gr )
-
-#---------------------------------------------------------------------------------------------#
-# set aside stems to remove: 
-SPKS08_2001_2009remove <- filter(SPKS08_2001_2009, annual_increment >= 7.5
-                                 | relative_gr < -0.25)
-summary(SPKS08_2001_2009)
-summary(SPKS08_2001_2009remove)
-dim(SPKS08_2001_2009) 
-dim(SPKS08_2001_2009remove) 
-dim(SPKS08_2001_2009remove)[[1]]/dim(SPKS08_2001_2009)[[1]]*100
-#---------------------------------------------------------------------------------------------#
-# 0 stems removed (0% ALIVE stems removed)
-#---------------------------------------------------------------------------------------------#
-par(mfrow=c(1,2))
-hist(SPKS08_2001_2009$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
-hist(SPKS08_2001_2009$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
-
-#SPKS081 Plot------
-# look at the change in DBH from census 1 to census 2
-par(mfrow=c(1,1))
-plot(SPKS08_2001_2009$dbh.x, SPKS08_2001_2009$dbh.y, pch=19, 
-     xlab="DBH SPKS08 2001 (cm)", ylab="DBH SPKS08 2009 (cm)")
-#add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
-abline(0,1, col="red", lwd=2) 
-#---------------------------------------------------------------------------------------------#
-
-#---------------------------------------------------------------------------------------------#
-# SPKS08 Second interval
-#---------------------------------------------------------------------------------------------#
-census1 <- filter(growdata, plot == "SPKS_08" & censusID == "08_census_2009")
-census2 <- filter(growdata, plot == "SPKS_08" & censusID == "08_census_2014")
-
-table(growdata$plot)
-table(census2$censusID)
-summary(census1)
-
-# check the number of unique stems in each dataset and compare between datasets
-length(unique(census1$stemID)); dim(census1)
-length(unique(census2$stemID)); dim(census2)
-
-# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
-SPKS08_2009_2014 <- inner_join(census1, census2, by="stemID")
-dim(SPKS08_2009_2014) 
-
-time <- (SPKS08_2009_2014$date.y-SPKS08_2009_2014$date.x)/365
-size2 <- SPKS08_2009_2014$dbh.y
-size1 <- SPKS08_2009_2014$dbh.x
-
-# calculate growth rates: 
-SPKS08_2009_2014$annual_increment <- (size2 - size1)/time
-SPKS08_2009_2014$relative_gr      <- (log(size2) - log(size1))/time
-
-summary(SPKS08_2009_2014$annual_increment)
-summary(SPKS08_2009_2014$relative_gr)
-#---------------------------------------------------------------------------------------------#
-# set aside stems to remove: 
-SPKS08_2009_2014remove <- filter(SPKS08_2009_2014, annual_increment >= 7.5
-                                 | relative_gr < -0.25)
-
-summary(SPKS08_2009_2014)
-summary(SPKS08_2009_2014remove)
-dim(SPKS08_2009_2014) 
-dim(SPKS08_2009_2014remove) 
-dim(SPKS08_2009_2014remove)[[1]]/dim(SPKS08_2009_2014)[[1]]*100
-#---------------------------------------------------------------------------------------------#
-# 0 stems removed (0% ALIVE stems removed)
-#---------------------------------------------------------------------------------------------#
-# take a look at the values
-par(mfrow=c(1,2))
-hist(SPKS08_2009_2014$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
-hist(SPKS08_2009_2014$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
-
-#SPKS082 Plot------
-# look at the change in DBH from census 1 to census 2
-par(mfrow=c(1,1))
-plot(SPKS08_2009_2014$dbh.x, SPKS08_2009_2014$dbh.y, pch=19, 
-     xlab="DBH SPKS08 2009 (cm)", ylab="DBH SPKS08 2014 (cm)")
-#add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
-abline(0,1, col="red", lwd=2)
-#---------------------------------------------------------------------------------------------#
-
 
 #---------------------------------------------------------------------------------------------#
 # DNM1 First interval 
@@ -509,7 +396,7 @@ dim(DNM50_2011_2019)
 dim(DNM50_2011_2019remove)
 dim(DNM50_2011_2019remove)[[1]]/dim(DNM50_2011_2019)[[1]]*100
 #---------------------------------------------------------------------------------------------#
-# 28 stems removed (0.01% ALIVE stems removed) 
+# 20 stems removed (0.01% ALIVE stems removed) 
 #---------------------------------------------------------------------------------------------#
 # take a look at the values
 par(mfrow=c(1,2))
@@ -524,6 +411,237 @@ plot(DNM50_2011_2019$dbh.x,DNM50_2011_2019$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 #---------------------------------------------------------------------------------------------#
+
+
+#---------------------------------------------------------------------------------------------#
+# SPKS06 first interval
+#---------------------------------------------------------------------------------------------#
+census1 <- filter(growdata, plot == "SPKS_06" & censusID == "06_census_2003")
+census2 <- filter(growdata, plot == "SPKS_06" & censusID == "06_census_2014")
+table(growdata$plot)
+table(census2$censusID)
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+SPKS06_2003_2014 <- inner_join(census1, census2, by="stemID")
+dim(SPKS06_2003_2014) 
+
+# calculate time difference and convert time from days to years  
+time <- (SPKS06_2003_2014$date.y-SPKS06_2003_2014$date.x)/365
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- SPKS06_2003_2014$dbh.y
+size1 <- SPKS06_2003_2014$dbh.x
+
+# calculate growth rates: 
+SPKS06_2003_2014$annual_increment <- (size2 - size1)/time
+SPKS06_2003_2014$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(SPKS06_2003_2014)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(SPKS06_2003_2014$annual_increment)
+summary(SPKS06_2003_2014$relative_gr )
+
+#---------------------------------------------------------------------------------------------#
+# set aside stems to remove: 
+SPKS06_2003_2014remove <- filter(SPKS06_2003_2014, annual_increment >= 7.5
+                                 | relative_gr < -0.25)
+summary(SPKS06_2003_2014)
+summary(SPKS06_2003_2014remove)
+dim(SPKS06_2003_2014) 
+dim(SPKS06_2003_2014remove) 
+dim(SPKS06_2003_2014remove)[[1]]/dim(SPKS06_2003_2014)[[1]]*100
+#---------------------------------------------------------------------------------------------#
+# 0 stems removed (0% ALIVE stems removed)
+#---------------------------------------------------------------------------------------------#
+par(mfrow=c(1,2))
+hist(SPKS06_2003_2014$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(SPKS06_2003_2014$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#SPKS081 Plot------
+# look at the change in DBH from census 1 to census 2
+par(mfrow=c(1,1))
+plot(SPKS06_2003_2014$dbh.x, SPKS06_2003_2014$dbh.y, pch=19, 
+     xlab="DBH SPKS08 2001 (cm)", ylab="DBH SPKS08 2009 (cm)")
+#add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
+abline(0,1, col="red", lwd=2) 
+#---------------------------------------------------------------------------------------------#
+
+
+#---------------------------------------------------------------------------------------------#
+# SPKS07 first interval
+#---------------------------------------------------------------------------------------------#
+census1 <- filter(growdata, plot == "SPKS_07" & censusID == "07_census_2008")
+census2 <- filter(growdata, plot == "SPKS_07" & censusID == "07_census_2013")
+table(growdata$plot)
+table(census2$censusID)
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+SPKS07_2008_2013 <- inner_join(census1, census2, by="stemID")
+dim(SPKS07_2008_2013) 
+
+# calculate time difference and convert time from days to years  
+time <- (SPKS07_2008_2013$date.y-SPKS07_2008_2013$date.x)/365
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- SPKS07_2008_2013$dbh.y
+size1 <- SPKS07_2008_2013$dbh.x
+
+# calculate growth rates: 
+SPKS07_2008_2013$annual_increment <- (size2 - size1)/time
+SPKS07_2008_2013$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(SPKS07_2008_2013)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(SPKS07_2008_2013$annual_increment)
+summary(SPKS07_2008_2013$relative_gr)
+
+#---------------------------------------------------------------------------------------------#
+# set aside stems to remove: 
+SPKS07_2008_2013remove <- filter(SPKS07_2008_2013, annual_increment >= 7.5
+                                 | relative_gr < -0.25)
+summary(SPKS07_2008_2013)
+summary(SPKS07_2008_2013remove)
+dim(SPKS07_2008_2013) 
+dim(SPKS07_2008_2013remove) 
+dim(SPKS07_2008_2013remove)[[1]]/dim(SPKS07_2008_2013)[[1]]*100
+#---------------------------------------------------------------------------------------------#
+# 0 stems removed (0% ALIVE stems removed)
+#---------------------------------------------------------------------------------------------#
+par(mfrow=c(1,2))
+hist(SPKS07_2008_2013$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(SPKS07_2008_2013$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#SPKS081 Plot------
+# look at the change in DBH from census 1 to census 2
+par(mfrow=c(1,1))
+plot(SPKS07_2008_2013$dbh.x, SPKS07_2008_2013$dbh.y, pch=19, 
+     xlab="DBH SPKS08 2001 (cm)", ylab="DBH SPKS08 2009 (cm)")
+#add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
+abline(0,1, col="red", lwd=2) 
+#---------------------------------------------------------------------------------------------#
+
+
+#---------------------------------------------------------------------------------------------#
+# SPKS08 first interval
+#---------------------------------------------------------------------------------------------#
+census1 <- filter(growdata, plot == "SPKS_08" & censusID == "08_census_2001")
+census2 <- filter(growdata, plot == "SPKS_08" & censusID == "08_census_2009")
+table(growdata$plot)
+table(census2$censusID)
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+SPKS08_2001_2009 <- inner_join(census1, census2, by="stemID")
+dim(SPKS08_2001_2009) 
+# notice that in 'SPKS08_2001_2009' dbh.x is dbh at census 1 and dbh.y is dbh at census 2
+
+# calculate time difference and convert time from days to years  
+time <- (SPKS08_2001_2009$date.y-SPKS08_2001_2009$date.x)/365
+# assign dbh at time 1 (size1) and time 2 (size2)
+size2 <- SPKS08_2001_2009$dbh.y
+size1 <- SPKS08_2001_2009$dbh.x
+
+# calculate growth rates: 
+SPKS08_2001_2009$annual_increment <- (size2 - size1)/time
+SPKS08_2001_2009$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(SPKS08_2001_2009)
+# take a look at the values - how do these compare to values and distributions in Condit et al 2006?
+summary(SPKS08_2001_2009$annual_increment)
+summary(SPKS08_2001_2009$relative_gr )
+
+#---------------------------------------------------------------------------------------------#
+# set aside stems to remove: 
+SPKS08_2001_2009remove <- filter(SPKS08_2001_2009, annual_increment >= 7.5
+                                 | relative_gr < -0.25)
+summary(SPKS08_2001_2009)
+summary(SPKS08_2001_2009remove)
+dim(SPKS08_2001_2009) 
+dim(SPKS08_2001_2009remove) 
+dim(SPKS08_2001_2009remove)[[1]]/dim(SPKS08_2001_2009)[[1]]*100
+#---------------------------------------------------------------------------------------------#
+# 0 stems removed (0% ALIVE stems removed)
+#---------------------------------------------------------------------------------------------#
+par(mfrow=c(1,2))
+hist(SPKS08_2001_2009$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(SPKS08_2001_2009$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#SPKS081 Plot------
+# look at the change in DBH from census 1 to census 2
+par(mfrow=c(1,1))
+plot(SPKS08_2001_2009$dbh.x, SPKS08_2001_2009$dbh.y, pch=19, 
+     xlab="DBH SPKS08 2001 (cm)", ylab="DBH SPKS08 2009 (cm)")
+#add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
+abline(0,1, col="red", lwd=2) 
+#---------------------------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------------------------#
+# SPKS08 Second interval
+#---------------------------------------------------------------------------------------------#
+census1 <- filter(growdata, plot == "SPKS_08" & censusID == "08_census_2009")
+census2 <- filter(growdata, plot == "SPKS_08" & censusID == "08_census_2014")
+
+table(growdata$plot)
+table(census2$censusID)
+summary(census1)
+
+# check the number of unique stems in each dataset and compare between datasets
+length(unique(census1$stemID)); dim(census1)
+length(unique(census2$stemID)); dim(census2)
+
+# restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+SPKS08_2009_2014 <- inner_join(census1, census2, by="stemID")
+dim(SPKS08_2009_2014) 
+
+time <- (SPKS08_2009_2014$date.y-SPKS08_2009_2014$date.x)/365
+size2 <- SPKS08_2009_2014$dbh.y
+size1 <- SPKS08_2009_2014$dbh.x
+
+# calculate growth rates: 
+SPKS08_2009_2014$annual_increment <- (size2 - size1)/time
+SPKS08_2009_2014$relative_gr      <- (log(size2) - log(size1))/time
+
+summary(SPKS08_2009_2014$annual_increment)
+summary(SPKS08_2009_2014$relative_gr)
+#---------------------------------------------------------------------------------------------#
+# set aside stems to remove: 
+SPKS08_2009_2014remove <- filter(SPKS08_2009_2014, annual_increment >= 7.5
+                                 | relative_gr < -0.25)
+
+summary(SPKS08_2009_2014)
+summary(SPKS08_2009_2014remove)
+dim(SPKS08_2009_2014) 
+dim(SPKS08_2009_2014remove) 
+dim(SPKS08_2009_2014remove)[[1]]/dim(SPKS08_2009_2014)[[1]]*100
+#---------------------------------------------------------------------------------------------#
+# 0 stems removed (0% ALIVE stems removed)
+#---------------------------------------------------------------------------------------------#
+# take a look at the values
+par(mfrow=c(1,2))
+hist(SPKS08_2009_2014$relative_gr , xlab="Relative growth rate (% yr-1)", col="grey", main="")
+hist(SPKS08_2009_2014$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+
+#SPKS082 Plot------
+# look at the change in DBH from census 1 to census 2
+par(mfrow=c(1,1))
+plot(SPKS08_2009_2014$dbh.x, SPKS08_2009_2014$dbh.y, pch=19, 
+     xlab="DBH SPKS08 2009 (cm)", ylab="DBH SPKS08 2014 (cm)")
+#add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
+abline(0,1, col="red", lwd=2)
+#---------------------------------------------------------------------------------------------#
+
 
 #---------------------------------------------------------------------------------------------#
 # SPKA9 First interval
@@ -728,6 +846,58 @@ plot(SPKA10_2009_2014$dbh.x,SPKA10_2009_2014$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 #---------------------------------------------------------------------------------------------#
+
+#---------------------------------------------------------------------------------------------#
+# SPKA12 First interval
+#---------------------------------------------------------------------------------------------#
+# census1 <- filter(growdata, plot == "SPKA_12" & censusID == "12_census_XXXX")
+# census2 <- filter(growdata, plot == "SPKA_12" & censusID == "12_census_2013")
+# 
+# # check the number of unique stems in each dataset and compare between datasets
+# length(unique(census1$stemID)); dim(census1)
+# length(unique(census2$stemID)); dim(census2)
+# 
+# # restrict each census to stems that are included in both datasets using inner_join(), a dplyr function
+# SPKA12_XXXX_2013 <- inner_join(census1, census2, by="stemID")
+# dim(SPKA10_2001_2009) 
+# 
+# time <- (SPKA10_2001_2009$date.y-SPKA10_2001_2009$date.x)/365
+# size2 <- SPKA10_2001_2009$dbh.y
+# size1 <- SPKA10_2001_2009$dbh.x
+# 
+# # calculate growth rates: 
+# SPKA10_2001_2009$annual_increment <- (size2 - size1)/time
+# SPKA10_2001_2009$relative_gr      <- (log(size2) - log(size1))/time
+# 
+# summary(SPKA10_2001_2009$annual_increment)
+# summary(SPKA10_2001_2009$relative_gr)
+# #---------------------------------------------------------------------------------------------#
+# # set aside stems to remove: 
+# SPKA10_2001_2009remove <- filter(SPKA10_2001_2009, annual_increment >= 7.5
+#                                  | relative_gr < -0.25)
+# 
+# summary(SPKA10_2001_2009)
+# summary(SPKA10_2001_2009remove)
+# dim(SPKA10_2001_2009) 
+# dim(SPKA10_2001_2009remove)
+# dim(SPKA10_2001_2009remove)[[1]]/dim(SPKA10_2001_2009)[[1]]*100
+# #---------------------------------------------------------------------------------------------#
+# # 0 stems removed (0% ALIVE stems removed)
+# #---------------------------------------------------------------------------------------------#
+# # take a look at the values
+# par(mfrow=c(1,2))
+# hist(SPKA10_2001_2009$relative_gr, xlab="Relative growth rate (% yr-1)", col="grey", main="")
+# hist(SPKA10_2001_2009$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
+# 
+# #SPKA101 Plot----------
+# # look at the change in DBH from census 1 to census 2
+# par(mfrow=c(1,1))
+# plot(SPKA10_2001_2009$dbh.x,SPKA10_2001_2009$dbh.y, pch=19, 
+#      xlab="DBH SPKA10 2001 (cm)", ylab="DBH SPKA10 2009 (cm)")
+# #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
+# abline(0,1, col="red", lwd=2) 
+#---------------------------------------------------------------------------------------------#
+
 
 #---------------------------------------------------------------------------------------------#
 # SPKH4 First interval
@@ -1018,7 +1188,7 @@ dim(SPKH30_2010_2015)
 dim(SPKH30_2010_2015remove)
 dim(SPKH30_2010_2015remove)[[1]]/dim(SPKH30_2010_2015)[[1]]*100
 #---------------------------------------------------------------------------------------------#
-# 0 stems removed (0.0% ALIVE stems removed)
+# 12 stems removed (0.18% ALIVE stems removed)
 #---------------------------------------------------------------------------------------------#
 # take a look at the values
 par(mfrow=c(1,2))
@@ -1158,9 +1328,10 @@ dim(LHC_03_08remove)[[1]]/dim(LHC_03_08)[[1]]*100
 #---------------------------------------------------------------------------------------------#
 # Create Combined Dataset of all growth rates
 #---------------------------------------------------------------------------------------------#
-removal_ID <- rbind(SPKS08_2001_2009remove, SPKS08_2009_2014remove, DNM1_2006_2013remove, 
-                      DNM1_2013_2016remove,DNM2_2006_2013remove, DNM2_2013_2016remove, 
-                      DNM3_2006_2013remove, DNM3_2013_2016remove,DNM50_2011_2019remove, 
+removal_ID <- rbind(DNM1_2006_2013remove, DNM1_2013_2016remove,DNM2_2006_2013remove, 
+                    DNM2_2013_2016remove, DNM3_2006_2013remove, DNM3_2013_2016remove,
+                    DNM50_2011_2019remove, SPKS08_2001_2009remove, SPKS08_2009_2014remove, 
+                    SPKS06_2003_2014remove, SPKS07_2008_2013remove, 
                       SPKA9_2001_2009remove, SPKA9_2009_2014remove, SPKA10_2001_2009remove, 
                       SPKA10_2009_2014remove, SPKH4_2001_2008remove, SPKH4_2008_2014remove, 
                       SPKH5_2001_2008remove, SPKH5_2008_2014remove, SPKH30_2001_2010remove, 
@@ -1200,9 +1371,9 @@ summary(DNM50$dbh)
 LHP <- subset(growdata, site == "LHP"); table(LHP$status)
 
 #---------------------------------------------------------------------------------------------#
-dim(growdata)    # n = 2,056,491
-dim(withremoval) # n = 2,056,301
-dim(growdata)[[1]] - length(tree_IDs_remove) # 2,056,424
+dim(growdata)    # n = 2,056,486
+dim(withremoval) # n = 2,056,296
+dim(growdata)[[1]] - length(tree_IDs_remove) # 2,056,419
 #---------------------------------------------------------------------------------------------#
 # I think 'withremoval' is smaller than ('growdata' - the number of 'tree_IDs_remove') because
 # tree_IDs_remove is by plot, not by census. So it's removing the plot-level treeIDs each time
