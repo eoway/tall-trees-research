@@ -3,7 +3,6 @@ library(ISLR)
 
 lam_data <- read_csv(here("Desktop","Research","HCRP","Lambir Data", "lam_topo.csv"))
 
-
 #Add quadrat level emergent labeling
 source("~/Documents/GitHub/tall-trees-research/heights.r")
 dbh99 <- quantile99dbh #from heights.r
@@ -19,7 +18,9 @@ lam_data$quad_type <- ifelse(lam_data$quadrat %in% emergentquad, "emrgnt", "none
 table(lam_data$quad_type)
 
 lam_stat <- lam_data %>% group_by(quadrat,quad_type,dbhmean,heightmean,heightmedian,height99,heightmax,HabType,
-                                  slope,aspect,tpi,elev,Lambir_TWI,soil)  %>%  summarise()
+                                  slope,aspect,tpi,elev,Lambir_TWI,soil)  %>%  summarise(quad_x = mean(x),
+                                                                                         quad_y = mean(y))
+summary(lam_stat$quad_x)
 lam_stat$soil <-as.factor(lam_stat$soil)
 table(lam_stat$quad_type)
 lam_stat$bitype <- ifelse(lam_stat$quad_type=="emrgnt", 1,0)
@@ -52,6 +53,31 @@ plot(lam_stat$Lambir_TWI, lam_stat$bitype)
 
 bisoil <- glm(bitype~soil, data=lam_stat, family="binomial")
 summary(bisoil)
+
+
+#with x and y coords
+bielevxy <- glm(bitype~elev+quad_x+quad_y, data=lam_stat, family="binomial")
+summary(bielevxy)
+plot(lam_stat$elev, lam_stat$bitype)
+
+bitpixy <- glm(bitype~tpi+quad_x+quad_y, data=lam_stat, family="binomial")
+summary(bitpixy)
+plot(lam_stat$tpi, lam_stat$bitype)
+
+biaspectxy <- glm(bitype~aspect+quad_x+quad_y, data=lam_stat, family="binomial")
+summary(biaspectxy)
+plot(lam_stat$aspect, lam_stat$bitype)
+
+bislopexy <- glm(bitype~slope+quad_x+quad_y, data=lam_stat, family="binomial")
+summary(bislopexy)
+plot(lam_stat$slope, lam_stat$bitype)
+
+bitwixy <- glm(bitype~Lambir_TWI+quad_x+quad_y, data=lam_stat, family="binomial")
+summary(bitwixy)
+plot(lam_stat$Lambir_TWI, lam_stat$bitype)
+
+bisoilxy <- glm(bitype~soil+quad_x+quad_y, data=lam_stat, family="binomial")
+summary(bisoilxy)
 
 #Random Effects
 #Just Ints--------
@@ -132,7 +158,7 @@ par(mfrow=c(1,1))
 plot(lmer.h99twitpi1)
 plot(lam_stat$Lambir_TWI,lam_stat$height99)
 
-#Height 99~TWI+TPI: 
+#Height 99~slope+aspect: 
 lmer.h99slopeaspect <- lmer(height99~slope+aspect+(1|soil), data=lam_stat)
 summary(lmer.h99slopeaspect)
 AIC(lmer.h99slopeaspect)
@@ -679,7 +705,7 @@ lm.h99estwi1 <- lm(height99~elev*slope*Lambir_TWI, data=lam_stat)
 summary(lm.h99estwi1)
 vif(lm.h99estwi1)
 plot(lm.h99estwi1) %>%
-  abline ()
+  abline () 
 
 #Height99~ elev*aspect*twi
 lm.h99eatwi1 <- lm(height99~elev*aspect*Lambir_TWI, data=lam_stat)
