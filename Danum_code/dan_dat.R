@@ -8,14 +8,13 @@ library(raster)
 library(rgdal)
 library(sp)
 library(here)
-library(rgdal)
+library(plyr)
+require("maptools")
 
 dat <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
-#soils-----
-shape_dat <- readOGR(dsn=here("Desktop","Research","HCRP","dan_dat"), layer="soil_association_utm50n") 
 
-#elev------
-Danum_elev <- raster(here("Desktop","Research","HCRP","dan_dat","ASU_GAO_Danum_50HaPlot_GroundElev.tif")); plot(Danum_elev)
+#elev------ 
+Danum_elev <- raster("~/Desktop/Research/HCRP/dan_dat/ASU_GAO_Danum_50HaPlot_GroundElev.tif"); plot(Danum_elev)
 Danum_slope_aspect_TPI <- terrain(Danum_elev, opt=c('slope', 'aspect', 'TPI'), unit='degrees')
 #topo_dat <-stack(Danum_elev) LOOK AT SCREENSHOT
 #dan_elev_rast_20m <- aggregate(Danum_elev, fact=10)
@@ -25,7 +24,7 @@ plot(Danum_slope_aspect_TPI)
 plot(Danum_slope_aspect_TPI)
 
 #twi--------
-Danum_TWI <- raster(here("Desktop","Research","HCRP","dan_dat","Danum_TWI.tif")); plot(Danum_TWI)
+Danum_TWI <- raster("~/Desktop/Research/HCRP/dan_dat/Danum_TWI.tif"); plot(Danum_TWI)
 cellStats(Danum_TWI, mean); cellStats(Danum_TWI, sd)
 
 #Main dat--------
@@ -59,6 +58,26 @@ spatialdan <- SpatialPointsDataFrame(coords=coords,
 class(spatialdan)
 spplot(spatialdan, "dbh")
 colnames(dandat)
+
+#Elsa Help----------------------------
+#soils-----
+dantest <- filter(dandat, dbh=="92")
+shape_dat <- readOGR(dsn="~/Desktop/Research/HCRP/dan_dat", layer="soil_association_utm50n") 
+
+datapol <- data.frame(shape_dat)
+points <- data.frame(x=dantest$x_utm, y=dantest$y_utm)
+coordinates(points) <- ~ x + y 
+proj4string(points) <- crs(spatialdan)
+#
+#function over from package sp
+test <- data.frame(over(xx=shape_dat, points))
+combine <- cbind(test, datapol)
+combine <- na.omit(combine) #only one point left
+
+
+
+
+
 
 
 test <- raster::extract(Danum_TWI,spatialdan)
