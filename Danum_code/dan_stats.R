@@ -17,13 +17,19 @@ table(emergentquad)
 dan_data$quad_type <- ifelse(dan_data$quadrat %in% emergentquad, "emrgnt", "nonemrgnt")
 table(dan_data$quad_type)
 
-dan_stat <- dan_data %>% group_by(quadrat,quad_type,slope,aspect,tpi,elev,twi)  %>%  summarise(quad_x = mean(x_utm),
-                                                                             quad_y = mean(y_utm),
-                                                                             dbhmean = mean(dbh, na.rm=T),
-                                                                             heightmean = mean(height, na.rm=T),
-                                                                             heightmedian = median(height, na.rm=T),
-                                                                             height99 = quantile(height, probs = 0.99, na.rm = TRUE),
-                                                                             heightmax = max(height,na.rm=T))
+dan_stat <- dan_data
+#dan_stat <- dan_data %>% group_by(quadrat,quad_type)  %>%  summarise(quad_x = mean(x_utm),
+#                                                                             quad_y = mean(y_utm),
+#                                                                             dbhmean = mean(dbh, na.rm=T),
+#                                                                             heightmean = mean(height, na.rm=T),
+#                                                                             heightmedian = median(height, na.rm=T),
+#                                                                             height99 = quantile(height, probs = 0.99, na.rm = TRUE),
+#                                                                             heightmax = max(height,na.rm=T),
+#                                                                             slope = mean(slope, na.rm=T),
+#                                                                             aspect = mean(aspect, na.rm=T),
+#                                                                     twi = mean(twi, na.rm=T),
+#                                                                     tpi = mean(tpi, na.rm=T),
+#                                                                     elev = mean(elev, na.rm=T))
 summary(dan_stat$quad_x)
 dan_stat$soil <-as.factor(dan_stat$soil)
 table(dan_stat$quad_type)
@@ -87,9 +93,15 @@ summary(bisoilxy)
 #Just Ints--------
 library(lme4)
 #Height 99~Elevation: 
-lmer.h99elev <- lmer(height99~elev+(1|soil), data=dan_stat)
+lmer.h99elev <- lmer(height~elev+(1|soil), data=dan_stat)
+tval <- 
 summary(lmer.h99elev)
 AIC(lmer.h99elev)
+names(lmer.h99elev)
+
+2*pt(-abs(t),df=n-1)
+
+
 names(lmer.h99elev)
 confint(lmer.h99elev)
 predict(lmer.h99elev, data.frame(elev=c(5,10,15)), 
