@@ -4,10 +4,11 @@ library(skimr)
 library(dplyr)
 library(stringr)
 library(ggplot2)
-#setwd("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
-#hdata <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
-hdata <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv") #EO
 
+#setwd("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+hdata <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+#hdata <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv") #EO
+summary(hdata$dbh)
 #Latest Censuses
 hdata <- filter(hdata, dbh >= 10)
 summary(hdata$dbh)
@@ -1682,20 +1683,49 @@ DNM3 %>%
   theme_classic()
 
 #DNM50-----
-emapdat <- filter(DNM50, dbh >= quantile99dbh)
 DNM50 %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(aes(col=tree_type99dbh))+
-  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=tree_type99dbhmap))+
+  geom_point(size=3, alpha=0.5) +
+  scale_color_manual("tree type", values=c("darkorange","red","grey50")) + 
   theme_classic()
+emapdat <- filter(DNM50, dbh >= quantile99dbh)
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=species))+
+  geom_point(size=3, alpha=0.7) + 
+  theme_classic()
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=genus))+
+  geom_point(size=3, alpha=0.7) + 
+  theme_classic()
+
+#DNM50 %>%
+#  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+#  geom_point(aes(col=tree_type99dbh))+
+#  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+#  theme_classic()
 
 #LHP-----
 emapdat <- filter(LHP, dbh >= quantile99dbh)
 LHP %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(aes(col=tree_type99dbh))+
-  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=tree_type99dbhmap))+
+  geom_point(size=1.5, alpha=0.5) +
+  scale_color_manual("tree type", values=c("darkorange","red","grey50"))+ 
+  theme_classic()+
+  geom_point(emapdat, mapping=aes(y=plot_y, x=plot_x))
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=species))+
+  geom_point(size=3, alpha=0.7) + 
   theme_classic()
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=genus))+
+  geom_point(size=3, alpha=0.7) + 
+  theme_classic()
+
+#LHP %>%
+#  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+#  geom_point(aes(col=tree_type99dbh))+
+#  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+#  theme_classic()
 SPKA
 #SPKA-----
 emapdat <- filter(SPKA, dbh >= quantile99dbh)
