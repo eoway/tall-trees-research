@@ -11,10 +11,12 @@ library(here)
 library(plyr)
 require("maptools")
 
-dat <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+#dat <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+dat <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv")
 
 #elev------ 
-Danum_elev <- raster("~/Desktop/Research/HCRP/dan_dat/ASU_GAO_Danum_50HaPlot_GroundElev.tif"); plot(Danum_elev)
+#Danum_elev <- raster("~/Desktop/Research/HCRP/dan_dat/ASU_GAO_Danum_50HaPlot_GroundElev.tif"); plot(Danum_elev)
+Danum_elev <- raster("G:/My Drive/Harvard/Tall_trees_Borneo_project/Data/Ordway-Harvard-Danum-50HaPlotChems-20200324/ASU_GAO_Danum_50HaPlot_GroundElev.tif"); plot(Danum_elev)
 Danum_slope_aspect_TPI <- terrain(Danum_elev, opt=c('slope', 'aspect', 'TPI'), unit='degrees')
 #topo_dat <-stack(Danum_elev) LOOK AT SCREENSHOT
 #dan_elev_rast_20m <- aggregate(Danum_elev, fact=10)
@@ -24,11 +26,12 @@ plot(Danum_slope_aspect_TPI)
 plot(Danum_slope_aspect_TPI)
 
 #twi--------
-Danum_TWI <- raster("~/Desktop/Research/HCRP/dan_dat/Danum_TWI.tif"); plot(Danum_TWI)
+#Danum_TWI <- raster("~/Desktop/Research/HCRP/dan_dat/Danum_TWI.tif"); plot(Danum_TWI)
+Danum_TWI <- raster("G:/My Drive/Harvard/CAO_data/GIS/Danum_TWI.tif"); plot(Danum_TWI)
 cellStats(Danum_TWI, mean); cellStats(Danum_TWI, sd)
 
 #Main dat--------
-dandat <- filter(dat,site == "DNM50")
+dandat <- filter(dat, site == "DNM50")
 dandat <- filter(dandat, dbh >= 10)
 table(dandat$census)
 dandat <- filter(dat,census == "census_2019")
@@ -42,7 +45,6 @@ colnames(dandat)
 # the 500m PY actually runs from E to W (== x_utm) and the 1000m PX actually runs from S to N (== y_utm)
 #x -> easting, y-> northing
 
-
 dandat$x_utm <- (587826.92-dandat$plot_y)+500 # mirror x coords and shift back ... appear to align much better with RS data
 dandat$y_utm <- (547348.96+dandat$plot_x)
 
@@ -53,8 +55,8 @@ coords<- dandat_analysis[,c("x_utm","y_utm")]
 dan_proj <- crs(Danum_TWI)
 
 spatialdan <- SpatialPointsDataFrame(coords=coords,
-                                 data=dandat_analysis,
-                                 proj4string=dan_proj)
+                                     data=dandat_analysis,
+                                     proj4string=dan_proj)
 class(spatialdan)
 spplot(spatialdan, "dbh")
 colnames(dandat)
@@ -62,17 +64,32 @@ colnames(dandat)
 #Elsa Help----------------------------
 #soils-----
 dantest <- filter(dandat, dbh=="92")
-shape_dat <- readOGR(dsn="~/Desktop/Research/HCRP/dan_dat", layer="soil_association_utm50n") 
+#shape_dat <- readOGR(dsn="~/Desktop/Research/HCRP/dan_dat", layer="soil_association_utm50n") 
+shape_dat <- readOGR(dsn="G:/My Drive/GIS_Data/SE_Asia/Soils_Topo", layer="soil_association_utm50n") 
+# filter soils shapefile to only SO_ASSOCIA [5] or SOIL_CLASS [10]
+colnames(shape_dat@data)
+soil_type = shape_dat[10]
 
-datapol <- data.frame(shape_dat)
-points <- data.frame(x=dantest$x_utm, y=dantest$y_utm)
-coordinates(points) <- ~ x + y 
-proj4string(points) <- crs(spatialdan)
-#
-#function over from package sp
-test <- data.frame(over(xx=shape_dat, points))
-combine <- cbind(test, datapol)
-combine <- na.omit(combine) #only one point left
+test <- raster::extract(soil_type,spatialdan)
+head(test)
+length(test)
+dim(test)
+# unfortunately, this dataset indicates only one soil type in the 50-ha plot
+#table(test$SO_ASSOCIA) 
+table(test$SOIL_CLASS)
+dim(spatialdan)
+# It turns out the raster extract function works after all!!
+dandat_analysis$soil <- raster::extract(shape_dat,spatialdan)
+
+# datapol <- data.frame(shape_dat)
+# points <- data.frame(x=dantest$x_utm, y=dantest$y_utm)
+# coordinates(points) <- ~ x + y 
+# proj4string(points) <- crs(shape_dat) #shape_dat; spatialdan
+
+# #function over from package sp
+# test <- data.frame(xx=over(shape_dat, points))
+# combine <- cbind(test, datapol)
+# combine <- na.omit(combine) #only one point left
 
 
 
