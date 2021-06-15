@@ -225,7 +225,7 @@ lambir <- inner_join(lam4, elev_soil, by="index")
 lambir <- subset(lambir, select = -c(HabType.y, soil.y))
 lambir <- rename(lambir, HabType = HabType.x, soil = soil.x)
 
-heightmetrics <- lam4 %>% group_by(quadrat, HabType, soil) %>% summarize( 
+heightmetrics <- lam4 %>% group_by(quadrat, HabType, soil, sp) %>% summarize( 
                                                                 dbhmean = mean(dbh, na.rm=T),
                                                                 heightmean = mean(height, na.rm=T),
                                                                 heightmedian = median(height, na.rm=T),
@@ -315,8 +315,8 @@ ggplot() +
   theme_classic()
 
 lambir_topo <- inner_join(lambir_all, twi_soil, by="index")
-lambir_topo <- subset(lambir_topo, select = -c(HabType.y, soil.y,x.y,y.y))
-lambir_topo <- rename(lambir_topo, HabType = HabType.x, soil = soil.x, x=x.x, y=y.x)
+lambir_topo <- subset(lambir_topo, select = -c(HabType.y, soil.y,x.y,y.y, sp.y))
+lambir_topo <- rename(lambir_topo, HabType = HabType.x, soil = soil.x, x=x.x, y=y.x, species=sp.x)
 summary(lambir_topo)
 write.csv(lambir_topo, here("Desktop","Research","HCRP","Lambir Data", "lam_topo.csv"))
 #---------------------------------------------------------------------------------------------#
