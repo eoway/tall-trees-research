@@ -17,6 +17,19 @@ hdata <- filter(hdata, census == "01_census_2016" | census == "02_census_2016" |
                   census == "census_2007_08" | census == "10_census_2014" |
                   census == "30_census_2015" | census == "08_census_2014")
 
+DNM50=filter(hdata, site == "DNM50")
+dan <- filter(DNM50, dbh >= quantile99dbh)
+dansp <- filter (dan, species == "excelsa" | species == "johorensis" | 
+                   species == "lanceolata" | species == "parvifolia" |
+                   species == "pauciflora" | species == "sumatrana" |
+                   species == "superba")
+table(hdata$site)
+LMN <- filter(hdata, site == "LHP")
+lam <- filter(LMN, dbh >= quantile99dbh)
+lamsp <- filter (lam, species == "excelsa" | species == "johorensis" | 
+                   species == "lanceolata" | species == "parvifolia" |
+                   species == "pauciflora" | species == "sumatrana" |
+                   species == "superba")
 #----------------------------------------------------------------------#
 #-----------------------Calculate Heights-------------------------------
 #----------------------------------------------------------------------#
@@ -246,7 +259,7 @@ hdata$tree_type99dbh <- ifelse(hdata$species %in% c(emergent99dbh), "emrgnt", "n
 # if an observation has tree_type99dbh == "emrgnt" and dbh >= some defined size == emrgnt_tree
 # else, if an observation has tree_type99dbh == "emrgnt" and dbh < some defined size == emrgnt_spp
 # else == non_emrgnt
-size_threhold = 100 # replace 100 with whatever threshold you want (e.g. quantile99dbh) 
+size_threhold = quantile99dbh # replace 100 with whatever threshold you want (e.g. quantile99dbh) 
 hdata$tree_type99dbhmap <- ifelse(hdata$tree_type99dbh == "emrgnt" & hdata$dbh >= size_threhold, "emrgnt_tree",
                                   ifelse(hdata$tree_type99dbh == "emrgnt" & hdata$dbh < size_threhold, "emrgnt_spp","non_emrgnt"))
 table(hdata$tree_type99dbh)
@@ -1687,7 +1700,8 @@ DNM50 %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x, col=tree_type99dbhmap))+
   geom_point(size=3, alpha=0.5) +
   scale_color_manual("tree type", values=c("darkorange","red","grey50")) + 
-  theme_classic()
+  theme_classic()+
+  geom_point(emapdat, mapping=aes(y=plot_y, x=plot_x))
 emapdat <- filter(DNM50, dbh >= quantile99dbh)
 emapdat %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x, col=species))+
@@ -1697,7 +1711,6 @@ emapdat %>%
   ggplot(mapping = aes(y=plot_y, x=plot_x, col=genus))+
   geom_point(size=3, alpha=0.7) + 
   theme_classic()
-
 #DNM50 %>%
 #  ggplot(mapping = aes(y=plot_y, x=plot_x))+
 #  geom_point(aes(col=tree_type99dbh))+
