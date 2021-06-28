@@ -1,6 +1,14 @@
 library(MASS)
 library(ISLR)
 library(dplyr)
+library(tidyverse)
+library(here)
+library(skimr)
+library(dplyr)
+library(stringr)
+library(readxl)
+library(raster)
+library(fgeo)
 
 lam_data <- read_csv("~/Desktop/Research/HCRP/Lambir Data/lam_topo.csv")
 summary(lam_data$dbh)
@@ -20,14 +28,27 @@ table(emergentquad)
 lam_data$quad_type <- ifelse(lam_data$quadrat %in% emergentquad, "emrgnt", "nonemrgnt")
 table(lam_data$quad_type)
 
-#MAKE SURE YOU ARE USING THE RIGHT lam_stat
+
+#map- FIXXXXXX
+#emapdat <- filter(lam_data, dbh >= quantile99dbh)
+#ggplot() +
+#  geom_point(data=emapdat, mapping = aes(y=y, x=x,fill=factor(species)))+
+#  geom_point(data=lam_data, mapping =aes(y=y, x=x,fill=factor(elev)))+
+#  theme_classic()
+#emapdat %>%
+#  plot(elev_rast)+
+#  geom_point()+
+#  geom_point(y=emapdat$y, x=emapdat$x, col=species)+
+#  theme_classic()
+
 #for individ level analyses
 indlam_stat <- lam_data
 
 #For quadrat level analyses
 lam_stat <- lam_data %>% group_by(quadrat,quad_type,dbhmean,heightmean,heightmedian,height99,heightmax,HabType,
                                   slope,aspect,tpi,elev,Lambir_TWI,soil)  %>%  summarise(quad_x = mean(x),
-                                                                                         quad_y = mean(y))
+                                                                                         quad_y = mean(y),
+                                                                                         )
 summary(lam_stat$quad_x)
 lam_stat$soil <-as.factor(lam_stat$soil)
 table(lam_stat$quad_type)
@@ -39,6 +60,52 @@ emerg <- filter(indlam_stat, tree_type=="emrgnt")
 summary(emerg)
 lamspecies <- as.data.frame(unique(emerg$species))
 
+#Binned plots------
+#individual level
+summary(indlam_stat$elev)
+indlam_stat$binelev <-  
+  cut(indlam_stat$elev, breaks=c(seq(105,245,by=10))
+  )
+indlam_stat %>%
+  ggplot(aes(x=binelev, y=log(height)))+
+  geom_boxplot()
+indlam_stat %>%
+  ggplot(aes(x=binelev, y=height))+
+  geom_boxplot()
+
+summary(indlam_stat$slope)
+indlam_stat$binslope <-  
+  cut(indlam_stat$slope, breaks=c(seq(0,50,by=5))
+  )
+indlam_stat %>%
+  ggplot(aes(x=binslope, y=log(height)))+
+  geom_boxplot()
+indlam_stat %>%
+  ggplot(aes(x=binslope, y=height))+
+  geom_boxplot()
+
+#quadrat level
+summary(lam_stat$elev)
+lam_stat$quadbinelev <-  
+  cut(lam_stat$elev, breaks=c(seq(105,245,by=10))
+  )
+lam_stat %>%
+  ggplot(aes(x=quadbinelev, y=log(height99)))+
+  geom_boxplot()
+lam_stat %>%
+  ggplot(aes(x=quadbinelev, y=height99))+
+  geom_boxplot()
+
+summary(lam_stat$slope)
+lam_stat$quadbinslope <-  
+  cut(lam_stat$slope, breaks=c(seq(0,50,by=5))
+  )
+lam_stat %>%
+  ggplot(aes(x=quadbinslope, y=log(height99)))+
+  geom_boxplot()
+lam_stat %>%
+  ggplot(aes(x=quadbinslope, y=height99))+
+  geom_boxplot()
 
 #HCRP Tables--------
 #Quad Level
@@ -71,7 +138,9 @@ effect_plot(fit4, pred = elev, plot.points = TRUE, colors="red", x.label="Elevat
 effect_plot(fit4, pred = soil, plot.points = TRUE, colors="red", x.label="Soil Type")
 effect_plot(fit4, pred = aspect, plot.points = TRUE, colors="red", x.label="Aspect")
 
-#Multiple Logistic Regression---------
+#---------------------------------------------------------------------------------------------#
+#-----------------------------Multiple Logistic Regression------------------------------------#
+#---------------------------------------------------------------------------------------------#
 #Individual Level
 bitwisoils <- glm(bitree_type~soil+Lambir_TWI+(Lambir_TWI*soil)+x+y, data=indlam_stat, family="binomial")
 summary(bitwisoils)
@@ -187,7 +256,9 @@ plot(lam_stat$Lambir_TWI, lam_stat$bitype)
 bisoilxy <- glm(bitype~soil+quad_x+quad_y, data=lam_stat, family="binomial")
 summary(bisoilxy)
 
-#Random Effects
+#---------------------------------------------------------------------------------------------#
+#----------------------------------------Random Effects---------------------------------------#
+#---------------------------------------------------------------------------------------------#
 #For indiv tree analyses----------
 #Height 99~Elevation: 
 lmer.h99elev <- lmer(height~elev+(1|soil), data=indlam_stat)
@@ -596,7 +667,10 @@ ggpairs(lam_stat)
 install.packages("GGally")
 structure(lam_stat)
 str(lam_stat)
-#Linear Regression------------
+#---------------------------------------------------------------------------------------------#
+#--------------------------------------Linear Regression--------------------------------------#
+#---------------------------------------------------------------------------------------------#
+
 lm.xy <- lm(height99~quad_x+quad_y, data=lam_stat)
 summary(lm.xy)
 
@@ -700,9 +774,6 @@ predict(lm.hmaxelev, data.frame(elev=c(5,10,15)),
 plot(lm.hmaxelev) %>%
   abline ()
 plot(lam_stat$elev,lam_stat$heightmax)
-
-
-
 
 
 #Height 99~TPI: 
@@ -1039,7 +1110,10 @@ plot(lm.hmaxHabType) %>%
   abline ()
 plot(lam_stat$HabType,lam_stat$heightmax)
 
-#Multiple Linear Regresion------------
+#---------------------------------------------------------------------------------------------#
+#-------------------------------Multiple Linear Regression------------------------------------#
+#---------------------------------------------------------------------------------------------#
+
 #with soil
 #Height99~ elev+slope+aspect+tpi+twi+soil
 lm.h99eastts <- lm(height99~elev+aspect+slope+tpi+Lambir_TWI+soil, data=lam_stat)
@@ -1112,8 +1186,6 @@ summary(lm.h99stwi1)
 vif(lm.h99stwi1)
 plot(lm.h99stwi1) %>%
   abline ()
-
-
 
 #without soil
 #Height99~ elev+slope+aspect+tpi+twi
