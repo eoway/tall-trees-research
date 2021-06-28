@@ -11,12 +11,12 @@ library(here)
 library(plyr)
 require("maptools")
 
-#dat <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
-dat <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv")
+dat <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+#dat <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv")
 
 #elev------ 
-#Danum_elev <- raster("~/Desktop/Research/HCRP/dan_dat/ASU_GAO_Danum_50HaPlot_GroundElev.tif"); plot(Danum_elev)
-Danum_elev <- raster("G:/My Drive/Harvard/Tall_trees_Borneo_project/Data/Ordway-Harvard-Danum-50HaPlotChems-20200324/ASU_GAO_Danum_50HaPlot_GroundElev.tif"); plot(Danum_elev)
+Danum_elev <- raster("~/Desktop/Research/HCRP/dan_dat/ASU_GAO_Danum_50HaPlot_GroundElev.tif"); plot(Danum_elev)
+#Danum_elev <- raster("G:/My Drive/Harvard/Tall_trees_Borneo_project/Data/Ordway-Harvard-Danum-50HaPlotChems-20200324/ASU_GAO_Danum_50HaPlot_GroundElev.tif"); plot(Danum_elev)
 Danum_slope_aspect_TPI <- terrain(Danum_elev, opt=c('slope', 'aspect', 'TPI'), unit='degrees')
 #topo_dat <-stack(Danum_elev) LOOK AT SCREENSHOT
 #dan_elev_rast_20m <- aggregate(Danum_elev, fact=10)
@@ -26,8 +26,8 @@ plot(Danum_slope_aspect_TPI)
 plot(Danum_slope_aspect_TPI)
 
 #twi--------
-#Danum_TWI <- raster("~/Desktop/Research/HCRP/dan_dat/Danum_TWI.tif"); plot(Danum_TWI)
-Danum_TWI <- raster("G:/My Drive/Harvard/CAO_data/GIS/Danum_TWI.tif"); plot(Danum_TWI)
+Danum_TWI <- raster("~/Desktop/Research/HCRP/dan_dat/Danum_TWI.tif"); plot(Danum_TWI)
+#Danum_TWI <- raster("G:/My Drive/Harvard/CAO_data/GIS/Danum_TWI.tif"); plot(Danum_TWI)
 cellStats(Danum_TWI, mean); cellStats(Danum_TWI, sd)
 
 #Main dat--------
@@ -61,6 +61,7 @@ class(spatialdan)
 spplot(spatialdan, "dbh")
 colnames(dandat)
 
+
 #Elsa Help----------------------------
 #soils-----
 dantest <- filter(dandat, dbh=="92")
@@ -90,11 +91,6 @@ dandat_analysis$soil <- raster::extract(shape_dat,spatialdan)
 # test <- data.frame(xx=over(shape_dat, points))
 # combine <- cbind(test, datapol)
 # combine <- na.omit(combine) #only one point left
-
-
-
-
-
 
 
 test <- raster::extract(Danum_TWI,spatialdan)
