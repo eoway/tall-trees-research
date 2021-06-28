@@ -36,6 +36,33 @@ table(lam_data$species_type)
 lam_ana <- filter(lam_data, species_type == "emrgntsp")
 table(lam_ana$species)
 
+lam_em <- filter(lam_ana, tree_type=="emrgnt")
+table(lam_em$species)
+#---------------------------------------------------------------------------------------------#
+#--------------------------------Emergents by Soil Type---------------------------------------#
+#---------------------------------------------------------------------------------------------#
+table(lam_data$soil)
+#clay
+clay <- filter(lam_data, soil == "Clay")
+table(clay$tree_type)
+table(clay$species_type)
+
+#fine loam
+fineloam <- filter(lam_data, soil == "Fine_loam")
+table(fineloam$tree_type)
+table(fineloam$species_type)
+
+#loam
+loam <- filter(lam_data, soil == "Loam")
+table(loam$tree_type)
+table(loam$species_type)
+
+#Sandy Loam
+sandyloam <- filter(lam_data, soil == "Sandy_loam")
+table(sandyloam$tree_type)
+table(sandyloam$species_type)
+
+
 #---------------------------------------------------------------------------------------------#
 #---------------------------------Quadrat Level Analysis--------------------------------------#
 #---------------------------------------------------------------------------------------------#
