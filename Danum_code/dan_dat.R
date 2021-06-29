@@ -62,7 +62,6 @@ spplot(spatialdan, "dbh")
 colnames(dandat)
 
 
-#Elsa Help----------------------------
 #soils-----
 dantest <- filter(dandat, dbh=="92")
 #shape_dat <- readOGR(dsn="~/Desktop/Research/HCRP/dan_dat", layer="soil_association_utm50n") 
