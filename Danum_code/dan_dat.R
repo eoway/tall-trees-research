@@ -159,7 +159,38 @@ analysismetrics <- dandat_analysis %>% group_by(quadrat) %>% summarize(
   quad_x = mean(x_utm),
   quad_y = mean(y_utm))
 
-dan_all <- inner_join(lambir, analysismetrics, by= "quadrat")
+#---------------------------------------------------------------------------------------------#
+#----------------------------Surrounding Tree Analysis Dataset--------------------------------
+#---------------------------------------------------------------------------------------------#
+#Elsa Help
+#Workflow
+#0. Create a column to label emergents and nonemergents
+#1. Restrict dataset to emergents and create a spatial points dataframe
+#2. Give each emergent a unique ID
+#3. Create buffer around emergent individuals
+#4. Intersect with original dataset
+#5. add corresponding ID to nonemergent trees within each buffer (e.g. if a tree is in the buffer of emergent tree with an ID of 96, label the tree with an ID of 96 also)
+#6. Summarize neighboring trees
+#7. add summary variable to original dataset
+
+#0
+dandat_analysis$tree_type <- ifelse(dandat_analysis$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
+#1 & 2
+dandat_emerg <- filter(dandat_analysis, dbh >= quantile99dbh)
+dandat_emerg$ID <- 1:nrow(dandat_emerg)
+coords<- dandat_emerg[,c("x_utm","y_utm")]
+emdan <- SpatialPointsDataFrame(coords=coords,
+                                     data=dandat_emerg,
+                                     proj4string=dan_proj)
+
+plot(emdan)
+#3
+emdan <- buffer(emdan, width=5)
+plot(emdan)
+#4?
 
 
+
+
+#Export file
 write.csv(dandat_analysis, here("Desktop","Research","HCRP","dan_dat", "dan_topo.csv"))
