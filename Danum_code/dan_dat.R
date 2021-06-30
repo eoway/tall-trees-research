@@ -64,8 +64,8 @@ colnames(dandat)
 
 #soils-----
 dantest <- filter(dandat, dbh=="92")
-#shape_dat <- readOGR(dsn="~/Desktop/Research/HCRP/dan_dat", layer="soil_association_utm50n") 
-shape_dat <- readOGR(dsn="G:/My Drive/GIS_Data/SE_Asia/Soils_Topo", layer="soil_association_utm50n") 
+shape_dat <- readOGR(dsn="~/Desktop/Research/HCRP/dan_dat", layer="soil_association_utm50n") 
+#shape_dat <- readOGR(dsn="G:/My Drive/GIS_Data/SE_Asia/Soils_Topo", layer="soil_association_utm50n") 
 # filter soils shapefile to only SO_ASSOCIA [5] or SOIL_CLASS [10]
 colnames(shape_dat@data)
 soil_type = shape_dat[10]
@@ -149,7 +149,9 @@ dandat_analysis$height <- dbh2h_01(dandat_analysis$dbh, hgt_max_SEA, hgt_ref_SEA
 table(dandat_analysis$height)
 
 #the merge
-analysismetrics <- dandat_analysis %>% group_by(quadrat) %>% summarize( 
+#EO: I added dply:: before summarize because it was using some other summarize function that
+# ...resulted in 1 observation instead of 1250 (the number of unique quadrats in dandat_analysis)
+analysismetrics <- dandat_analysis %>% group_by(quadrat) %>% dplyr::summarize(
   dbhmean = mean(dbh, na.rm=T),
   heightmean = mean(height, na.rm=T),
   heightmedian = median(height, na.rm=T),
@@ -158,13 +160,16 @@ analysismetrics <- dandat_analysis %>% group_by(quadrat) %>% summarize(
   quad_x = mean(x_utm),
   quad_y = mean(y_utm))
 
+dim(analysismetrics)
+
 #---------------------------------------------------------------------------------------------#
 #----------------------------Surrounding Tree Analysis Dataset--------------------------------
 #---------------------------------------------------------------------------------------------#
 #Elsa Help
 #Workflow
+#-1. Create a spatial points dataframe from entire Danum dataset
 #0. Create a column to label emergents and nonemergents
-#1. Restrict dataset to emergents and create a spatial points dataframe
+#1. Restrict dataset to emergents
 #2. Give each emergent a unique ID
 #3. Create buffer around emergent individuals
 #4. Intersect with original dataset
@@ -172,24 +177,71 @@ analysismetrics <- dandat_analysis %>% group_by(quadrat) %>% summarize(
 #6. Summarize neighboring trees
 #7. add summary variable to original dataset
 
+#-1 
+coords<- dandat_analysis[,c("x_utm","y_utm")]
+dandat_analysis_spdf <- SpatialPointsDataFrame(coords=coords,
+                                data=dandat_analysis,
+                                proj4string=dan_proj)
+
 #0
-dandat_analysis$tree_type <- ifelse(dandat_analysis$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
+quantile99dbh = 100 #EO I didn't have quantile99dbh assigned here, so I just used an arbitrary number
+dandat_analysis_spdf$tree_type <- ifelse(dandat_analysis_spdf$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
+
 #1 & 2
-dandat_emerg <- filter(dandat_analysis, dbh >= quantile99dbh)
+dandat_emerg <- subset(dandat_analysis_spdf, dbh >= quantile99dbh)
+dim(dandat_analysis_spdf); dim(dandat_emerg)
 dandat_emerg$ID <- 1:nrow(dandat_emerg)
-coords<- dandat_emerg[,c("x_utm","y_utm")]
-emdan <- SpatialPointsDataFrame(coords=coords,
-                                     data=dandat_emerg,
-                                     proj4string=dan_proj)
+# coords<- dandat_emerg[,c("x_utm","y_utm")]
+# emdan <- SpatialPointsDataFrame(coords=coords,
+#                                 data=dandat_emerg,
+#                                 proj4string=dan_proj)
 
-plot(emdan)
+plot(dandat_emerg)
+
 #3
-emdan <- buffer(emdan, width=5)
-plot(emdan)
-#4?
+library(rgeos)
+#dandat_emerg <- buffer(dandat_emerg, width=5)
+dandat_emerg_buff <- gBuffer(dandat_emerg, byid=T, width=5) #EO: use the gBuffer function in rgeos instead, and set byid=T
+plot(dandat_emerg_buff)
+dim(dandat_emerg_buff); dim(dandat_emerg)
+#EO: You should still have a separate row for each buffer polygon, equal to the number of points in dandat_emerg 
+class(dandat_emerg_buff)
+#EO: notice that this is still a spatial dataframe (SpatialPolygonsDataFrame)
 
+#4 & 5
+#EO: Using the raster extract() function automatically integrates the two datasets below
+dan_spdf <- raster::extract(dandat_emerg_buff, dandat_analysis_spdf)
+dim(dan_spdf); dim(dandat_analysis_spdf)
+# EO: I think dan_spdf has more observations because there is redundancy in trees that are within multiple emergent tree  buffer zones
+# EO: we can check this using the following three lines of code
 
+unique_trees <- dan_spdf %>% group_by(point.ID) %>% dplyr::summarize(n=n())
+summary(unique_trees)
+subset(unique_trees, n > 1)
+# we see that several trees IDs (point.ID) are repeated twice, indicating they exist within two overlapping emergent tree buffers
 
+summary(dan_spdf)
+summary(dan_spdf$dbh); summary(dandat_analysis_spdf$dbh)
+
+#EO: to count the number of trees within each emergent buffer (poly.ID) run the code below
+trees_within_buff <- dan_spdf %>% group_by(poly.ID) %>% dplyr::summarize(n=n())
+summary(trees_within_buff)
+#EO: the minimum number of trees within a 5m buffer is 9, the max is definitely not 249,518 trees
+#EO: that max number suggestes one of the polygons in dan_spdf is the larger plot boundary excluding the buffer polygons
+#EO: remove that one using na.omit to get back to 270 polygons instead of 271
+trees_within_buff <- na.omit(trees_within_buff)
+summary(trees_within_buff)
+#EO: now the max number of trees within an emergent buffer is 75
+hist(trees_within_buff$n)
+
+#6. Summarize neighboring trees
+#EO: enter what you want to summarize in the code below
+buff_summaries <- dan_spdf %>% group_by(poly.ID) %>% dplyr::summarize()
+
+#7. add summary variable to original dataset
+#EO: add summary variables to original dataset based on the poly.ID from buff_sumaries and ...
+#EO: ...the X1 or treeID value from dandat_emerg_buff, where the rows correspond to poly.ID 1:270
+#EO: let me know if you run into more questions here
 
 #Export file
 write.csv(dandat_analysis, here("Desktop","Research","HCRP","dan_dat", "dan_topo.csv"))
