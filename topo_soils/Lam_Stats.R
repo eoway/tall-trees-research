@@ -25,15 +25,22 @@ emergents <- filter(lam_label, tree_type=="emrgnt")
 emergentquad <- unique(emergents$quadrat)
 table(emergentquad)
 
-lam_data$quad_type <- ifelse(lam_data$quadrat %in% emergentquad, "emrgnt", "nonemrgnt")
-table(lam_data$quad_type)
+
 
 
 #map- FIXXXXXX
 #emapdat <- filter(lam_data, dbh >= quantile99dbh)
+#elevdat <- subset(lam_data, select = c(elev, x, y))
+#elevdat <- unique(elevdat)
+#speciesdat <- subset(lam_data, select = c(species, x, y))
+#plot(elevdat$x, elevdat$y, fill=elev, col=grey(1:100/100)) # just using a grayscale for the color palette instead of R's default color palette 
+#plot(speciesdat$x,speciesdat$y, add=T, col="red") # the add=T will add these data to the plot you just created -- the elevation map
+
+
+
 #ggplot() +
-#  geom_point(data=emapdat, mapping = aes(y=y, x=x,fill=factor(species)))+
-#  geom_point(data=lam_data, mapping =aes(y=y, x=x,fill=factor(elev)))+
+#  geom_point(data=emapdat, mapping = aes(y=y, x=x,col=species))+
+#  geom_point(data=lam_data, mapping =aes(y=y, x=x,col=elev))+
 #  theme_classic()
 #emapdat %>%
 #  plot(elev_rast)+
@@ -45,15 +52,21 @@ table(lam_data$quad_type)
 indlam_stat <- lam_data
 
 #For quadrat level analyses
-lam_stat <- lam_data %>% group_by(quadrat,quad_type,dbhmean,heightmean,heightmedian,height99,heightmax,HabType,
+lam_stat <- lam_data %>% group_by(quadrat,dbhmean,heightmean,heightmedian,height99,heightmax,HabType,
                                   slope,aspect,tpi,elev,Lambir_TWI,soil)  %>%  summarise(quad_x = mean(x),
                                                                                          quad_y = mean(y),
-                                                                                         )
+                                                                                         n_trees = n(), 
+                                                                                         n_emrgnt = length(unique(tree_type[tree_type == 'emrgnt'])), 
+                                                                                         prop_emrgnt = n_emrgnt/n_trees)
+table(lam_stat$quad_type)
+table(lam_stat$n_emrgnt)
 summary(lam_stat$quad_x)
 lam_stat$soil <-as.factor(lam_stat$soil)
 table(lam_stat$quad_type)
 lam_stat$bitype <- ifelse(lam_stat$quad_type=="emrgnt", 1,0)
 table(lam_stat$bitype)
+
+
 
 #Emergent Species List---------------------------------
 emerg <- filter(indlam_stat, tree_type=="emrgnt")
