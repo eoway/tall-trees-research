@@ -67,7 +67,12 @@ effect_plot(fit5, pred = slope, plot.points = TRUE, colors="red", x.label="Slope
 #------------------------------------------------------------------------------------#
 #-----------------------------Quadrat level analysis---------------------------------#
 #------------------------------------------------------------------------------------#
-dan_quad <- dan_data %>% group_by(quadrat,quad_type,soil)  %>%  summarise(quad_x = mean(x_utm),
+
+#n_emrgnt is not working properly***************
+dan_quad <- dan_data %>% group_by(quadrat,quad_type)  %>%  summarise(quad_x = mean(x_utm),
+                                                        n_trees = n(), 
+                                                        n_emrgnt = length(unique(tree_type[tree_type == 'emrgnt'])), 
+                                                        prop_emrgnt = n_emrgnt/n_trees,            
                                                         quad_y = mean(y_utm),
                                                         slope = mean(slope),
                                                         aspect = mean(aspect),
@@ -76,6 +81,7 @@ dan_quad <- dan_data %>% group_by(quadrat,quad_type,soil)  %>%  summarise(quad_x
                                                         twi = mean(twi),
                                                         height99 = quantile(height, probs = 0.99, na.rm = TRUE))
 
+table(dan_quad$n_emrgnt)
 dan_quad$bitype <- ifelse(dan_quad$quad_type=="emrgnt", 1,0)
 table(dan_quad$bitype)
 
