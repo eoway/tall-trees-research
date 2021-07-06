@@ -12,6 +12,7 @@ library(stringr)
 library(readxl)
 library(raster)
 library(fgeo)
+setwd("~/Desktop/Research/HCRP")
 
 #----- PLOT COLOR PALETTE -----
 library(colorRamps)
@@ -143,7 +144,6 @@ res(elev_rast)
 plot(elev_rast)
 
 # project to WGS
-#What is this????????---------------------------------
 crs(elev_rast) <- CRS("+proj=utm +zone=50 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
 #crs(elev_rast) <- CRS("+proj=longlat +datum=WGS84")
 projection(elev_rast)
@@ -225,7 +225,7 @@ lambir <- inner_join(lam4, elev_soil, by="index")
 lambir <- subset(lambir, select = -c(HabType.y, soil.y))
 lambir <- rename(lambir, HabType = HabType.x, soil = soil.x)
 
-heightmetrics <- lam4 %>% group_by(quadrat, HabType, soil, sp) %>% summarize( 
+heightmetrics <- lam4 %>% group_by(quadrat) %>% summarize(HabType=HabType, soil=soil, sp=sp,
                                                                 dbhmean = mean(dbh, na.rm=T),
                                                                 heightmean = mean(height, na.rm=T),
                                                                 heightmedian = median(height, na.rm=T),
@@ -318,7 +318,19 @@ lambir_topo <- inner_join(lambir_all, twi_soil, by="index")
 lambir_topo <- subset(lambir_topo, select = -c(HabType.y, soil.y,x.y,y.y, sp.y))
 lambir_topo <- rename(lambir_topo, HabType = HabType.x, soil = soil.x, x=x.x, y=y.x, species=sp.x)
 summary(lambir_topo)
+
 write.csv(lambir_topo, here("Desktop","Research","HCRP","Lambir Data", "lam_topo.csv"))
+
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+#----------------------------Surrounding Tree Analysis Dataset--------------------------------#
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+coords<- lambir_topo[,c("x","y")]
+lam_proj <- crs(elev_rast)
+emlam <- SpatialPointsDataFrame(coords=coords,
+                                data=lambir_topo,
+                                proj4string=lam_proj)
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
