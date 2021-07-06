@@ -184,7 +184,6 @@ dandat_analysis_spdf <- SpatialPointsDataFrame(coords=coords,
                                 proj4string=dan_proj)
 
 #0
-quantile99dbh = 100 #EO I didn't have quantile99dbh assigned here, so I just used an arbitrary number
 dandat_analysis_spdf$tree_type <- ifelse(dandat_analysis_spdf$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
 
 #1 & 2
@@ -236,9 +235,13 @@ hist(trees_within_buff$n)
 
 #6. Summarize neighboring trees
 #EO: enter what you want to summarize in the code below
-buff_summaries <- dan_spdf %>% group_by(poly.ID) %>% dplyr::summarize()
+buff_summaries <- dan_spdf %>% group_by(poly.ID) %>% dplyr::summarize(heightmean=mean(height),
+                                                                      dbhmean=mean(dbh),
+                                                                      n_trees = n())
+                                                                      
 
 #7. add summary variable to original dataset
+
 #EO: add summary variables to original dataset based on the poly.ID from buff_sumaries and ...
 #EO: ...the X1 or treeID value from dandat_emerg_buff, where the rows correspond to poly.ID 1:270
 #EO: let me know if you run into more questions here
