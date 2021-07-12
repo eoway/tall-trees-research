@@ -8,9 +8,10 @@ require(rgdal)
 require(raster)
 
 
-setwd("/Volumes/LaCie/Research")
-heightdat <- raster("Forest_height_2019_SASIA.tif"); plot(heightdat)
+setwd("G:/My Drive/Research")
+heightdat <- raster("height_data/Forest_height_2019_SASIA.tif"); plot(heightdat)
 
+#Elsa Help
 heightdat[heightdat > 100] <- NA
 
 heightdat
@@ -21,8 +22,6 @@ plot(heightdat)
 #save a new version of the raster
 
 
-#soils
-wcs <- "https://maps.isric.org/mapserv?map=/map/nitrogen.map&
-  SERVICE=WCS&
-  VERSION=2.0.0&
-  REQUEST=GetCapabilities"
+#water data
+
+waterdat <- readOGR(dsn="G:/My Drive/Research/river_data", layer="._rivers_asia_37331") 
