@@ -4,7 +4,7 @@ library(here)
 
 dan_data <- read_csv("~/Desktop/Research/HCRP/dan_dat/dan_topo.csv")
 
-#Add quadrat level emergent labeling
+#Add individual and quadrat level emergent labeling
 source("~/Documents/GitHub/tall-trees-research/heights.r")
 dbh99 <- quantile99dbh #from heights.r
 dan_data$tree_type <- ifelse(dan_data$dbh>=dbh99, "emrgnt", "nonemrgnt")
@@ -56,13 +56,6 @@ fit5 <- lm(height~elev+slope+x_utm+y_utm, data=dan_stat)
 summary(fit5)
 effect_plot(fit5, pred = elev, plot.points = TRUE, colors="red", x.label="Elevation")
 effect_plot(fit5, pred = slope, plot.points = TRUE, colors="red", x.label="Slope")
-
-#------------------------------------------------------------------------------------#
-#-------------------------Surrounding Tree Analysis----------------------------------#
-#------------------------------------------------------------------------------------#
-
-#euclidean()?
-
 
 #------------------------------------------------------------------------------------#
 #-----------------------------Quadrat level analysis---------------------------------#
