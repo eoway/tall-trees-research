@@ -9,7 +9,8 @@ library(ggplot2)
 hdata <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
 #hdata <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv") #EO
 summary(hdata$dbh)
-#Latest Censuses
+
+#Restrict to Latest Censuses------------
 hdata <- filter(hdata, dbh >= 10)
 summary(hdata$dbh)
 hdata <- filter(hdata, census == "01_census_2016" | census == "02_census_2016" | 
