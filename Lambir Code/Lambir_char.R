@@ -12,6 +12,7 @@ library(stringr)
 library(readxl)
 library(raster)
 library(fgeo)
+setwd("~/Desktop/Research/HCRP")
 
 #----- PLOT COLOR PALETTE -----
 library(colorRamps)
@@ -164,6 +165,7 @@ plot(topo_20m)
 # assign 20m quadrat IDs vertically to match Lambir quadrats....
 #elev_rast_20m$index <- 1:ncell(elev_rast_20m)
 
+#Every 25th entry is NA for soils stuff?????-----------------------------ELSA---------------------------
 elev_rast_20m$index <- c(seq(26,1378,by=26),seq(25,1377,by=26),seq(24,1376,by=26),
                          seq(23,1375,by=26),seq(22,1374,by=26),seq(21,1373,by=26),
                          seq(20,1372,by=26),seq(19,1371,by=26),seq(18,1370,by=26),
@@ -223,7 +225,7 @@ lambir <- inner_join(lam4, elev_soil, by="index")
 lambir <- subset(lambir, select = -c(HabType.y, soil.y))
 lambir <- rename(lambir, HabType = HabType.x, soil = soil.x)
 
-heightmetrics <- lam4 %>% group_by(quadrat, HabType, soil, sp) %>% summarize( 
+heightmetrics <- lam4 %>% group_by(quadrat) %>% summarize(HabType=HabType, soil=soil, sp=sp,
                                                                 dbhmean = mean(dbh, na.rm=T),
                                                                 heightmean = mean(height, na.rm=T),
                                                                 heightmedian = median(height, na.rm=T),
@@ -316,4 +318,31 @@ lambir_topo <- inner_join(lambir_all, twi_soil, by="index")
 lambir_topo <- subset(lambir_topo, select = -c(HabType.y, soil.y,x.y,y.y, sp.y))
 lambir_topo <- rename(lambir_topo, HabType = HabType.x, soil = soil.x, x=x.x, y=y.x, species=sp.x)
 summary(lambir_topo)
+
 write.csv(lambir_topo, here("Desktop","Research","HCRP","Lambir Data", "lam_topo.csv"))
+
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+#----------------------------Surrounding Tree Analysis Dataset--------------------------------#
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+coords<- lambir_topo[,c("x","y")]
+lam_proj <- crs(elev_rast)
+emlam <- SpatialPointsDataFrame(coords=coords,
+                                data=lambir_topo,
+                                proj4string=lam_proj)
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+
+#DNM_50_TWI <- mask(Danum_TWI, DNM_50); DNM_50_TWI <- crop(DNM_50_TWI, DNM_50, snap="out"); plot(DNM_50_TWI, col=rev(r2))
+#cellStats(DNM_50_TWI, mean); cellStats(DNM_50_TWI, sd)
+
+#SPKA_fp_TWI <- mask(Sepilok_TWI, spka); SPKA_fp_TWI <- crop(SPKA_fp_TWI, spka, snap="out"); plot(SPKA_fp_TWI, col=rev(r2))
+#SPKS_fp_TWI <- mask(Sepilok_TWI, spks); SPKS_fp_TWI <- crop(SPKS_fp_TWI, spks, snap="out"); plot(SPKS_fp_TWI, col=rev(r2))
+#SPKH_fp_TWI <- mask(Sepilok_TWI, spkh); SPKH_fp_TWI <- crop(SPKH_fp_TWI, spkh, snap="out"); plot(SPKH_fp_TWI, col=rev(r2))
+
+#cellStats(SPKA_fp_TWI, mean); cellStats(SPKA_fp_TWI, sd)
+#cellStats(SPKS_fp_TWI, mean); cellStats(SPKS_fp_TWI, sd)
+#cellStats(SPKH_fp_TWI, mean); cellStats(SPKH_fp_TWI, sd)
+#---------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------#
