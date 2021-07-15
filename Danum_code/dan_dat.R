@@ -235,12 +235,13 @@ hist(trees_within_buff$n)
 
 #6. Summarize neighboring trees
 #EO: enter what you want to summarize in the code below
-buff_summaries <- dan_spdf %>% group_by(poly.ID) %>% dplyr::summarize(heightmean=mean(height),
+buff_summaries <- dan_spdf %>% group_by(poly.ID, X1) %>% dplyr::summarize(heightmean=mean(height),
                                                                       dbhmean=mean(dbh),
                                                                       n_trees = n())
                                                                       
 
 #7. add summary variable to original dataset
+dandat_analysis_surr <- merge(dandat_analysis,buff_summaries, by="X1")
 
 #EO: add summary variables to original dataset based on the poly.ID from buff_sumaries and ...
 #EO: ...the X1 or treeID value from dandat_emerg_buff, where the rows correspond to poly.ID 1:270
@@ -248,3 +249,5 @@ buff_summaries <- dan_spdf %>% group_by(poly.ID) %>% dplyr::summarize(heightmean
 
 #Export file
 write.csv(dandat_analysis, here("Desktop","Research","HCRP","dan_dat", "dan_topo.csv"))
+
+write.csv(dandat_analysis_surr, ("~/Desktop/Research/HCRP/dan_dat/dan_surr.csv"))
