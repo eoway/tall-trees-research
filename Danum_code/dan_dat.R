@@ -11,7 +11,8 @@ library(here)
 library(plyr)
 require("maptools")
 
-dat <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+#dat <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+dat <- read_csv("G:/My Drive/Research/cleandat/main_dat.csv")
 #dat <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv")
 
 #elev------ 
