@@ -12,7 +12,8 @@ library(fgeo)
 
 lam_data <- read_csv("~/Desktop/Research/HCRP/Lambir Data/lam_topo.csv")
 summary(lam_data$dbh)
-#Add quadrat level emergent labeling
+
+#Add individual and quadrat level emergent labeling-------------
 source("~/Documents/GitHub/tall-trees-research/heights.r")
 dbh99 <- quantile99dbh #from heights.r
 lam_data$tree_type <- ifelse(lam_data$dbh>=dbh99, "emrgnt", "nonemrgnt")
@@ -24,6 +25,7 @@ table(lam_label$tree_type)
 emergents <- filter(lam_label, tree_type=="emrgnt")
 emergentquad <- unique(emergents$quadrat)
 table(emergentquad)
+
 
 
 
@@ -58,6 +60,7 @@ lam_stat <- lam_data %>% group_by(quadrat,dbhmean,heightmean,heightmedian,height
                                                                                          n_trees = n(), 
                                                                                          n_emrgnt = length(unique(tree_type[tree_type == 'emrgnt'])), 
                                                                                          prop_emrgnt = n_emrgnt/n_trees)
+lam_stat$quad_type <- ifelse(lam_stat$quadrat %in% emergentquad, "emrgnt", "nonemrgnt")
 table(lam_stat$quad_type)
 table(lam_stat$n_emrgnt)
 summary(lam_stat$quad_x)
