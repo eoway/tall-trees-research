@@ -20,14 +20,12 @@ lam_data$tree_type <- ifelse(lam_data$dbh>=dbh99, "emrgnt", "nonemrgnt")
 lam_data$bitree_type <- ifelse(lam_data$dbh>=dbh99, 1, 0)
 table(lam_data$tree_type)
 table(lam_data$bitree_type)
-lam_label <- lam_data %>% group_by(quadrat,tree_type)  %>%  summarize()
+lam_label <- lam_data %>% group_by(quadrat,tree_type)  %>%  dplyr::summarize()
 table(lam_label$tree_type)
 emergents <- filter(lam_label, tree_type=="emrgnt")
+table(emergents$tree_type)
 emergentquad <- unique(emergents$quadrat)
 table(emergentquad)
-
-
-
 
 
 #map- FIXXXXXX
@@ -37,8 +35,6 @@ table(emergentquad)
 #speciesdat <- subset(lam_data, select = c(species, x, y))
 #plot(elevdat$x, elevdat$y, fill=elev, col=grey(1:100/100)) # just using a grayscale for the color palette instead of R's default color palette 
 #plot(speciesdat$x,speciesdat$y, add=T, col="red") # the add=T will add these data to the plot you just created -- the elevation map
-
-
 
 #ggplot() +
 #  geom_point(data=emapdat, mapping = aes(y=y, x=x,col=species))+
@@ -55,11 +51,14 @@ indlam_stat <- lam_data
 
 #For quadrat level analyses
 lam_stat <- lam_data %>% group_by(quadrat,dbhmean,heightmean,heightmedian,height99,heightmax,HabType,
-                                  slope,aspect,tpi,elev,Lambir_TWI,soil)  %>%  summarise(quad_x = mean(x),
+                                  slope,aspect,tpi,elev,Lambir_TWI,soil)  %>%  dplyr::summarise(quad_x = mean(x),
                                                                                          quad_y = mean(y),
                                                                                          n_trees = n(), 
                                                                                          n_emrgnt = length(unique(tree_type[tree_type == 'emrgnt'])), 
                                                                                          prop_emrgnt = n_emrgnt/n_trees)
+#---------------------------------------------------------------------------------
+#---------------------------------------Elsa Help---------------------------------
+#---------------------------------------------------------------------------------
 lam_stat$quad_type <- ifelse(lam_stat$quadrat %in% emergentquad, "emrgnt", "nonemrgnt")
 table(lam_stat$quad_type)
 table(lam_stat$n_emrgnt)
