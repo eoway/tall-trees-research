@@ -134,7 +134,9 @@ quantile90dbh <-quantile(hdata$dbh, probs = 0.90, na.rm = TRUE)
 quantile95dbh <-quantile(hdata$dbh, probs = 0.95, na.rm = TRUE)
 quantile99dbh <-quantile(hdata$dbh, probs = 0.99, na.rm = TRUE)
 
-#Remove Indets--------
+#----------------------------------------------------------------------#
+#-------------------------------Remove Indets--------
+#----------------------------------------------------------------------#
 hdata <- filter(hdata, species != "Indet")
 
 #----------------------------------------------------------------------#
