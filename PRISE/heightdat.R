@@ -15,10 +15,9 @@ heightdat <- raster("height_data/Forest_height_2019_SASIA.tif"); plot(heightdat)
 #Elsa Help
 #heightdat[heightdat > 100] <- NA
 
+#is.na(heightdat) <- c(101, 102, 103)
 
-is.na(heightdat) <- c(101, 102, 103)
-
-NAvalue(heightdat) <- c(101, 102, 103)
+#NAvalue(heightdat) <- c(101, 102, 103)
 
 summary(heightdat)
 heightdat
