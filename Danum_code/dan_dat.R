@@ -11,9 +11,10 @@ library(here)
 library(plyr)
 require("maptools")
 
-#dat <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
-dat <- read_csv("G:/My Drive/Research/cleandat/main_dat.csv")
+dat <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+#dat <- read_csv("G:/My Drive/Research/cleandat/main_dat.csv")
 #dat <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv")
+
 
 #elev------ 
 Danum_elev <- raster("~/Desktop/Research/HCRP/dan_dat/ASU_GAO_Danum_50HaPlot_GroundElev.tif"); plot(Danum_elev)
@@ -24,7 +25,6 @@ Danum_slope_aspect_TPI <- terrain(Danum_elev, opt=c('slope', 'aspect', 'TPI'), u
 #dan_topo_20m <- aggregate(Danum_slope_aspect_TPI, fact=10)
 #res(dan_elev_rast_20m); res(dan_topo_20m)
 plot(Danum_slope_aspect_TPI)
-plot(Danum_slope_aspect_TPI)
 
 #twi--------
 Danum_TWI <- raster("~/Desktop/Research/HCRP/dan_dat/Danum_TWI.tif"); plot(Danum_TWI)
@@ -34,6 +34,7 @@ cellStats(Danum_TWI, mean); cellStats(Danum_TWI, sd)
 #Main dat--------
 dandat <- filter(dat, site == "DNM50")
 dandat <- filter(dandat, dbh >= 10)
+summary(dandat)
 table(dandat$census)
 dandat <- filter(dat,census == "census_2019")
 colnames(dandat)
@@ -163,6 +164,10 @@ analysismetrics <- dandat_analysis %>% group_by(quadrat) %>% dplyr::summarize(
 
 dim(analysismetrics)
 
+
+summary(dandat_analysis)
+dandat_analysis <- filter(dandat_analysis, dbh >=10)
+
 #---------------------------------------------------------------------------------------------#
 #----------------------------Surrounding Tree Analysis Dataset--------------------------------
 #---------------------------------------------------------------------------------------------#
@@ -178,6 +183,10 @@ dim(analysismetrics)
 #6. Summarize neighboring trees
 #7. add summary variable to original dataset
 
+#---------------------------------------------------------------------------------------------#
+#----------------------------Surrounding Tree Analysis Dataset--------------------------------
+#-------------------------------------sampling >=10 cm----------------------------------------#
+
 #-1 
 coords<- dandat_analysis[,c("x_utm","y_utm")]
 dandat_analysis_spdf <- SpatialPointsDataFrame(coords=coords,
@@ -188,7 +197,20 @@ dandat_analysis_spdf <- SpatialPointsDataFrame(coords=coords,
 dandat_analysis_spdf$tree_type <- ifelse(dandat_analysis_spdf$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
 
 #1 & 2
-dandat_emerg <- subset(dandat_analysis_spdf, dbh >= quantile99dbh)
+dandatemerg <- subset(dandat_analysis, dbh >= quantile99dbh)
+
+dandatsamp <- subset(dandat_analysis, dbh < quantile99dbh)
+dandatsamp <- sample_n(dandatsamp, 325)
+
+dandat_emerg <- rbind(dandatsamp, dandatemerg)
+
+coords<- dandat_emerg[,c("x_utm","y_utm")]
+dandat_emerg <- SpatialPointsDataFrame(coords=coords,
+                                               data=dandat_emerg,
+                                               proj4string=dan_proj)
+
+
+#dandat_emerg <- subset(dandat_analysis_spdf, dbh >= quantile99dbh)
 dim(dandat_analysis_spdf); dim(dandat_emerg)
 dandat_emerg$ID <- 1:nrow(dandat_emerg)
 # coords<- dandat_emerg[,c("x_utm","y_utm")]
@@ -248,7 +270,99 @@ dandat_analysis_surr <- merge(dandat_analysis,buff_summaries, by="X1")
 #EO: ...the X1 or treeID value from dandat_emerg_buff, where the rows correspond to poly.ID 1:270
 #EO: let me know if you run into more questions here
 
+#---------------------------------------------------------------------------------------------#
+#----------------------------Surrounding Tree Analysis Dataset--------------------------------
+#-------------------------------------sampling >=60 cm----------------------------------------#
+#-1 
+coords<- dandat_analysis[,c("x_utm","y_utm")]
+dandat_analysis_spdf <- SpatialPointsDataFrame(coords=coords,
+                                               data=dandat_analysis,
+                                               proj4string=dan_proj)
+
+#0
+dandat_analysis_spdf$tree_type <- ifelse(dandat_analysis_spdf$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
+
+#1 & 2
+dandatemerg <- subset(dandat_analysis, dbh >= quantile99dbh)
+
+dandatsamp <- subset(dandat_analysis, dbh < quantile99dbh & dbh >= 60)
+summary(dandatsamp)
+dandatsamp <- sample_n(dandatsamp, 325)
+
+dandat_emerg <- rbind(dandatsamp, dandatemerg)
+
+coords<- dandat_emerg[,c("x_utm","y_utm")]
+dandat_emerg <- SpatialPointsDataFrame(coords=coords,
+                                       data=dandat_emerg,
+                                       proj4string=dan_proj)
+
+
+#dandat_emerg <- subset(dandat_analysis_spdf, dbh >= quantile99dbh)
+dim(dandat_analysis_spdf); dim(dandat_emerg)
+dandat_emerg$ID <- 1:nrow(dandat_emerg)
+# coords<- dandat_emerg[,c("x_utm","y_utm")]
+# emdan <- SpatialPointsDataFrame(coords=coords,
+#                                 data=dandat_emerg,
+#                                 proj4string=dan_proj)
+
+plot(dandat_emerg)
+
+#3
+library(rgeos)
+#dandat_emerg <- buffer(dandat_emerg, width=5)
+dandat_emerg_buff <- gBuffer(dandat_emerg, byid=T, width=5) #EO: use the gBuffer function in rgeos instead, and set byid=T
+plot(dandat_emerg_buff)
+dim(dandat_emerg_buff); dim(dandat_emerg)
+#EO: You should still have a separate row for each buffer polygon, equal to the number of points in dandat_emerg 
+class(dandat_emerg_buff)
+#EO: notice that this is still a spatial dataframe (SpatialPolygonsDataFrame)
+
+#4 & 5
+#EO: Using the raster extract() function automatically integrates the two datasets below
+dan_spdf <- raster::extract(dandat_emerg_buff, dandat_analysis_spdf)
+dim(dan_spdf); dim(dandat_analysis_spdf)
+# EO: I think dan_spdf has more observations because there is redundancy in trees that are within multiple emergent tree  buffer zones
+# EO: we can check this using the following three lines of code
+
+unique_trees <- dan_spdf %>% group_by(point.ID) %>% dplyr::summarize(n=n())
+summary(unique_trees)
+subset(unique_trees, n > 1)
+# we see that several trees IDs (point.ID) are repeated twice, indicating they exist within two overlapping emergent tree buffers
+
+summary(dan_spdf)
+summary(dan_spdf$dbh); summary(dandat_analysis_spdf$dbh)
+
+#EO: to count the number of trees within each emergent buffer (poly.ID) run the code below
+trees_within_buff <- dan_spdf %>% group_by(poly.ID) %>% dplyr::summarize(n=n())
+summary(trees_within_buff)
+#EO: the minimum number of trees within a 5m buffer is 9, the max is definitely not 249,518 trees
+#EO: that max number suggestes one of the polygons in dan_spdf is the larger plot boundary excluding the buffer polygons
+#EO: remove that one using na.omit to get back to 270 polygons instead of 271
+trees_within_buff <- na.omit(trees_within_buff)
+summary(trees_within_buff)
+#EO: now the max number of trees within an emergent buffer is 75
+hist(trees_within_buff$n)
+
+#6. Summarize neighboring trees
+#EO: enter what you want to summarize in the code below
+buff_summaries <- dan_spdf %>% group_by(poly.ID, X1) %>% dplyr::summarize(heightmean=mean(height),
+                                                                          dbhmean=mean(dbh),
+                                                                          n_trees = n())
+
+
+#7. add summary variable to original dataset
+dandat_analysis_surr_60 <- merge(dandat_analysis,buff_summaries, by="X1")
+
+#EO: add summary variables to original dataset based on the poly.ID from buff_sumaries and ...
+#EO: ...the X1 or treeID value from dandat_emerg_buff, where the rows correspond to poly.ID 1:270
+#EO: let me know if you run into more questions here
+
+
+
+
 #Export file
-write.csv(dandat_analysis, here("Desktop","Research","HCRP","dan_dat", "dan_topo.csv"))
+write.csv(dandat_analysis, ("~/Desktop/Research/HCRP/dan_dat/dan_topo.csv"))
 
 write.csv(dandat_analysis_surr, ("~/Desktop/Research/HCRP/dan_dat/dan_surr.csv"))
+
+write.csv(dandat_analysis_surr_60, ("~/Desktop/Research/HCRP/dan_dat/dan_surr60.csv"))
