@@ -3,19 +3,21 @@ library(ISLR)
 library(here)
 
 dan_data <- read_csv("~/Desktop/Research/HCRP/dan_dat/dan_topo.csv")
-
+summary(dan_data)
+table(dan_data$quadrat)
 #Add individual and quadrat level emergent labeling
 source("~/Documents/GitHub/tall-trees-research/heights.r")
+dbh99 <- 95
 dbh99 <- quantile99dbh #from heights.r
 dan_data$tree_type <- ifelse(dan_data$dbh>=dbh99, "emrgnt", "nonemrgnt")
 dan_data$bitree_type <- ifelse(dan_data$dbh>=dbh99, 1, 0)
 table(dan_data$tree_type)
 table(dan_data$bitree_type)
-dan_label <- dan_data %>% group_by(tree_type,quadrat)  %>%  summarize()
+dan_label <- dan_data %>% group_by(tree_type,quadrat)  %>%  dplyr::summarize()
 table(dan_label$tree_type)
 emergents <- filter(dan_label, tree_type=="emrgnt")
 emergentquad <- unique(emergents$quadrat)
-table(emergentquad)
+summary(emergentquad)
 
 dan_data$quad_type <- ifelse(dan_data$quadrat %in% emergentquad, "emrgnt", "nonemrgnt")
 table(dan_data$quad_type)
@@ -61,8 +63,7 @@ effect_plot(fit5, pred = slope, plot.points = TRUE, colors="red", x.label="Slope
 #-----------------------------Quadrat level analysis---------------------------------#
 #------------------------------------------------------------------------------------#
 
-#n_emrgnt is not working properly***************
-dan_quad <- dan_data %>% group_by(quadrat,quad_type)  %>%  summarise(quad_x = mean(x_utm),
+dan_quad <- dan_data %>% group_by(quadrat,quad_type)  %>%  dplyr::summarise(quad_x = mean(x_utm),
                                                         n_trees = n(), 
                                                         n_emrgnt = length(unique(tree_type[tree_type == 'emrgnt'])), 
                                                         prop_emrgnt = n_emrgnt/n_trees,            
