@@ -260,12 +260,13 @@ hist(trees_within_buff$n)
 #EO: enter what you want to summarize in the code below
 buff_summaries <- dan_spdf %>% group_by(poly.ID, X1) %>% dplyr::summarize(heightmean=mean(height),
                                                                       dbhmean=mean(dbh),
+                                                                      height99 = quantile(height, probs = 0.99, na.rm = TRUE),
                                                                       n_trees = n())
                                                                       
 
 #7. add summary variable to original dataset
 dandat_analysis_surr <- merge(dandat_analysis,buff_summaries, by="X1")
-
+summary(dandat_analysis_surr)
 #EO: add summary variables to original dataset based on the poly.ID from buff_sumaries and ...
 #EO: ...the X1 or treeID value from dandat_emerg_buff, where the rows correspond to poly.ID 1:270
 #EO: let me know if you run into more questions here
@@ -336,7 +337,7 @@ summary(dan_spdf$dbh); summary(dandat_analysis_spdf$dbh)
 trees_within_buff <- dan_spdf %>% group_by(poly.ID) %>% dplyr::summarize(n=n())
 summary(trees_within_buff)
 #EO: the minimum number of trees within a 5m buffer is 9, the max is definitely not 249,518 trees
-#EO: that max number suggestes one of the polygons in dan_spdf is the larger plot boundary excluding the buffer polygons
+#EO: that max number suggests one of the polygons in dan_spdf is the larger plot boundary excluding the buffer polygons
 #EO: remove that one using na.omit to get back to 270 polygons instead of 271
 trees_within_buff <- na.omit(trees_within_buff)
 summary(trees_within_buff)
@@ -350,6 +351,7 @@ buff_summaries <- dan_spdf %>% group_by(poly.ID, X1) %>% dplyr::summarize(height
                                                                           n_trees = n())
 
 
+summary(buff_summaries)
 #7. add summary variable to original dataset
 dandat_analysis_surr_60 <- merge(dandat_analysis,buff_summaries, by="X1")
 
