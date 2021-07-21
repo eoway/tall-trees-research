@@ -12,6 +12,7 @@ library(stringr)
 library(readxl)
 library(raster)
 library(fgeo)
+library(plyr)
 setwd("~/Desktop/Research/HCRP")
 
 #----- PLOT COLOR PALETTE -----
@@ -223,9 +224,9 @@ lam4 <- filter(lam4, dbh>=10)
 
 lambir <- inner_join(lam4, elev_soil, by="index")
 lambir <- subset(lambir, select = -c(HabType.y, soil.y))
-lambir <- rename(lambir, HabType = HabType.x, soil = soil.x)
+lambir <- rename(lambir, replace= c("HabType.x" = "HabType", "soil.x" = "soil"))
 
-heightmetrics <- lam4 %>% group_by(quadrat) %>% summarize(HabType=HabType, soil=soil, sp=sp,
+heightmetrics <- lam4 %>% group_by(quadrat) %>% dplyr::summarize(HabType=HabType, soil=soil, sp=sp,
                                                                 dbhmean = mean(dbh, na.rm=T),
                                                                 heightmean = mean(height, na.rm=T),
                                                                 heightmedian = median(height, na.rm=T),
@@ -233,7 +234,7 @@ heightmetrics <- lam4 %>% group_by(quadrat) %>% summarize(HabType=HabType, soil=
                                                                 heightmax = max(height,na.rm=T))
 lambir_all <- inner_join(lambir, heightmetrics, by= "quadrat")
 lambir_all <- subset(lambir_all, select = -c(HabType.y, soil.y))
-lambir_all <- rename(lambir_all, HabType = HabType.x, soil = soil.x)
+lambir_all <- rename(lambir_all, replace= c("HabType.x" = "HabType", "soil.x" = "soil"))
 
 
 
@@ -315,9 +316,10 @@ ggplot() +
   theme_classic()
 
 lambir_topo <- inner_join(lambir_all, twi_soil, by="index")
-lambir_topo <- subset(lambir_topo, select = -c(HabType.y, soil.y,x.y,y.y, sp.y))
-lambir_topo <- rename(lambir_topo, HabType = HabType.x, soil = soil.x, x=x.x, y=y.x, species=sp.x)
+lambir_topo <- subset(lambir_topo, select = -c(HabType.y, soil.y,x.x,y.x, sp.y))
+lambir_topo <- rename(lambir_topo, replace = c("HabType.x" = "HabType", "soil.x" = "soil", "x.y"="x", "y.y"="y", "sp.x"="species"))
 summary(lambir_topo)
+
 
 write.csv(lambir_topo, here("Desktop","Research","HCRP","Lambir Data", "lam_topo.csv"))
 
@@ -326,11 +328,92 @@ write.csv(lambir_topo, here("Desktop","Research","HCRP","Lambir Data", "lam_topo
 #----------------------------Surrounding Tree Analysis Dataset--------------------------------#
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
+#-1
 coords<- lambir_topo[,c("x","y")]
 lam_proj <- crs(elev_rast)
-emlam <- SpatialPointsDataFrame(coords=coords,
+lam_analysis_spdf <- SpatialPointsDataFrame(coords=coords,
                                 data=lambir_topo,
                                 proj4string=lam_proj)
+
+#0
+lam_analysis_spdf$tree_type <- ifelse(lam_analysis_spdf$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
+
+#1 & 2
+lamdatemerg <- subset(lambir_topo, dbh >= quantile99dbh)
+dim(lamdatemerg)
+summary(lamdatemerg)
+lamdatsamp <- subset(lambir_topo, dbh < quantile99dbh)
+lamdatsamp <- sample_n(lamdatsamp, 10400)
+summary(lamdatsamp)
+lamdat_emerg <- rbind(lamdatsamp, lamdatemerg)
+
+coords<- lamdat_emerg[,c("x","y")]
+lamdat_emerg <- SpatialPointsDataFrame(coords=coords,
+                                       data=lamdat_emerg,
+                                       proj4string=lam_proj)
+
+
+#dandat_emerg <- subset(dandat_analysis_spdf, dbh >= quantile99dbh)
+dim(lam_analysis_spdf); dim(lamdat_emerg)
+lamdat_emerg$ID <- 1:nrow(lamdat_emerg)
+# coords<- dandat_emerg[,c("x_utm","y_utm")]
+# emdan <- SpatialPointsDataFrame(coords=coords,
+#                                 data=dandat_emerg,
+#                                 proj4string=dan_proj)
+
+plot(lamdat_emerg)
+
+#3
+library(rgeos)
+#dandat_emerg <- buffer(dandat_emerg, width=5)
+lamdat_emerg_buff <- gBuffer(lamdat_emerg, byid=T, width=5) #EO: use the gBuffer function in rgeos instead, and set byid=T
+plot(lamdat_emerg_buff)
+dim(lamdat_emerg_buff); dim(lamdat_emerg)
+#EO: You should still have a separate row for each buffer polygon, equal to the number of points in dandat_emerg 
+class(lamdat_emerg_buff)
+#EO: notice that this is still a spatial dataframe (SpatialPolygonsDataFrame)
+
+#4 & 5
+#EO: Using the raster extract() function automatically integrates the two datasets below
+lam_spdf <- raster::extract(lamdat_emerg_buff, lam_analysis_spdf)
+dim(lam_spdf); dim(lam_analysis_spdf)
+# EO: I think dan_spdf has more observations because there is redundancy in trees that are within multiple emergent tree  buffer zones
+# EO: we can check this using the following three lines of code
+
+unique_trees <- lam_spdf %>% group_by(point.ID) %>% dplyr::summarize(n=n())
+summary(unique_trees)
+subset(unique_trees, n > 1)
+# we see that several trees IDs (point.ID) are repeated twice, indicating they exist within two overlapping emergent tree buffers
+
+summary(lam_spdf)
+summary(lam_spdf$dbh); summary(lam_analysis_spdf$dbh)
+
+#EO: to count the number of trees within each emergent buffer (poly.ID) run the code below
+trees_within_buff <- lam_spdf %>% group_by(poly.ID) %>% dplyr::summarize(n=n())
+summary(trees_within_buff)
+#EO: the minimum number of trees within a 5m buffer is 9, the max is definitely not 249,518 trees
+#EO: that max number suggestes one of the polygons in dan_spdf is the larger plot boundary excluding the buffer polygons
+#EO: remove that one using na.omit to get back to 270 polygons instead of 271
+trees_within_buff <- na.omit(trees_within_buff)
+summary(trees_within_buff)
+#EO: now the max number of trees within an emergent buffer is 75
+hist(trees_within_buff$n)
+
+#6. Summarize neighboring trees
+#EO: enter what you want to summarize in the code below
+buff_summaries <- lam_spdf %>% group_by(poly.ID, X1) %>% dplyr::summarize(heightmean=mean(height),
+                                                                          dbhmean=mean(dbh),
+                                                                          height99 = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                          n_trees = n())
+
+
+#7. add summary variable to original dataset
+lamdat_analysis_surr <- merge(lambir_topo,buff_summaries, by="X1")
+summary(lamdat_analysis_surr)
+#EO: add summary variables to original dataset based on the poly.ID from buff_sumaries and ...
+#EO: ...the X1 or treeID value from dandat_emerg_buff, where the rows correspond to poly.ID 1:270
+#EO: let me know if you run into more questions here
+
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 
