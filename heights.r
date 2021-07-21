@@ -10,9 +10,12 @@ hdata <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
 #hdata <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv") #EO
 summary(hdata$dbh)
 
-#Restrict to Latest Censuses------------
+#Remove ress <10cm----------------
 hdata <- filter(hdata, dbh >= 10)
 summary(hdata$dbh)
+
+
+#Restrict to Latest Censuses------------
 hdata <- filter(hdata, census == "01_census_2016" | census == "02_census_2016" | 
                   census == "03_census_2016" | census == "census_2019" |
                   census == "census_2007_08" | census == "10_census_2014" |
@@ -31,6 +34,7 @@ lamsp <- filter (lam, species == "excelsa" | species == "johorensis" |
                    species == "lanceolata" | species == "parvifolia" |
                    species == "pauciflora" | species == "sumatrana" |
                    species == "superba")
+
 #----------------------------------------------------------------------#
 #-----------------------Calculate Heights-------------------------------
 #----------------------------------------------------------------------#
@@ -217,6 +221,7 @@ emergent99Ch <- unique(emergent99Ch$species)
 table(emergent99Ch)
 
 hdata$tree_type99Ch <- ifelse(hdata$species %in% c(emergent99Ch), "emrgnt", "non_emrgnt")
+
 #Chave with E
 emergent99E <- filter(hdata, dbh >= quantile99E)
 table(emergent99E$dbh)
