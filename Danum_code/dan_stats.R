@@ -3,8 +3,10 @@ library(ISLR)
 library(here)
 
 dan_data <- read_csv("~/Desktop/Research/HCRP/dan_dat/dan_topo.csv")
+table(dan_data$dbh)
 summary(dan_data)
 table(dan_data$quadrat)
+
 #Add individual and quadrat level emergent labeling
 source("~/Documents/GitHub/tall-trees-research/heights.r")
 dbh99 <- 95
