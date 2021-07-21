@@ -53,6 +53,7 @@ dandat$y_utm <- (547348.96+dandat$plot_x)
 plot(dandat$x_utm,dandat$y_utm)
 
 dandat_analysis <- dandat
+summary(dandat_analysis)
 coords<- dandat_analysis[,c("x_utm","y_utm")]
 dan_proj <- crs(Danum_TWI)
 
@@ -130,7 +131,9 @@ dandat_analysis$elev <- raster::extract(Danum_elev,spatialdan)
 #dim(spatialdan)
 #dandat_analysis$soil <- raster::extract(shape_dat,spatialdan)
 
-#Equation
+
+
+#Height Equation---------
 dbh2h_01 <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht){ 
   dbh_crit <- exp(-0.5 / hgt_ref * (b2Ht - sqrt(b2Ht**2 - 4 * hgt_ref * (b1Ht - log(hgt_max)))))
   h <- ifelse(dbh <= dbh_crit,
@@ -146,13 +149,14 @@ b2Ht_SEA    = 0.5782 #"coefficient of ln(D)" # Use for dbh2h_01
 hgt_ref_SEA = -0.0114
 hgt_max_SEA = 100
 
-#Calculate
+#Calculate Heights---------------
 dandat_analysis$height <- dbh2h_01(dandat_analysis$dbh, hgt_max_SEA, hgt_ref_SEA, b1Ht_SEA, b2Ht_SEA)
 table(dandat_analysis$height)
 
 #the merge
 #EO: I added dply:: before summarize because it was using some other summarize function that
 # ...resulted in 1 observation instead of 1250 (the number of unique quadrats in dandat_analysis)
+#Not used, but redone in dan_stats for quad level analysis
 analysismetrics <- dandat_analysis %>% group_by(quadrat) %>% dplyr::summarize(
   dbhmean = mean(dbh, na.rm=T),
   heightmean = mean(height, na.rm=T),
