@@ -12,6 +12,7 @@ library(fgeo)
 
 lam_data <- read_csv("~/Desktop/Research/HCRP/Lambir Data/lam_topo.csv")
 summary(lam_data$dbh)
+summary(lam_data$CensusID)
 
 #Add individual and quadrat level emergent labeling-------------
 source("~/Documents/GitHub/tall-trees-research/heights.r")
