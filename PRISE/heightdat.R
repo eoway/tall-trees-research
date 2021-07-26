@@ -100,20 +100,74 @@ analysis$height <- raster::extract(heightdat3,heightsample)
 #issues: soils data not working, pretty sure distance is working incorrectly?
 write.csv(analysis, ("G:/My Drive/Research/PRISE_data/analysisdat"))
 
+analysis <- read_csv("G:/My Drive/Research/PRISE_data/analysisdat")
+
 #soil data
 #----------------------------------------------------------------#
 #------------------------Shapefile Code---------------------------
 #----------------------------------------------------------------#
-soilbd <- raster("SEA_Regional_Datasets/SoilGrids_BD_SEAsia.tif")
+soilbd <- raster("soils/SoilGrids_BD_SEA-0000000000-0000000000.tif")
+soilbd2 <- raster("soils/SoilGrids_BD_SEA-0000000000-0000018944.tif")
+soilbd3 <- raster("soils/SoilGrids_BD_SEA-0000018944-0000000000.tif")
+soilbd4 <- raster("soils/SoilGrids_BD_SEA-0000018944-0000018944.tif")
 plot(soilbd)
-soilsoc <- raster("SEA_Regional_Datasets/SoilGrids_SOC_SEAsia.tif")
-plot(soilsoc)
-crs(soilsoc)
-soilsand <- raster("SEA_Regional_Datasets/SoilGrids_Sand_SEAsia.tif")
-soilph <- raster("SEA_Regional_Datasets/SoilGrids_pH_SEAsia.tif")
-soilnit <- raster("SEA_Regional_Datasets/SoilGrids_N_SEAsia.tif")
-soilclay <- raster("SEA_Regional_Datasets/SoilGrids_Clay_SEAsia.tif")
-soilcec <- raster("SEA_Regional_Datasets/SoilGrids_CEC_SEAsia.tif")
+plot(soilbd2)
+plot(soilbd3)
+plot(soilbd4)
+
+soilSOC <- raster("soils/SoilGrids_SOC_SEA-0000000000-0000000000.tif")
+soilSOC2 <- raster("soils/SoilGrids_SOC_SEA-0000000000-0000018944.tif")
+soilSOC3 <- raster("soils/SoilGrids_SOC_SEA-0000018944-0000000000.tif")
+soilSOC4 <- raster("soils/SoilGrids_SOC_SEA-0000018944-0000018944.tif")
+plot(soilSOC)
+plot(soilSOC2)
+plot(soilSOC3)
+plot(soilSOC4)
+
+soilSand <- raster("soils/SoilGrids_Sand_SEA-0000000000-0000000000.tif")
+soilSand2 <- raster("soils/SoilGrids_Sand_SEA-0000000000-0000018944.tif")
+soilSand3 <- raster("soils/SoilGrids_Sand_SEA-0000018944-0000000000.tif")
+soilSand4 <- raster("soils/SoilGrids_Sand_SEA-0000018944-0000018944.tif")
+plot(soilSand)
+plot(soilSand2)
+plot(soilSand3)
+plot(soilSand4)
+
+soilpH <- raster("soils/SoilGrids_pH_SEA-0000000000-0000000000.tif")
+soilpH2 <- raster("soils/SoilGrids_pH_SEA-0000000000-0000018944.tif")
+soilpH3 <- raster("soils/SoilGrids_pH_SEA-0000018944-0000000000.tif")
+soilpH4 <- raster("soils/SoilGrids_pH_SEA-0000018944-0000018944.tif")
+plot(soilpH)
+plot(soilpH2)
+plot(soilpH3)
+plot(soilpH4)
+
+soilnit <- raster("soils/SoilGrids_N_SEA-0000000000-0000000000.tif")
+soilnit2 <- raster("soils/SoilGrids_N_SEA-0000000000-0000018944.tif")
+soilnit3 <- raster("soils/SoilGrids_N_SEA-0000018944-0000000000.tif")
+soilnit4 <- raster("soils/SoilGrids_N_SEA-0000018944-0000018944.tif")
+plot(soilnit)
+plot(soilnit2)
+plot(soilnit3)
+plot(soilnit4)
+
+soilclay <- raster("soils/SoilGrids_Clay_SEA-0000000000-0000000000.tif")
+soilclay2 <- raster("soils/SoilGrids_Clay_SEA-0000000000-0000018944.tif")
+soilclay3 <- raster("soils/SoilGrids_Clay_SEA-0000018944-0000000000.tif")
+soilclay4 <- raster("soils/SoilGrids_Clay_SEA-0000018944-0000018944.tif")
+plot(soilclay)
+plot(soilclay2)
+plot(soilclay3)
+plot(soilclay4)
+
+soilcec <- raster("soils/SoilGrids_CEC_SEA-0000000000-0000000000.tif")
+soilcec2 <- raster("soils/SoilGrids_CEC_SEA-0000000000-0000018944.tif")
+soilcec3 <- raster("soils/SoilGrids_CEC_SEA-0000018944-0000000000.tif")
+soilcec4 <- raster("soils/SoilGrids_CEC_SEA-0000018944-0000018944.tif")
+plot(soilcec)
+plot(soilcec2)
+plot(soilcec3)
+plot(soilcec4)
 
 #extract data
 #bulk density
@@ -125,25 +179,25 @@ dim(heightsample)
 analysis$bulkdensity <- raster::extract(soilbd,heightsample)
 
 #soc
-temp <- raster::extract(soilsoc,heightsample)
+temp <- raster::extract(soilSOC,heightsample)
 head(temp)
 length(temp)
 dim(heightsample)
-analysis$soc <- raster::extract(soilsoc,heightsample)
+analysis$soc <- raster::extract(soilSOC,heightsample)
 
 #sand
-temp <- raster::extract(soilsand,heightsample)
+temp <- raster::extract(soilSand,heightsample)
 head(temp)
 length(temp)
 dim(heightsample)
-analysis$sand <- raster::extract(soilsand,heightsample)
+analysis$sand <- raster::extract(soilSand,heightsample)
 
 #ph
-temp <- raster::extract(soilph,heightsample)
+temp <- raster::extract(soilpH,heightsample)
 head(temp)
 length(temp)
 dim(heightsample)
-analysis$ph <- raster::extract(soilph,heightsample)
+analysis$ph <- raster::extract(soilpH,heightsample)
 
 #nitrogen
 temp <- raster::extract(soilnit,heightsample)
@@ -165,6 +219,8 @@ head(temp)
 length(temp)
 dim(heightsample)
 analysis$cec <- raster::extract(soilcec,heightsample)
+
+write.csv(analysis, ("G:/My Drive/Research/PRISE_data/analysisdat"))
 
 #----------------------------------------------------------------#
 #---------------------------WCS Code-----------------------------
