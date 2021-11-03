@@ -45,6 +45,7 @@ summary(sample)
 #plot(heightsample)
 
 heightsample <- readOGR("hsample","sample")
+crs(heightsample)
 plot(heightsample)
 #water data
 waterdat <- readOGR("river_data/rivers_asia_37331","rivers_asia_37331")
@@ -98,7 +99,6 @@ length(test)
 dim(heightsample)
 analysis <- as(heightsample, "data.frame")
 analysis$elev <- raster::extract(elevdat,heightsample)
-
 
 temp <- raster::extract(slope_aspect_TPI$slope,heightsample)
 head(temp)

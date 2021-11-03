@@ -7,8 +7,10 @@ library(sp)
 library(plyr)
 
 
-dat <- read_csv("G:/My Drive/Research/PRISE_data/biganalysisdat")
+dat <- read_csv("~/Google Drive/My Drive/Research/PRISE_data/biganalysisdat")
 summary(dat$height)
+
+#calculate 99th percentile dbh
 dbh99 <- quantile(dat$height, probs = 0.99, na.rm = TRUE)
 
 hist(dat$height, xlab = "height", main = "Histogram of Tree Heights")
@@ -50,6 +52,7 @@ dat$cec2[is.na(dat$cec2)] <- ""
 dat$cec3[is.na(dat$cec3)] <- ""
 dat$cec4[is.na(dat$cec4)] <- ""
 
+# Paste columns together
 dat$bd <- paste(dat$bulkdensity, dat$bulkdensity2, dat$bulkdensity3, dat$bulkdensity4)
 dat$soc <- paste(dat$soc, dat$soc2, dat$soc3, dat$soc4)
 dat$sand <- paste(dat$sand, dat$sand2, dat$sand3, dat$sand4)

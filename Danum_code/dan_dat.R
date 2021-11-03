@@ -33,9 +33,11 @@ cellStats(Danum_TWI, mean); cellStats(Danum_TWI, sd)
 
 #Main dat--------
 dandat <- filter(dat, site == "DNM50")
+#exclude stems less than 10cm
 dandat <- filter(dandat, dbh >= 10)
 summary(dandat)
 table(dandat$census)
+#filter to latest census
 dandat <- filter(dat,census == "census_2019")
 colnames(dandat)
 
@@ -57,6 +59,7 @@ summary(dandat_analysis)
 coords<- dandat_analysis[,c("x_utm","y_utm")]
 dan_proj <- crs(Danum_TWI)
 
+#Create a spatial points dataframe
 spatialdan <- SpatialPointsDataFrame(coords=coords,
                                      data=dandat_analysis,
                                      proj4string=dan_proj)
@@ -260,12 +263,19 @@ summary(trees_within_buff)
 #EO: now the max number of trees within an emergent buffer is 75
 hist(trees_within_buff$n)
 
+#### Subset dan_spdf to exclude emergents, try #6 again, 
+
+
 #6. Summarize neighboring trees
 #EO: enter what you want to summarize in the code below
-buff_summaries <- dan_spdf %>% group_by(poly.ID, X1) %>% dplyr::summarize(heightmean=mean(height),
+
+#### Should only need to group by poly.ID, make sure you have height values for all the other trees
+#### Put issue on GItHub if you still can't figure it out
+buff_summaries <- dan_spdf %>% group_by(poly.ID, X1) %>% dplyr::summarize(heightmean=mean(height, na.rm = TRUE),
                                                                       dbhmean=mean(dbh),
                                                                       height99 = quantile(height, probs = 0.99, na.rm = TRUE),
-                                                                      n_trees = n())
+                                                                      n_trees = n()
+                                                                      )
                                                                       
 
 #7. add summary variable to original dataset

@@ -193,9 +193,11 @@ length(unique(lam4$index))
 #dim(lhp_elev_df)
 dim(elev_rast_20m)
 
+#stack elevation and topography metrics
 elev_topo_20m <- stack(elev_rast_20m, topo_20m)
 plot(elev_topo_20m)
 
+#plot
 par(mfrow=c(2,1))
 plot(elev_topo_20m$elev, col=r2, main="Elevation (m)")
 plot(elev_topo_20m$slope, col=r2, main="Slope (degrees)")
@@ -220,19 +222,26 @@ plot(elev_rast_20m$elev, col=r2)
 #The Great Merge-------------
 #---------------------------------------------------------------------------------------------#
 lam4$quadrat <- as.character(lam4$index)
+#filter data to only include stems greater than 10cm
 lam4 <- filter(lam4, dbh>=10)
 
+#combine last census data with topo and soil metrics
 lambir <- inner_join(lam4, elev_soil, by="index")
+
+#Remove duplicate columns
 lambir <- subset(lambir, select = -c(HabType.y, soil.y))
 lambir <- rename(lambir, replace= c("HabType.x" = "HabType", "soil.x" = "soil"))
 
+# Calculate height metrics to be added to full dataset (allows for dataset to be by individual instead of by quadrat while still having height values)
 heightmetrics <- lam4 %>% group_by(quadrat) %>% dplyr::summarize(HabType=HabType, soil=soil, sp=sp,
                                                                 dbhmean = mean(dbh, na.rm=T),
                                                                 heightmean = mean(height, na.rm=T),
                                                                 heightmedian = median(height, na.rm=T),
                                                                 height99 = quantile(height, probs = 0.99, na.rm = TRUE),
                                                                 heightmax = max(height,na.rm=T))
+# Join full dataset with height metrics
 lambir_all <- inner_join(lambir, heightmetrics, by= "quadrat")
+#Remove duplicate columns
 lambir_all <- subset(lambir_all, select = -c(HabType.y, soil.y))
 lambir_all <- rename(lambir_all, replace= c("HabType.x" = "HabType", "soil.x" = "soil"))
 
@@ -304,6 +313,7 @@ length(unique(TWI_20m$index))
 TWI_20m_df <- as.data.frame(TWI_20m, xy=T)
 twi_soil = merge(TWI_20m_df, lambir.habs, by = "index", all.x=T)
 
+#plot
 ggplot() + 
   geom_point(data=twi_soil, aes(x,y, col=Lambir_TWI), size=8) + 
   scale_color_gradientn(colours=r2) +
@@ -315,12 +325,14 @@ ggplot() +
   geom_point(data=twi_soil, aes(x,y, col=soil), size=6) + 
   theme_classic()
 
+#join full dataset with TWI and Soil metrics
 lambir_topo <- inner_join(lambir_all, twi_soil, by="index")
+# Remove duplicate columns
 lambir_topo <- subset(lambir_topo, select = -c(HabType.y, soil.y,x.x,y.x, sp.y))
 lambir_topo <- rename(lambir_topo, replace = c("HabType.x" = "HabType", "soil.x" = "soil", "x.y"="x", "y.y"="y", "sp.x"="species"))
 summary(lambir_topo)
 
-
+# Export data file
 write.csv(lambir_topo, here("Desktop","Research","HCRP","Lambir Data", "lam_topo.csv"))
 
 #---------------------------------------------------------------------------------------------#

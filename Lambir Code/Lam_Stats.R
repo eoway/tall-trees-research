@@ -15,19 +15,41 @@ summary(lam_data$dbh)
 summary(lam_data$CensusID)
 
 #Add individual and quadrat level emergent labeling-------------
+# Import Heights.R
 source("~/Documents/GitHub/tall-trees-research/heights.r")
+# Set 99th percentile dbh for emergent cut off
 dbh99 <- quantile99dbh #from heights.r
+#dbh99 <- 95
+
+# Add emergent/nonemergent labelling
+# Make a column labelling each individual as emergent/non emergent
 lam_data$tree_type <- ifelse(lam_data$dbh>=dbh99, "emrgnt", "nonemrgnt")
+# Create a binomial term that is equivalent to emergent/non emergent labelling
 lam_data$bitree_type <- ifelse(lam_data$dbh>=dbh99, 1, 0)
+# Check numbers
 table(lam_data$tree_type)
 table(lam_data$bitree_type)
+# Minimize to quadrat level
 lam_label <- lam_data %>% group_by(quadrat,tree_type)  %>%  dplyr::summarize()
-table(lam_label$tree_type)
-emergents <- filter(lam_label, tree_type=="emrgnt")
-table(emergents$tree_type)
-emergentquad <- unique(emergents$quadrat)
-table(emergentquad)
+check = length(unique(lam_label$quadrat))
+#### check = 1300
 
+# Check numbers
+table(lam_label$tree_type)
+# Create df with only emergent trees
+emergents <- filter(lam_label, tree_type=="emrgnt")
+# Check numbers
+table(emergents$tree_type)
+# Create a list of quadrats that contain emergent trees
+emergentquad <- unique(emergents$quadrat)
+# Check values
+table(emergentquad)
+check2 = length(emergentquad)
+
+# Investigation into quadrat emergent number differences
+lam_check <- filter(lam_data, tree_type=="emrgnt")
+len <- length(lam_data$treeID)
+len <- length(emergentquad)
 
 #map- FIXXXXXX
 #emapdat <- filter(lam_data, dbh >= quantile99dbh)
@@ -47,26 +69,47 @@ table(emergentquad)
 #  geom_point(y=emapdat$y, x=emapdat$x, col=species)+
 #  theme_classic()
 
+lam_data$quadrat <- as.numeric(lam_data$quadrat)
+
 #for individ level analyses
-indlam_stat <- lam_data
+indlam_stat <- lam_data %>% group_by(treeID,slope,aspect,tpi,elev,Lambir_TWI,soil,height,x,y)  %>%  dplyr::summarize()
 
 #For quadrat level analyses
-lam_stat <- lam_data %>% group_by(quadrat,dbhmean,heightmean,heightmedian,height99,heightmax,HabType,
+lam_stat <- lam_data %>% dplyr::group_by(quadrat,dbhmean,heightmean,heightmedian,height99,heightmax,HabType,
                                   slope,aspect,tpi,elev,Lambir_TWI,soil)  %>%  dplyr::summarise(quad_x = mean(x),
-                                                                                         quad_y = mean(y),
-                                                                                         n_trees = n(), 
-                                                                                         n_emrgnt = length(unique(tree_type[tree_type == 'emrgnt'])), 
-                                                                                         prop_emrgnt = n_emrgnt/n_trees)
+                                                                                         quad_y = mean(y))
+                                                                                         #n_trees = n(), 
+                                                                                         #n_emrgnt = length(unique(tree_type[tree_type == 'emrgnt'])), 
+                                                                                         #prop_emrgnt = n_emrgnt/n_trees)
+lam_stat2 <- lam_stat %>% dplyr::group_by(quadrat)
+
+check32 = length(unique(lam_stat2$quadrat))
+### check3 = 1300
+check42 = length(lam_stat2$quadrat)
+
+check3 = length(unique(lam_stat$quadrat))
+### check3 = 1300
+check4 = length(lam_stat$quadrat)
+### Check4 = 1301 - Here's the issue!
+
+# Quadrat 172 is being double counted
+quad172 <- filter(lam_stat, quadrat == 172)
+table(quad172)
 #---------------------------------------------------------------------------------
 #---------------------------------------Elsa Help---------------------------------
 #---------------------------------------------------------------------------------
+# Label quadrat based on emergent quadrat list previously made
 lam_stat$quad_type <- ifelse(lam_stat$quadrat %in% emergentquad, "emrgnt", "nonemrgnt")
+# Check
 table(lam_stat$quad_type)
 table(lam_stat$n_emrgnt)
 summary(lam_stat$quad_x)
-lam_stat$soil <-as.factor(lam_stat$soil)
 table(lam_stat$quad_type)
+# Change soil data type to a factor
+lam_stat$soil <-as.factor(lam_stat$soil)
+# Create a binomial term that corresponds to quadrat type
 lam_stat$bitype <- ifelse(lam_stat$quad_type=="emrgnt", 1,0)
+# Cehck
 table(lam_stat$bitype)
 
 
@@ -128,7 +171,7 @@ lam_stat %>%
 quad <- lm(height99~soil+Lambir_TWI+(Lambir_TWI*soil)+quad_x+quad_y, data=lam_stat)
 summary(quad)
 
-indiv <- lm(height~soil+Lambir_TWI+(Lambir_TWI*soil)+x+y, data=lam_stat)
+indiv <- lm(height~soil+Lambir_TWI+(Lambir_TWI*soil)+x+y, data=indlam_stat)
 summary(indiv)
 
 #HCRP TWI Plot
