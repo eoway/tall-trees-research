@@ -73,6 +73,8 @@ dat$nitrogen <- as.numeric(as.character(dat$nitrogen))
 dat$clay <- as.numeric(as.character(dat$clay))
 dat$cec <- as.numeric(as.character(dat$cec))
 
+write.csv(dat, ("~/Google Drive/My Drive/Research/PRISE_data/metrics_dat.csv"))
+
 summary(dat$sand)
 summary(dat$ph)
 summary(dat$nitrogen)
