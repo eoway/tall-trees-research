@@ -12,6 +12,7 @@ library(plyr)
 require("maptools")
 
 dat <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+summary(dat)
 #dat <- read_csv("G:/My Drive/Research/cleandat/main_dat.csv")
 #dat <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv")
 
@@ -151,6 +152,9 @@ b1Ht_SEA    = 0.5279284 * log(10) # Use for dbh2h_01
 b2Ht_SEA    = 0.5782 #"coefficient of ln(D)" # Use for dbh2h_01
 hgt_ref_SEA = -0.0114
 hgt_max_SEA = 100
+
+#
+
 
 #Calculate Heights---------------
 dandat_analysis$height <- dbh2h_01(dandat_analysis$dbh, hgt_max_SEA, hgt_ref_SEA, b1Ht_SEA, b2Ht_SEA)
@@ -377,7 +381,11 @@ dandat_analysis_surr_60 <- merge(dandat_analysis,buff_summaries, by="X1")
 
 
 #Export file
+
 write.csv(dandat_analysis, ("~/Desktop/Research/HCRP/dan_dat/dan_topo.csv"))
+dat <- read_csv("~/Desktop/Research/HCRP/dan_dat/dan_topo.csv")
+summary(dat)
+
 
 write.csv(dandat_analysis_surr, ("~/Desktop/Research/HCRP/dan_dat/dan_surr.csv"))
 
