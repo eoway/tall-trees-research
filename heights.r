@@ -16,10 +16,10 @@ summary(hdata$dbh)
 
 
 #Restrict to Latest Censuses------------
-hdata <- filter(hdata, census == "01_census_2016" | census == "02_census_2016" | 
-                  census == "03_census_2016" | census == "census_2019" |
-                  census == "census_2007_08" | census == "10_census_2014" |
-                  census == "30_census_2015" | census == "08_census_2014")
+#hdata <- filter(hdata, census == "01_census_2016" | census == "02_census_2016" | 
+#                  census == "03_census_2016" | census == "census_2019" |
+#                  census == "census_2007_08" | census == "10_census_2014" |
+#                  census == "30_census_2015" | census == "08_census_2014")
 
 DNM50=filter(hdata, site == "DNM50")
 dan <- filter(DNM50, dbh >= quantile99dbh)
@@ -106,7 +106,7 @@ E_SPK = E[3]
 #Calculate Heights-----
 #Feld
 hdata$heightFeld <- dbh2h_01(hdata$dbh, hgt_max_SEA, hgt_ref_SEA, b1Ht_SEA, b2Ht_SEA)
-table(hdata$heightFeld)
+summary(hdata$heightFeld)
 #Chave
 hdata$heightCh <- dbh2h_34(hdata$dbh,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34)
 table(hdata$heightCh)
@@ -119,6 +119,7 @@ hdata$heightE <- dbh2h_ChaveE(hdata$dbh,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34,E_DNM
 #----------------------------------------------------------------------#
 table(hdata$species)
 table(hdata$heightCh)
+summary(hdata$heightFeld)
 summary(hdata)
 #Feld Heights Quantiles
 quantile90Feld <-quantile(hdata$heightFeld, probs = 0.90, na.rm = TRUE)
