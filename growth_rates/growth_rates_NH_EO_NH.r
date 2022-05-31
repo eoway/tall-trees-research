@@ -10,22 +10,26 @@ library(skimr)
 #Load Data----------
 growdata <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/growth_dat.csv")
 
+# Filter stems less than 10cm DBH
 growdata <- filter(growdata, dbh >= 10)
+# Check
+summary(growdata$dbh)
 
 #---------------------------------------------------------------------------#
-#--------------------------Growth Rate Calcutlations------------------------
+#--------------------------Growth Rate Calculations------------------------
 #---------------------------------------------------------------------------#
 
 #SPKS08 first interval------------
-
+# Identify the 2 censuses that will be used to 
+# calculate growth rates from
 census1 <- filter(growdata, plot == "SPKS_08" & censusID == "08_census_2001")
 census2 <- filter(growdata, plot == "SPKS_08" & censusID == "08_census_2009")
 
-table(growdata$plot)
-
+# Check Filtering
 table(census2$censusID)
-
-summary(census1)
+table(census2$plot)
+table(census1$censusID)
+table(census1$plot)
 
 # check the number of unique stems in each dataset and compare between datasets
 length(unique(census1$stemID)); dim(census1)
@@ -48,8 +52,9 @@ size1 <- SPKS08_2001_2009$dbh.x
 SPKS08_2001_2009$annual_increment <- (size2 - size1)/time
 SPKS08_2001_2009$relative_gr      <- (log(size2) - log(size1))/time
 
-
+# Check
 summary(SPKS08_2001_2009)
+
 # take a look at the values - how do these compare to values and distributions in Condit et al 2006?
 summary(SPKS08_2001_2009$annual_increment)
 summary(SPKS08_2001_2009$relative_gr )
@@ -65,6 +70,9 @@ plot(SPKS08_2001_2009$dbh.x, SPKS08_2001_2009$dbh.y, pch=19,
      xlab="DBH SPKS08 2001 (cm)", ylab="DBH SPKS08 2009 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+# Repeat above for each interval
+
 
 
 #SPKS08 Second interval--------
@@ -180,6 +188,8 @@ plot(SPKS08_2001_2014$dbh.x, SPKS08_2001_2014$dbh.y, pch=19,
 abline(0,1, col="red", lwd=2)
 
 
+
+
 #DNM1 First interval --------
 
 DNM1 <- filter(growdata, plot == "DNM1_01" )
@@ -230,6 +240,9 @@ plot(DNM1_2006_2013$dbh.x, DNM1_2006_2013$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
+
 #DNM1 Second interval --------
 
 census1 <- filter(growdata, plot == "DNM1_01" & censusID == "01_census_2013")
@@ -276,6 +289,9 @@ plot(DNM1_2013_2016$dbh.x, DNM1_2013_2016$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
+
 #DNM1 Large interval --------
 DNM1 <- filter(growdata, plot == "DNM1_01")
 table(DNM1$censusID)
@@ -285,17 +301,13 @@ DNM1131 <- filter(DNM1, censusID == "01_census_2013")
 DNM1132 <- filter(DNM1, censusID == "01_census_2013")
 DNM116  <- filter(DNM1, censusID == "01_census_2016")
 
-DNM106$pool_stem_ID    <- paste0(DNM106$stemID, "_1") # you're using "SPKS01" and "SPKA01"
+DNM106$pool_stem_ID    <- paste0(DNM106$stemID, "_1")
 DNM1131$pool_stem_ID   <- paste0(DNM1131$stemID, "_2")
-DNM1132$pool_stem_ID <- paste0(DNM1132$stemID, "_1") # also changed "pool_census_ID" to "pool_stem_ID"
+DNM1132$pool_stem_ID <- paste0(DNM1132$stemID, "_1")
 DNM116$pool_stem_ID  <- paste0(DNM116$stemID, "_2")
 
 census1 <- rbind(DNM106, DNM1131)
 census2 <- rbind(DNM1132, DNM116)
-#---------------------------------------------------------------------------------------------#
-# I updated some errors in the code above and changed the suffix so that "_1" and "_2"
-# correspond to the datasets that are associated with census 1 and census 2. 
-#---------------------------------------------------------------------------------------------#
 
 DNM1_2006_2016 <- inner_join(census1, census2, by="pool_stem_ID")
 dim(DNM1_2006_2016) 
@@ -306,7 +318,6 @@ dim(DNM1131)
 head(DNM1_2006_2016)
 table(DNM1_2006_2016$censusID.x)
 table(DNM1_2006_2016$censusID.y)
-# notice that in 'SPKS08_2001_2009' dbh.x is dbh at census 1 and dbh.y is dbh at census 2
 
 # calculate time difference and convert time from days to years  
 time <- (DNM1_2006_2016$date.y-DNM1_2006_2016$date.x)/365
@@ -334,6 +345,9 @@ plot(DNM1_2006_2016$dbh.x, DNM1_2006_2016$dbh.y, pch=19,
      xlab="DBH DNM1 2006 (cm)", ylab="DBH DNM1 2016 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+
+
 
 
 #DNM2 First interval --------
@@ -384,6 +398,8 @@ plot(DNM2_2006_2013$dbh.x, DNM2_2006_2013$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
 #DNM2 Second interval --------
 DNM2 <- filter(growdata, plot == "DNM2_02" )
 table(DNM2$censusID)
@@ -431,6 +447,8 @@ plot(DNM2_2013_2016$dbh.x, DNM2_2013_2016$dbh.y, pch=19,
      xlab="DBH DNM2 2013 (cm)", ylab="DBH DNM2 2016 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+
 
 
 #DNM2 Large interval --------
@@ -485,6 +503,9 @@ plot(DNM2_2006_2016$dbh.x, DNM2_2006_2016$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
+
 #DNM3 First interval --------
 DNM3 <- filter(growdata, plot == "DNM3_03" )
 table(DNM3$censusID)
@@ -532,6 +553,8 @@ plot(DNM3_2006_2013$dbh.x, DNM3_2006_2013$dbh.y, pch=19,
      xlab="DBH DNM3 2006 (cm)", ylab="DBH DNM3 2013 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+
 
 #DNM3 Second interval --------
 DNM3 <- filter(growdata, plot == "DNM3_03" )
@@ -582,6 +605,8 @@ plot(DNM3_2013_2016$dbh.x, DNM3_2013_2016$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
 #DNM3 Large interval --------
 DNM3 <- filter(growdata, plot == "DNM3_03")
 table(DNM3$censusID)
@@ -628,6 +653,8 @@ plot(DNM3_2006_2016$dbh.x, DNM3_2006_2016$dbh.y, pch=19,
      xlab="DBH DNM3 2006 (cm)", ylab="DBH DNM3 2016 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+
 
 #DNM50 Large interval Unpooled--------
 DNM50 <- filter(growdata, plot == "DNM50_FGEO" )
@@ -677,6 +704,9 @@ plot(DNM50_2011_2019$dbh.x,DNM50_2011_2019$dbh.y, pch=19,
      xlab="DBH DNM50 2011 (cm)", ylab="DBH DNM50 2019 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+
+
 
 #DNM50 Large interval Pooled--------
 DNM50 <- filter(growdata, plot == "DNM50_FGEO" )
@@ -756,6 +786,8 @@ par(mfrow=c(1,2))
 hist(SPKA9_2001_2009$relative_gr, xlab="Relative growth rate (% yr-1)", col="grey", main="")
 hist(SPKA9_2001_2009$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
 
+
+
 #SPKA91 Plot----------
 # look at the change in DBH from census 1 to census 2
 par(mfrow=c(1,1))
@@ -763,6 +795,8 @@ plot(SPKA9_2001_2009$dbh.x,SPKA9_2001_2009$dbh.y, pch=19,
      xlab="DBH SPKA9 2001 (cm)", ylab="DBH SPKA9 2001 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+
 
 #SPKA9 Second interval --------
 SPKA9 <- filter(growdata, plot == "SPKA_09" )
@@ -811,6 +845,8 @@ plot(SPKA9_2009_2014$dbh.x,SPKA9_2009_2014$dbh.y, pch=19,
      xlab="DBH SPKA9 2009 (cm)", ylab="DBH SPKA9 2014 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+
 
 #SPKA9 Large interval --------
 SPKA9 <- filter(growdata, plot == "SPKA_09" )
@@ -864,6 +900,8 @@ plot(SPKA9_2001_2014$dbh.x,SPKA9_2001_2014$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
 #SPKA10 First interval --------
 SPKA10 <- filter(growdata, plot == "SPKA_10" )
 table(SPKA10$censusID)
@@ -912,6 +950,8 @@ plot(SPKA10_2001_2009$dbh.x,SPKA10_2001_2009$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
 #SPKA10 Second interval --------
 SPKA10 <- filter(growdata, plot == "SPKA_10" )
 table(SPKA10$censusID)
@@ -959,6 +999,8 @@ plot(SPKA10_2009_2014$dbh.x,SPKA10_2009_2014$dbh.y, pch=19,
      xlab="DBH SPKA10 2009 (cm)", ylab="DBH SPKA10 2014 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+
 
 #SPKA10 Large interval --------
 SPKA10 <- filter(growdata, plot == "SPKA_10" )
@@ -1012,6 +1054,8 @@ plot(SPKA10_2001_2014$dbh.x,SPKA10_2001_2014$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
 #SPKH4 First interval --------
 SPKH4 <- filter(growdata, plot == "SPKH_04")
 table(SPKH4$censusID)
@@ -1059,6 +1103,8 @@ plot(SPKH4_2001_2008$dbh.x,SPKH4_2001_2008$dbh.y, pch=19,
      xlab="DBH SPKH4 2001 (cm)", ylab="DBH SPKH4 2008 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+
 
 #SPKH4 Second interval --------
 SPKH4 <- filter(growdata, plot == "SPKH_04")
@@ -1160,6 +1206,8 @@ plot(SPKH4_2001_2014$dbh.x,SPKH4_2001_2014$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
 #SPKH5 First interval --------
 SPKH5 <- filter(growdata, plot == "SPKH_05")
 table(SPKH5$censusID)
@@ -1256,6 +1304,8 @@ plot(SPKH5_2008_2014$dbh.x,SPKH5_2008_2014$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
 #SPKH5 Large interval --------
 SPKH5 <- filter(growdata, plot == "SPKH_05")
 table(SPKH5$censusID)
@@ -1308,6 +1358,8 @@ plot(SPKH5_2001_2014$dbh.x,SPKH5_2001_2014$dbh.y, pch=19,
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
 
+
+
 #SPKH30 First interval --------
 SPKH30 <- filter(growdata, plot == "SPKH_30")
 table(SPKH30$censusID)
@@ -1356,6 +1408,7 @@ plot(SPKH30_2001_2010$dbh.x,SPKH30_2001_2010$dbh.y, pch=19,
 abline(0,1, col="red", lwd=2) 
 
 
+
 #SPKH30 Second interval --------
 SPKH30 <- filter(growdata, plot == "SPKH_30")
 table(SPKH30$censusID)
@@ -1402,6 +1455,7 @@ plot(SPKH30_2010_2015$dbh.x,SPKH30_2010_2015$dbh.y, pch=19,
      xlab="DBH SPKH30 2010 (cm)", ylab="DBH SPKH30 2015 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
 
 
 #SPKH30 Large interval --------
@@ -1455,6 +1509,8 @@ plot(SPKH30_2001_2015$dbh.x,SPKH30_2001_2015$dbh.y, pch=19,
      xlab="DBH SPKH30 2001 (cm)", ylab="DBH SPKH30 2015 (cm)")
 #add a 1:1 line to see more obviously how different DBH values are from census 1 to census 2
 abline(0,1, col="red", lwd=2) 
+
+
 
 #LHP_clay first interval------------
 LHP <- filter(growdata, site == "LHP")
@@ -1925,8 +1981,9 @@ hist(LH_sandstone_2003_2008$relative_gr , xlab="Relative growth rate (% yr-1)", 
 hist(LH_sandstone_2003_2008$annual_increment, xlab="Annual increment (cm)", col="grey", main="")
 
 
-
-#Create Combined Dataset of all growth rates-----
+#---------------------------------------------------------#
+#--------Create Combined Dataset of all growth rates-------
+#---------------------------------------------------------#
 
 growthr <- rbind(SPKS08_2001_2009, SPKS08_2009_2014, DNM1_2006_2013, DNM1_2013_2016,
       DNM2_2006_2013, DNM2_2013_2016, DNM3_2006_2013, DNM3_2013_2016, DNM50_2011_2019, 
@@ -1979,6 +2036,7 @@ dbh2h_ChaveE <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht,E){
         return(h)
 }
 
+
 # Parameters-------
 #Feldspauch - -----
 b1Ht_SEA    = 0.5279284 * log(10) # Use for dbh2h_01
@@ -2012,6 +2070,8 @@ E_SPK = E[3]
 # Cicra "E" value
 #E_CRA = E[5]; E_CRA #-0.04474343
 colnames(growthr)
+
+
 #Calculate Heights-----
 #Feld
 growthr$heightFeld <- dbh2h_01(growthr$dbh.y, hgt_max_SEA, hgt_ref_SEA, b1Ht_SEA, b2Ht_SEA)
@@ -2023,11 +2083,15 @@ table(growthr$heightCh)
 # need to specify which "E" value to use - from above
 growthr$heightE <- dbh2h_ChaveE(growthr$dbh.y,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34,E_DNM)
 
+
 #Source Height Quantiles------
 source("heights.r")
 
+
 #Exclude Indets???? ASK------
 growthr <- filter(growthr, species.y != "Indet")
+
+
 #quantile 90-------
 #Feld
 growthr$tree_type90F <- ifelse(growthr$species.y %in% c(emergent90Feld), "emrgnt", "non_emrgnt")
@@ -3209,6 +3273,7 @@ ggplot() +
         geom_boxplot(growthr, mapping = aes(site.x, log(relative_gr)))
 rel_gr.aov <- aov(relative_gr ~ site.x, data = growthr)
 summary(rel_gr.aov)
+
 #DBH and Growth Rate Scatter Plot
 growthr %>%
         ggplot(aes(dbh.y, log(annual_increment)))+
