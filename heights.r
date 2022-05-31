@@ -5,41 +5,44 @@ library(dplyr)
 library(stringr)
 library(ggplot2)
 
-#setwd("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
+#----------------------------------------------------------------------#
+#---------------------------Prepare Data--------------------------------
+#----------------------------------------------------------------------#
+
+# Read in Data
 hdata <- read_csv("~/Desktop/Research/HCRP/Elsa Clean/main_dat.csv")
-#hdata <- read_csv("G:/My Drive/Harvard/Plot_Data/clean_inventory_data/main_dat.csv") #EO
-summary(hdata$dbh)
 
-#Remove ress <10cm----------------
+
+
+# Check column names
+colnames(hdata)
+# Change ...1 column to index
+hdata <- rename(hdata, "index" = "...1")
+# Check to see if renaming worked
+# ...1 column should now be indes
+colnames(hdata)
+
+
+
+# Look at DBH Distribution
+summary(hdata$dbh)
+# Lots of NAs; Min 0; Max 251.8
+
+
+
+#Remove trees <10cm
 hdata <- filter(hdata, dbh >= 10)
+# Check to make sure filtering worked
+# Min should now be 10
 summary(hdata$dbh)
 
 
-#Restrict to Latest Censuses------------
-#hdata <- filter(hdata, census == "01_census_2016" | census == "02_census_2016" | 
-#                  census == "03_census_2016" | census == "census_2019" |
-#                  census == "census_2007_08" | census == "10_census_2014" |
-#                  census == "30_census_2015" | census == "08_census_2014")
-
-DNM50=filter(hdata, site == "DNM50")
-dan <- filter(DNM50, dbh >= quantile99dbh)
-dansp <- filter (dan, species == "excelsa" | species == "johorensis" | 
-                   species == "lanceolata" | species == "parvifolia" |
-                   species == "pauciflora" | species == "sumatrana" |
-                   species == "superba")
-table(hdata$site)
-LMN <- filter(hdata, site == "LHP")
-lam <- filter(LMN, dbh >= quantile99dbh)
-lamsp <- filter (lam, species == "excelsa" | species == "johorensis" | 
-                   species == "lanceolata" | species == "parvifolia" |
-                   species == "pauciflora" | species == "sumatrana" |
-                   species == "superba")
-
 #----------------------------------------------------------------------#
-#-----------------------Calculate Heights-------------------------------
+#------------------------Height Equations-------------------------------
 #----------------------------------------------------------------------#
-
 #Height Equations------
+
+
 #use the Feldpausch et al 2011 equation with the Southeast Asia regional coefficients
 dbh2h_01 <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht){ # exclude hgt_ref here if using first dbh_crit eq.
   #  dbh_crit <- exp((log(hgt_max)-b1Ht)/b2Ht)
@@ -49,6 +52,9 @@ dbh2h_01 <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht){ # exclude hgt_ref here if u
               exp(b1Ht + b2Ht * log(dbh_crit)))
   return(h)
 }
+
+
+
 # CASE(3,4) ## Chave et al. 2014 - assuming environmental factor = 0 ## 
 dbh2h_34 <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht){
   #  dbh_crit <- exp((log(hgt_max)-b1Ht)/b2Ht)
@@ -58,6 +64,9 @@ dbh2h_34 <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht){
               exp(b1Ht + b2Ht * log(dbh_crit) + (hgt_ref * log(dbh_crit)**2)))
   return(h)
 }
+
+
+
 
 ## Chave et al. 2014 - WITH environmental factor ##
 dbh2h_ChaveE <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht,E){
@@ -70,13 +79,18 @@ dbh2h_ChaveE <- function(dbh,hgt_max,hgt_ref,b1Ht,b2Ht,E){
   return(h)
 }
 
+
+
 # Parameters-------
+
 #Feldspauch - -----
 b1Ht_SEA    = 0.5279284 * log(10) # Use for dbh2h_01
 # SAME AS: b1Ht_SEA = 1.2156
 b2Ht_SEA    = 0.5782 #"coefficient of ln(D)" # Use for dbh2h_01
 hgt_ref_SEA = -0.0114
 hgt_max_SEA = 100
+
+
 #Chave------
 b1Ht_34    =  0.893 # Use for dbh2h_34 & dbh2h_ChaveE
 b2Ht_34    =  0.76 # Use for dbh2h_34 & dbh2h_ChaveE
@@ -103,32 +117,41 @@ E_SPK = E[3]
 # Cicra "E" value
 #E_CRA = E[5]; E_CRA #-0.04474343
 
-#Calculate Heights-----
+
+
+
+#----------------------------------------------------------------------#
+#-------------------------Calculate Heights-----------------------------
+#----------------------------------------------------------------------#
 #Feld
 hdata$heightFeld <- dbh2h_01(hdata$dbh, hgt_max_SEA, hgt_ref_SEA, b1Ht_SEA, b2Ht_SEA)
 summary(hdata$heightFeld)
+
+
 #Chave
 hdata$heightCh <- dbh2h_34(hdata$dbh,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34)
-table(hdata$heightCh)
+summary(hdata$heightCh)
+
+
 #Chave with E
 # need to specify which "E" value to use - from above
 hdata$heightE <- dbh2h_ChaveE(hdata$dbh,hgt_max,hgt_ref_34,b1Ht_34,b2Ht_34,E_DNM)
+summary(hdata$heightE)
+
 
 #----------------------------------------------------------------------#
 #-----------------------Calculate Quantiles-----------------------------
 #----------------------------------------------------------------------#
-table(hdata$species)
-table(hdata$heightCh)
-summary(hdata$heightFeld)
-summary(hdata)
 #Feld Heights Quantiles
 quantile90Feld <-quantile(hdata$heightFeld, probs = 0.90, na.rm = TRUE)
 quantile95Feld <-quantile(hdata$heightFeld, probs = 0.95, na.rm = TRUE)
 quantile99Feld <-quantile(hdata$heightFeld, probs = 0.99, na.rm = TRUE)
+
 #Chave Height Quantiles
 quantile90Ch <-quantile(hdata$heightCh, probs = 0.90, na.rm = TRUE)
 quantile95Ch <-quantile(hdata$heightCh, probs = 0.95, na.rm = TRUE)
 quantile99Ch <-quantile(hdata$heightCh, probs = 0.99, na.rm = TRUE)
+
 #Chave with E Quantiles
 quantile90E <-quantile(hdata$heightE, probs = 0.90, na.rm = TRUE)
 quantile95E <-quantile(hdata$heightE, probs = 0.95, na.rm = TRUE)
@@ -140,29 +163,101 @@ quantile95dbh <-quantile(hdata$dbh, probs = 0.95, na.rm = TRUE)
 quantile99dbh <-quantile(hdata$dbh, probs = 0.99, na.rm = TRUE)
 
 #----------------------------------------------------------------------#
-#-------------------------------Remove Indets--------
+#---------------------------Dataframes----------------------------------
+#----------------------------------------------------------------------#
+# Make a dataframe that only includes Latest Censuses
+# Look at censuses by site and idenify name of latest census
+table(hdata$census)
+
+DNM50=filter(hdata, site == "DNM50")
+table(DNM50$census)
+
+DNM1=filter(hdata, site == "DNM1")
+table(DNM1$census)
+
+DNM2=filter(hdata, site == "DNM2")
+table(DNM2$census)
+
+DNM3=filter(hdata, site == "DNM3")
+table(DNM3$census)
+
+LHP=filter(hdata, site == "LHP")
+table(LHP$census)
+
+SPKA=filter(hdata, site == "SPKA")
+table(SPKA$census)
+
+SPKH=filter(hdata, site == "SPKH")
+table(SPKH$census)
+
+SPKS=filter(hdata, site == "SPKS")
+table(SPKS$census)
+
+
+
+#------------------Separate Dataframes---------------------------
+# Create a dataframe with only latest censuses
+latest_censuses <- filter(hdata, census == "01_census_2016"| census == "02_census_2016"| 
+                            census == "03_census_2016"| census == "census_2019" |
+                            census == "census_2007_08"| census == "10_census_2014" |
+                            census == "30_census_2015"| census == "08_census_2014")
+# Check filtering
+table(latest_censuses$census)
+
+
+
+# Make data frames for Danum 50 and Lambir
+# Danum 50 hectare plot
+DNM50=filter(hdata, site == "DNM50")
+dan <- filter(DNM50, dbh >= quantile99dbh)
+dansp <- filter (dan, species == "excelsa" | species == "johorensis" | 
+                   species == "lanceolata" | species == "parvifolia" |
+                   species == "pauciflora" | species == "sumatrana" |
+                   species == "superba")
+table(hdata$site)
+
+# Lambir
+LMN <- filter(hdata, site == "LHP")
+lam <- filter(LMN, dbh >= quantile99dbh)
+lamsp <- filter (lam, species == "excelsa" | species == "johorensis" | 
+                   species == "lanceolata" | species == "parvifolia" |
+                   species == "pauciflora" | species == "sumatrana" |
+                   species == "superba")
+
+
+#----------------------------------------------------------------------#
+#--------------------------Remove Indets--------------------------------
 #----------------------------------------------------------------------#
 hdata <- filter(hdata, species != "Indet")
 
 #----------------------------------------------------------------------#
-#------------Adding Emergent/Non-emergent Labeling----------------------
+#-------Adding Emergent/Non-emergent Labeling by species----------------
 #----------------------------------------------------------------------#
 #quantile 90-------
 #Feld
+# Make dataframe with only trees above the percentile threshold
 emergent90Feld <- filter(hdata, dbh >= quantile90Feld)
-table(emergent90Feld$dbh)
+# Check
+summary(emergent90Feld$dbh)
+quantile90Feld
 
+# filter to only unique species
 emergent90Feld <- unique(emergent90Feld$species)
 table(emergent90Feld)
 
+# create a column that labels trees of species within emergent90Feld as emergent
+# and trees of all other species as non emergent
 hdata$tree_type90F <- ifelse(hdata$species %in% c(emergent90Feld), "emrgnt", "non_emrgnt")
+
+# Repeat above for each threshold
+
 
 #Chave w/o E
 emergent90Ch <- filter(hdata, dbh >= quantile90Ch)
-table(emergent90Ch$dbh)
+summary(emergent90Ch$dbh)
 
 emergent90Ch <- unique(emergent90Ch$species)
-table(emergent90Ch)
+summary(emergent90Ch)
 
 hdata$tree_type90Ch <- ifelse(hdata$species %in% c(emergent90Ch), "emrgnt", "non_emrgnt")
 
@@ -260,22 +355,31 @@ table(emergent99dbh)
 
 hdata$tree_type99dbh <- ifelse(hdata$species %in% c(emergent99dbh), "emrgnt", "non_emrgnt")
 
+
+
 #----------------------------------------------------------------------#
-#--------------------------Elsa Help------------------------------------
-#How do I make a third category for emergent individuals?
+#-Create a column separating emergents, nonemergents, & emergent species-
 #----------------------------------------------------------------------#
-# use a nested ifelse statement with two conditions (emergent status & DBH) that reads as follows: 
-# if an observation has tree_type99dbh == "emrgnt" and dbh >= some defined size == emrgnt_tree
-# else, if an observation has tree_type99dbh == "emrgnt" and dbh < some defined size == emrgnt_spp
-# else == non_emrgnt
-size_threhold = quantile99dbh # replace 100 with whatever threshold you want (e.g. quantile99dbh) 
+# Set a size threshold
+size_threhold = quantile99dbh
+# Create a column that labels trees as either emergent (meaning the tree is actually tall)
+# emergent species (meaning the tree is a member of a species that gets tall)
+# and non emergent meaning the tree is not tall and is not a member of a species that gets tall
 hdata$tree_type99dbhmap <- ifelse(hdata$tree_type99dbh == "emrgnt" & hdata$dbh >= size_threhold, "emrgnt_tree",
                                   ifelse(hdata$tree_type99dbh == "emrgnt" & hdata$dbh < size_threhold, "emrgnt_spp","non_emrgnt"))
+# Check
 table(hdata$tree_type99dbh)
 table(hdata$tree_type99dbhmap)
 # if you compare the two tables above, non_emergent should have the same number of observations for both variables
 # tree_type99dbhmap splits tree_type99dbh == emrgnt into two variables now
 
+
+
+#----------------------------------------------------------------------#
+#-----------------------------Boxplots----------------------------------
+#----------------------------------------------------------------------#
+# Create boxplots showing the dbh distribution of 
+# emergents, nonemergents, and emergent species
 ggplot(hdata, aes(x=tree_type99dbh, y=dbh, fill=tree_type99dbh)) + 
   geom_boxplot() + 
   theme_classic() + theme(legend.position = c(0.8, 0.8))
@@ -283,6 +387,112 @@ ggplot(hdata, aes(x=tree_type99dbh, y=dbh, fill=tree_type99dbh)) +
 ggplot(hdata, aes(x=tree_type99dbhmap, y=dbh, fill=tree_type99dbhmap)) + 
   geom_boxplot() + 
   theme_classic() + theme(legend.position = c(0.8, 0.8))
+
+
+#----------------------------------------------------------------------#
+#-------------------------------Maps------------------------------------
+#----------------------------------------------------------------------#
+# filter all using: tree_type99dbhmap instead of tree_type99dbh
+#DNM1-----
+DNM1 %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=tree_type99dbhmap))+
+  geom_point(size=3, alpha=0.7) +
+  scale_color_manual("tree type", values=c("darkorange","red","grey50")) + 
+  theme_classic()
+
+# emapdat <- filter(DNM1, dbh >= tree_type99dbhmap)
+# DNM1 %>%
+#   ggplot(mapping = aes(y=plot_y, x=plot_x))+
+#   geom_point(aes(col=tree_type99dbhmap))+
+#   geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+#   theme_classic()
+
+#DNM2-----
+emapdat <- filter(DNM2, dbh >= quantile99dbh)
+DNM2 %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
+
+#DNM3-----
+emapdat <- filter(DNM3, dbh >= quantile99dbh)
+DNM3 %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
+
+#DNM50-----
+DNM50 %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=tree_type99dbhmap))+
+  geom_point(size=3, alpha=0.5) +
+  scale_color_manual("tree type", values=c("darkorange","red","grey50")) + 
+  theme_classic()+
+  geom_point(emapdat, mapping=aes(y=plot_y, x=plot_x))
+emapdat <- filter(DNM50, dbh >= quantile99dbh)
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=species))+
+  geom_point(size=3, alpha=0.7) + 
+  theme_classic()
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=genus))+
+  geom_point(size=3, alpha=0.7) + 
+  theme_classic()
+#DNM50 %>%
+#  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+#  geom_point(aes(col=tree_type99dbh))+
+#  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+#  theme_classic()
+
+#LHP-----
+emapdat <- filter(LHP, dbh >= quantile99dbh)
+LHP %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=tree_type99dbhmap))+
+  geom_point(size=1.5, alpha=0.5) +
+  scale_color_manual("tree type", values=c("darkorange","red","grey50"))+ 
+  theme_classic()+
+  geom_point(emapdat, mapping=aes(y=plot_y, x=plot_x))
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=species))+
+  geom_point(size=3, alpha=0.7) + 
+  theme_classic()
+emapdat %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x, col=genus))+
+  geom_point(size=3, alpha=0.7) + 
+  theme_classic()
+
+#LHP %>%
+#  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+#  geom_point(aes(col=tree_type99dbh))+
+#  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+#  theme_classic()
+SPKA
+#SPKA-----
+emapdat <- filter(SPKA, dbh >= quantile99dbh)
+SPKA %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
+
+#SPKH-----
+emapdat <- filter(SPKH, dbh >= quantile99dbh)
+SPKH %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
+
+#SPKS-----
+emapdat <- filter(SPKS, dbh >= quantile99dbh)
+SPKS %>%
+  ggplot(mapping = aes(y=plot_y, x=plot_x))+
+  geom_point(aes(col=tree_type99dbh))+
+  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
+  theme_classic()
+
+
 #----------------------------------------------------------------------#
 #Can stop running code here if you just want to make manuscript plots (see section at the bottom for manuscript plot code)-------------------------------
 #----------------------------------------------------------------------#
@@ -1666,112 +1876,6 @@ hdata %>%
   ggplot(hdata, mapping = aes(fill=tree_type99E, y=stem_BA, x=site))+
   geom_col(position="stack", stat="identity")
 table(hdata$site)
-#----------------------------------------------------------------------#
-#--------------------------------Maps------------------------------------
-#----------------------------------------------------------------------#
-#----------------------------------------------------------------------#
-#--------------------------Elsa Help------------------------------------
-#Map Scripts (pertain to first Elsa Help, where I just need a third category)
-#----------------------------------------------------------------------#
-# filter all using: tree_type99dbhmap instead of tree_type99dbh
-#DNM1-----
-DNM1 %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x, col=tree_type99dbhmap))+
-  geom_point(size=3, alpha=0.7) +
-  scale_color_manual("tree type", values=c("darkorange","red","grey50")) + 
-  theme_classic()
-
-# emapdat <- filter(DNM1, dbh >= tree_type99dbhmap)
-# DNM1 %>%
-#   ggplot(mapping = aes(y=plot_y, x=plot_x))+
-#   geom_point(aes(col=tree_type99dbhmap))+
-#   geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
-#   theme_classic()
-
-#DNM2-----
-emapdat <- filter(DNM2, dbh >= quantile99dbh)
-DNM2 %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(aes(col=tree_type99dbh))+
-  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
-  theme_classic()
-
-#DNM3-----
-emapdat <- filter(DNM3, dbh >= quantile99dbh)
-DNM3 %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(aes(col=tree_type99dbh))+
-  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
-  theme_classic()
-
-#DNM50-----
-DNM50 %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x, col=tree_type99dbhmap))+
-  geom_point(size=3, alpha=0.5) +
-  scale_color_manual("tree type", values=c("darkorange","red","grey50")) + 
-  theme_classic()+
-  geom_point(emapdat, mapping=aes(y=plot_y, x=plot_x))
-emapdat <- filter(DNM50, dbh >= quantile99dbh)
-emapdat %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x, col=species))+
-  geom_point(size=3, alpha=0.7) + 
-  theme_classic()
-emapdat %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x, col=genus))+
-  geom_point(size=3, alpha=0.7) + 
-  theme_classic()
-#DNM50 %>%
-#  ggplot(mapping = aes(y=plot_y, x=plot_x))+
-#  geom_point(aes(col=tree_type99dbh))+
-#  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
-#  theme_classic()
-
-#LHP-----
-emapdat <- filter(LHP, dbh >= quantile99dbh)
-LHP %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x, col=tree_type99dbhmap))+
-  geom_point(size=1.5, alpha=0.5) +
-  scale_color_manual("tree type", values=c("darkorange","red","grey50"))+ 
-  theme_classic()+
-  geom_point(emapdat, mapping=aes(y=plot_y, x=plot_x))
-emapdat %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x, col=species))+
-  geom_point(size=3, alpha=0.7) + 
-  theme_classic()
-emapdat %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x, col=genus))+
-  geom_point(size=3, alpha=0.7) + 
-  theme_classic()
-
-#LHP %>%
-#  ggplot(mapping = aes(y=plot_y, x=plot_x))+
-#  geom_point(aes(col=tree_type99dbh))+
-#  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
-#  theme_classic()
-SPKA
-#SPKA-----
-emapdat <- filter(SPKA, dbh >= quantile99dbh)
-SPKA %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(aes(col=tree_type99dbh))+
-  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
-  theme_classic()
-
-#SPKH-----
-emapdat <- filter(SPKH, dbh >= quantile99dbh)
-SPKH %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(aes(col=tree_type99dbh))+
-  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
-  theme_classic()
-
-#SPKS-----
-emapdat <- filter(SPKS, dbh >= quantile99dbh)
-SPKS %>%
-  ggplot(mapping = aes(y=plot_y, x=plot_x))+
-  geom_point(aes(col=tree_type99dbh))+
-  geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
-  theme_classic()
 
 #----------------------------------------------------------------------#
 #-------------------Plots for manuscript-------------------------------
