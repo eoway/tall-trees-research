@@ -60,6 +60,7 @@ summary(dandat_analysis)
 coords<- dandat_analysis[,c("x_utm","y_utm")]
 dan_proj <- crs(Danum_TWI)
 
+
 #Create a spatial points dataframe
 spatialdan <- SpatialPointsDataFrame(coords=coords,
                                      data=dandat_analysis,
