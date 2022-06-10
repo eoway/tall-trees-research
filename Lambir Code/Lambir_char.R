@@ -79,8 +79,11 @@ names(lam_elev) #xdim = 1040m; ydim = 500m
 lhp_elev_df <- lam_elev
 head(lhp_elev_df)
 dim(lhp_elev_df)
+
+# create an ID column
 lhp_elev_df$ID <- seq(1:length(lhp_elev_df$elev))
 
+# Plot elevation
 ggplot() + 
   geom_point(data=lhp_elev_df, aes(x,y, col=elev))
 
@@ -112,8 +115,8 @@ lam4$gx <- as.numeric(lam4$gx)
 lam4$gy <- as.numeric(lam4$gy)
 
 #I think this is actually what I want in the end
-test <- lam4 %>% group_by(quadrat, HabType, soil) %>% summarize(x = mean(gx, na.rm=T),
-                                                                y = mean(gy, na.rm=T), 
+test <- lam4 %>% group_by(quadrat, HabType, soil) %>% dplyr::summarize(x = mean(gx, na.rm=T),
+                                                                y = mean(gy, na.rm=T),
                                                                 dbh = mean(dbh, na.rm=T),
                                                                 heightmean = mean(height, na.rm=T),
                                                                 heightmedian = median(height, na.rm=T),
@@ -148,12 +151,16 @@ plot(elev_rast)
 crs(elev_rast) <- CRS("+proj=utm +zone=50 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
 #crs(elev_rast) <- CRS("+proj=longlat +datum=WGS84")
 projection(elev_rast)
+extent(elev_rast)
 
+# Calculate slope, aspect, and TPI
 Lambir_slope_aspect_TPI <- terrain(elev_rast, opt=c('slope', 'aspect', 'TPI'), unit='degrees')
 summary(Lambir_slope_aspect_TPI)
 
 # writeRaster(elev_rast, "G:/My Drive/Harvard/CAO_data/GIS/Lambir_elevation.tif", overwrite=T)
 # writeRaster(Lambir_slope_aspect_TPI, "G:/My Drive/Harvard/CAO_data/GIS/Lambir_slope_aspect_TPI.tif", overwrite=T)
+
+
 #---------------------------------------------------------------------------------------------#
 # use lambir.habs data where soil type is summarized into 5x5m sub-quadrats (n=1300)
 # Lambir (n = 1300 20x20m quadrats; n = 21109 5x5m quadrats)
@@ -164,9 +171,6 @@ plot(elev_rast_20m)
 plot(topo_20m)
 
 # assign 20m quadrat IDs vertically to match Lambir quadrats....
-#elev_rast_20m$index <- 1:ncell(elev_rast_20m)
-
-#Every 25th entry is NA for soils stuff?????-----------------------------ELSA---------------------------
 elev_rast_20m$index <- c(seq(26,1378,by=26),seq(25,1377,by=26),seq(24,1376,by=26),
                          seq(23,1375,by=26),seq(22,1374,by=26),seq(21,1373,by=26),
                          seq(20,1372,by=26),seq(19,1371,by=26),seq(18,1370,by=26),

@@ -492,9 +492,121 @@ SPKS %>%
   geom_point(emapdat, mapping = aes(y=plot_y, x=plot_x))+
   theme_classic()
 
+#----------------------------------------------------------------------#
+#-------------------Plots for manuscript-------------------------------
+#----------------------------------------------------------------------#
+#DBH Histogram-------
+hdata %>%
+  ggplot(hdata, mapping = aes(x=dbh))+
+  geom_histogram()+
+  geom_vline(xintercept = quantile90dbh) +
+  geom_vline(xintercept = quantile95dbh) +
+  geom_vline(xintercept = quantile99dbh)
+
+#All three height calculations on one plot
+hdata %>%
+  ggplot(aes(dbh, heightFeld, colour= "Height Defintion"))+
+  geom_point(aes(dbh, heightFeld), color="chartreuse3")+
+  geom_point(aes(dbh, heightCh), color="darkorchid3")+
+  geom_point(aes(dbh, heightE), color="deepskyblue3")+
+  geom_hline(yintercept = quantile90Feld, color="chartreuse4")+
+  annotate("text", y= quantile90Feld+2,x=230,label=round(quantile90Feld, digits=3))+
+  geom_hline(yintercept = quantile95Feld, color="chartreuse4")+
+  annotate("text", y= quantile95Feld+2,x=230,label=round(quantile95Feld, digits=3))+
+  geom_hline(size=1, yintercept = quantile99Feld, color="chartreuse4")+
+  annotate("text", y= quantile99Feld+2,x=230,label=round(quantile99Feld, digits=3))+
+  geom_vline(xintercept = quantile90dbh, color="black")+
+  annotate("text", x= quantile90dbh+5,y=5,label=round(quantile90dbh, digits=3))+
+  geom_vline(xintercept = quantile95dbh, color="black")+
+  annotate("text", x= quantile95dbh+7,y=5,label=round(quantile95dbh, digits=3))+
+  geom_vline(size=1, xintercept = quantile99dbh, color="black")+
+  annotate("text", x= quantile99dbh+5,y=5,label=round(quantile99dbh, digits=3))+
+  xlab("DBH")+
+  ylab("Height")
+#----- PLOT COLOR PALETTE -----
+
+
+#99th percentile DBH and All Height Calculations Plot with Emergent species colored darker
+#----------------------------------------------------------------------#
+#--------------------------Elsa Help------------------------------------
+#How do I change colors so that each line is different and each set of emergents are different?
+#----------------------------------------------------------------------#
+
+# for colors, see ggnewscale (https://github.com/eliocamp/ggnewscale)
+# i just came across it and it works beautifully for this
+library(ggnewscale)
+
+# also, remember that tree_type99dbhmap is determined based on my arbitrary size threshold of dbh = 100
+# once you update it to quantile99dbh, the colors will correspond to the vertical line in this plot
+
+hdata %>%
+  ggplot(aes(dbh, heightFeld))+
+  geom_point(aes(col=tree_type99dbhmap))+
+  scale_color_manual("Feldpausch allom", values=c("green","chartreuse","darkgreen")) + 
+  new_scale_color() + # from ggnewscale - everything after this requires a new color scale
+  geom_point(aes(col=tree_type99dbhmap, dbh, heightCh))+
+  scale_color_manual("Chave allom", values=c("#1d91c0","#41b6c4","#253494")) + 
+  new_scale_color() +
+  geom_point(aes(col=tree_type99dbhmap, dbh, heightE))+
+  scale_color_manual("Chave+E allom", values=c("#7a0177","#ae017e","#810f7c")) + 
+  geom_vline(xintercept = quantile99dbh, color="black")+
+  xlab("DBH")+
+  ylab("Height")+
+  theme_classic() 
+
+# hdata %>%
+#   ggplot(aes(dbh, heightFeld))+
+#   geom_point(aes(col=tree_type99F))+
+#   geom_point(aes(col=tree_type99Ch, dbh, heightCh))+
+#   geom_point(aes(col=tree_type99E, dbh, heightE))+
+#   geom_vline(xintercept = quantile99dbh, color="black")+
+#   xlab("DBH")+
+#   ylab("Height")+
+#   theme_classic()
+
+#Same plot as last one, but with only Feld Height Calculation
+hdata %>%
+  ggplot(aes(dbh, heightFeld, col=tree_type99F))+
+  geom_point()+
+  geom_vline(xintercept = quantile99dbh, color="black")+
+  xlab("DBH")+
+  ylab("Height")
+
+#Stem_BA---
+plotdata <- filter(hdata, DFstatus == "A")
+table(plotdata$DFstatus)
+plotdat <- plotdata %>% group_by(site, tree_type99dbh) %>% summarize(n_stems=n(), plot_BA = sum(stem_BA, na.rm=T, 
+                                                                                                mean_stem_BA = mean(stem_BA, na.rm=T)))
+
+plotdat$area <- c(1,1,1,1,1,1,50,50,52,52,8,8,12,12,4,4)
+
+plotdat$stemBAha <- plotdat$plot_BA/plotdat$area
+
+plotdat$stemdens <- plotdat$n_stems/plotdat$area
+table(LHP$DFstatus)
+table(DNM50$DFstatus)
+#re
+#plotdat$cluster <- factor(plot_dat2$cluster, levels=c("nonemrgnt","emrgnt"),
+#labels=c("Nonemergent","Emergent" ))
+#----------------------------------------------------------------------#
+#--------------------------Elsa Help------------------------------------
+#Sepiloks densities are weird
+#----------------------------------------------------------------------#
+#Stem_BAs plot------
+plotdat %>%
+  ggplot(plotdat, mapping = aes(fill=tree_type99dbh, y=stemBAha, x=site))+
+  geom_col(position="stack")
+
+#Stem density plot------
+plotdat %>%
+  ggplot(plotdat, mapping = aes(fill=tree_type99dbh, y=stemdens, x=site))+
+  geom_col(position="stack")
+
+
+
 
 #----------------------------------------------------------------------#
-#Can stop running code here if you just want to make manuscript plots (see section at the bottom for manuscript plot code)-------------------------------
+# Ignore this -> just random plots I made before I knew how to code haha-------------------------------
 #----------------------------------------------------------------------#
 #----------------------------------------------------------------------#
 #-------------------------Plot Parameters-------------------------------
@@ -1876,114 +1988,4 @@ hdata %>%
   ggplot(hdata, mapping = aes(fill=tree_type99E, y=stem_BA, x=site))+
   geom_col(position="stack", stat="identity")
 table(hdata$site)
-
-#----------------------------------------------------------------------#
-#-------------------Plots for manuscript-------------------------------
-#----------------------------------------------------------------------#
-#DBH Histogram-------
-hdata %>%
-  ggplot(hdata, mapping = aes(x=dbh))+
-  geom_histogram()+
-  geom_vline(xintercept = quantile90dbh) +
-  geom_vline(xintercept = quantile95dbh) +
-  geom_vline(xintercept = quantile99dbh)
-
-#All three height calculations on one plot
-hdata %>%
-  ggplot(aes(dbh, heightFeld, colour= "Height Defintion"))+
-  geom_point(aes(dbh, heightFeld), color="chartreuse3")+
-  geom_point(aes(dbh, heightCh), color="darkorchid3")+
-  geom_point(aes(dbh, heightE), color="deepskyblue3")+
-  geom_hline(yintercept = quantile90Feld, color="chartreuse4")+
-  annotate("text", y= quantile90Feld+2,x=230,label=round(quantile90Feld, digits=3))+
-  geom_hline(yintercept = quantile95Feld, color="chartreuse4")+
-  annotate("text", y= quantile95Feld+2,x=230,label=round(quantile95Feld, digits=3))+
-  geom_hline(size=1, yintercept = quantile99Feld, color="chartreuse4")+
-  annotate("text", y= quantile99Feld+2,x=230,label=round(quantile99Feld, digits=3))+
-  geom_vline(xintercept = quantile90dbh, color="black")+
-  annotate("text", x= quantile90dbh+5,y=5,label=round(quantile90dbh, digits=3))+
-  geom_vline(xintercept = quantile95dbh, color="black")+
-  annotate("text", x= quantile95dbh+7,y=5,label=round(quantile95dbh, digits=3))+
-  geom_vline(size=1, xintercept = quantile99dbh, color="black")+
-  annotate("text", x= quantile99dbh+5,y=5,label=round(quantile99dbh, digits=3))+
-  xlab("DBH")+
-  ylab("Height")
-#----- PLOT COLOR PALETTE -----
-
-
-#99th percentile DBH and All Height Calculations Plot with Emergent species colored darker
-#----------------------------------------------------------------------#
-#--------------------------Elsa Help------------------------------------
-#How do I change colors so that each line is different and each set of emergents are different?
-#----------------------------------------------------------------------#
-
-# for colors, see ggnewscale (https://github.com/eliocamp/ggnewscale)
-# i just came across it and it works beautifully for this
-library(ggnewscale)
-
-# also, remember that tree_type99dbhmap is determined based on my arbitrary size threshold of dbh = 100
-# once you update it to quantile99dbh, the colors will correspond to the vertical line in this plot
-
-hdata %>%
-  ggplot(aes(dbh, heightFeld))+
-  geom_point(aes(col=tree_type99dbhmap))+
-  scale_color_manual("Feldpausch allom", values=c("green","chartreuse","darkgreen")) + 
-  new_scale_color() + # from ggnewscale - everything after this requires a new color scale
-  geom_point(aes(col=tree_type99dbhmap, dbh, heightCh))+
-  scale_color_manual("Chave allom", values=c("#1d91c0","#41b6c4","#253494")) + 
-  new_scale_color() +
-  geom_point(aes(col=tree_type99dbhmap, dbh, heightE))+
-  scale_color_manual("Chave+E allom", values=c("#7a0177","#ae017e","#810f7c")) + 
-  geom_vline(xintercept = quantile99dbh, color="black")+
-  xlab("DBH")+
-  ylab("Height")+
-  theme_classic() 
-
-# hdata %>%
-#   ggplot(aes(dbh, heightFeld))+
-#   geom_point(aes(col=tree_type99F))+
-#   geom_point(aes(col=tree_type99Ch, dbh, heightCh))+
-#   geom_point(aes(col=tree_type99E, dbh, heightE))+
-#   geom_vline(xintercept = quantile99dbh, color="black")+
-#   xlab("DBH")+
-#   ylab("Height")+
-#   theme_classic()
-
-#Same plot as last one, but with only Feld Height Calculation
-hdata %>%
-  ggplot(aes(dbh, heightFeld, col=tree_type99F))+
-  geom_point()+
-  geom_vline(xintercept = quantile99dbh, color="black")+
-  xlab("DBH")+
-  ylab("Height")
-
-#Stem_BA---
-plotdata <- filter(hdata, DFstatus == "A")
-table(plotdata$DFstatus)
-plotdat <- plotdata %>% group_by(site, tree_type99dbh) %>% summarize(n_stems=n(), plot_BA = sum(stem_BA, na.rm=T, 
-                                                                                                mean_stem_BA = mean(stem_BA, na.rm=T)))
-
-plotdat$area <- c(1,1,1,1,1,1,50,50,52,52,8,8,12,12,4,4)
-
-plotdat$stemBAha <- plotdat$plot_BA/plotdat$area
-
-plotdat$stemdens <- plotdat$n_stems/plotdat$area
-table(LHP$DFstatus)
-table(DNM50$DFstatus)
-#re
-#plotdat$cluster <- factor(plot_dat2$cluster, levels=c("nonemrgnt","emrgnt"),
-#labels=c("Nonemergent","Emergent" ))
-#----------------------------------------------------------------------#
-#--------------------------Elsa Help------------------------------------
-#Sepiloks densities are weird
-#----------------------------------------------------------------------#
-#Stem_BAs plot------
-plotdat %>%
-  ggplot(plotdat, mapping = aes(fill=tree_type99dbh, y=stemBAha, x=site))+
-  geom_col(position="stack")
-
-#Stem density plot------
-plotdat %>%
-  ggplot(plotdat, mapping = aes(fill=tree_type99dbh, y=stemdens, x=site))+
-  geom_col(position="stack")
 

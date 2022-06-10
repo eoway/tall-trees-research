@@ -2133,7 +2133,56 @@ growthr$tree_type95dbh <- ifelse(growthr$species.y %in% c(emergent95dbh), "emrgn
 growthr$tree_type99dbh <- ifelse(growthr$species.y %in% c(emergent99dbh), "emrgnt", "non_emrgnt")
 
 
+#----------------------------------------------------------------------#
+#-------------------Plots for manuscript-------------------------------
+#----------------------------------------------------------------------#
+bincheck <- filter(growthr, dbh.y>=124 & dbh.y<134)
+bincheck <- filter(growthr, dbh.y>=134 & dbh.y<156)
+bincheck <- filter(growthr, dbh.y>=156 & dbh.y<300)
+#Binned Box Plots
+growthr$size_class <- 
+        cut(growthr$dbh.y, breaks=c(seq(0,116,by=4), 124, 134, 156, 300)
+        )
+plot(growthr$size_class, log(growthr$annual_increment), pch=19, 
+     xlab="DBH", ylab="annual increment", )
+
+plot(growthr$size_class, log(growthr$relative_gr), pch=19, 
+     xlab="DBH", ylab="relative growth", )
+
+#Site and Growth Rate Box Plots ASK ABOUT ANOVA!
+ggplot() +
+        geom_boxplot(growthr, mapping = aes(site.x, log(annual_increment)))
+an_gr.aov <- aov(annual_increment ~ site.x, data = growthr)
+an_gr.aov
+summary(an_gr.aov)
+ggplot() +
+        geom_boxplot(growthr, mapping = aes(site.x, log(relative_gr)))
+rel_gr.aov <- aov(relative_gr ~ site.x, data = growthr)
+summary(rel_gr.aov)
+
+#DBH and Growth Rate Scatter Plot
+growthr %>%
+        ggplot(aes(dbh.y, log(annual_increment)))+
+        geom_point(color = "chartreuse3")+
+        geom_point(data = growthrGRnem99dbh,color = "chartreuse4")+
+        geom_vline(xintercept = quantile99dbh, color="black")
+growthr %>%
+        ggplot(aes(dbh.y, log(relative_gr)))+
+        geom_point(color = "chartreuse3")+
+        geom_point(data = growthrGRnem99dbh,color = "chartreuse4")+
+        geom_vline(xintercept = quantile99dbh, color="black")
+
+#Box Plots Separated by emergent definitions
+growthr %>%
+        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type99dbh))+
+        geom_boxplot()
+growthr %>%
+        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type99dbh))+
+        geom_boxplot()
+
+
 #---------------------------------------------------------------------------#
+#-----This section can be ignored! Everything below is random plots I made before I knew how to code haha---
 #-------------------------Plot Variables-------------------------------------
 #---------------------------------------------------------------------------#
 
@@ -3246,53 +3295,6 @@ SPKS %>%
         geom_vline(xintercept = quantile99E) +
         scale_x_continuous(trans = 'log') +
         scale_y_continuous(trans = 'log')
-
-#----------------------------------------------------------------------#
-#-------------------Plots for manuscript-------------------------------
-#----------------------------------------------------------------------#
-bincheck <- filter(growthr, dbh.y>=124 & dbh.y<134)
-bincheck <- filter(growthr, dbh.y>=134 & dbh.y<156)
-bincheck <- filter(growthr, dbh.y>=156 & dbh.y<300)
-#Binned Box Plots
-growthr$size_class <- 
-        cut(growthr$dbh.y, breaks=c(seq(0,116,by=4), 124, 134, 156, 300)
-        )
-plot(growthr$size_class, log(growthr$annual_increment), pch=19, 
-     xlab="DBH", ylab="annual increment", )
-
-plot(growthr$size_class, log(growthr$relative_gr), pch=19, 
-     xlab="DBH", ylab="relative growth", )
-
-#Site and Growth Rate Box Plots ASK ABOUT ANOVA!
-ggplot() +
-        geom_boxplot(growthr, mapping = aes(site.x, log(annual_increment)))
-an_gr.aov <- aov(annual_increment ~ site.x, data = growthr)
-an_gr.aov
-summary(an_gr.aov)
-ggplot() +
-        geom_boxplot(growthr, mapping = aes(site.x, log(relative_gr)))
-rel_gr.aov <- aov(relative_gr ~ site.x, data = growthr)
-summary(rel_gr.aov)
-
-#DBH and Growth Rate Scatter Plot
-growthr %>%
-        ggplot(aes(dbh.y, log(annual_increment)))+
-        geom_point(color = "chartreuse3")+
-        geom_point(data = growthrGRnem99dbh,color = "chartreuse4")+
-        geom_vline(xintercept = quantile99dbh, color="black")
-growthr %>%
-        ggplot(aes(dbh.y, log(relative_gr)))+
-        geom_point(color = "chartreuse3")+
-        geom_point(data = growthrGRnem99dbh,color = "chartreuse4")+
-        geom_vline(xintercept = quantile99dbh, color="black")
-
-#Box Plots Separated by emergent definitions
-growthr %>%
-        ggplot(aes(x=site.x, y=log(relative_gr), fill=tree_type99dbh))+
-        geom_boxplot()
-growthr %>%
-        ggplot(aes(x=site.x, y=log(annual_increment), fill=tree_type99dbh))+
-        geom_boxplot()
 
 
 

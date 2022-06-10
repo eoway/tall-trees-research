@@ -32,6 +32,7 @@ table(lam_data$bitree_type)
 # Minimize to quadrat level
 lam_label <- lam_data %>% group_by(quadrat,tree_type)  %>%  dplyr::summarize()
 check = length(unique(lam_label$quadrat))
+check
 #### check = 1300
 
 # Check numbers
@@ -45,12 +46,13 @@ emergentquad <- unique(emergents$quadrat)
 # Check values
 table(emergentquad)
 check2 = length(emergentquad)
-
+check2
 # Investigation into quadrat emergent number differences
 lam_check <- filter(lam_data, tree_type=="emrgnt")
 len <- length(lam_data$treeID)
+len
 len <- length(emergentquad)
-
+len
 #map- FIXXXXXX
 #emapdat <- filter(lam_data, dbh >= quantile99dbh)
 #elevdat <- subset(lam_data, select = c(elev, x, y))
@@ -84,8 +86,10 @@ lam_stat <- lam_data %>% dplyr::group_by(quadrat,dbhmean,heightmean,heightmedian
 lam_stat2 <- lam_stat %>% dplyr::group_by(quadrat)
 
 check32 = length(unique(lam_stat2$quadrat))
+check32
 ### check3 = 1300
 check42 = length(lam_stat2$quadrat)
+check42
 
 check3 = length(unique(lam_stat$quadrat))
 ### check3 = 1300
@@ -95,6 +99,9 @@ check4 = length(lam_stat$quadrat)
 # Quadrat 172 is being double counted
 quad172 <- filter(lam_stat, quadrat == 172)
 table(quad172)
+
+# Remove one of the Quadrat 172s
+
 #---------------------------------------------------------------------------------
 #---------------------------------------Elsa Help---------------------------------
 #---------------------------------------------------------------------------------
