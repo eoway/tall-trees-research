@@ -52,7 +52,7 @@ gedi_finder <- function(product, bbox) {
 }
 
 # User-provided inputs (UPDATE FOR YOUR DESIRED PRODUCT AND BOUNDING BOX REGION OF INTEREST)
-product <- 'GEDI01_B.002'           # Options include 'GEDI01_B.002', 'GEDI02_A.002', 'GEDI02_B.002'
+product <- 'GEDI02_A.002'           # Options include 'GEDI01_B.002', 'GEDI02_A.002', 'GEDI02_B.002'
 bbox <- '102.269106,2.962146,102.348169,3.014783'  # bounding box coords in LL Longitude, LL Latitude, UR Longitude, UR Latitude format
 
 # Call the gedi_finder function using the user-provided inputs
