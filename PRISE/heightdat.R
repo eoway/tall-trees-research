@@ -47,6 +47,7 @@ summary(sample)
 heightsample <- readOGR("hsample","sample")
 crs(heightsample)
 plot(heightsample)
+
 #water data
 waterdat <- readOGR("river_data/rivers_asia_37331","rivers_asia_37331")
 plot(waterdat)
