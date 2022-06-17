@@ -34,7 +34,8 @@ extent(camp)
 crs(camp)
 
 # Load GEDI data
-gedi_dat <- read_csv("~/Desktop/Research/Cameroon/cameroon_filtered_cov_95")
+gedi_dat <- read_csv("~/Desktop/Research/Cameroon/cameroon_filtered_all_95")
+gedi_dat$Shot_Number
 summary(gedi_dat)
 
 # Convert it to a spatial points dataframe
@@ -55,6 +56,8 @@ bouamir_utm <- spTransform(camp, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +
 irdplot_utm <- spTransform(irdplot, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs"))
 crs(bouamir_utm)
 
+cam_utm1 <- as(cam_utm, "data.frame")
+
 #calculate distance to nearest road
 gedi_dat$distance <- apply(gDistance(cam_utm, roads_utm,byid=TRUE),2,min)/1000
 summary(gedi_dat$distance)
@@ -73,4 +76,175 @@ summary(gedi_dat$distance_to_IRD)
 #summary(gedi_low_distance$rh100)
 
 # export data to be plotted in python
-write.csv(gedi_dat, ("~/Desktop/Research/Cameroon/gedi_dist_cov_95"))
+#write.csv(gedi_dat, ("~/Desktop/Research/Cameroon/gedi_dist_full_final"))
+
+#-----------------------------------------------------#
+#-----------Make shapefiles for field work!!----------
+#-----------------------------------------------------#
+#---------All Points-------------
+# Load data
+dat <- read_csv("~/Desktop/Research/Cameroon/cameroon_all_points_for_shp")
+summary(dat)
+dat <- subset (dat, select = -c(...1, ...3))
+
+
+coords<- dat[,c("Longitude","Latitude")]
+proj <- crs(reserve)
+spdf_all <- SpatialPointsDataFrame(coords=coords,
+                                   data=dat,
+                                   proj4string=proj)
+plot(spdf_all)
+crs(spdf_all)
+extent(spdf_all)
+
+writeOGR(spdf_all, dsn = "~/Desktop/Research/Cameroon/", layer = "all_shots_cameroon",
+         driver = "ESRI Shapefile" )
+
+# Check
+check <- readOGR("~/Desktop/Research/Cameroon/", "all_shots_cameroon")
+check1 <- as(check, "data.frame")
+
+# Make buffer!
+spdf_all_buff <- spTransform(spdf_all, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs"))
+crs(spdf_all_buff)
+extent(spdf_all_buff)
+
+spdf_all_buff <- gBuffer(spdf_all_buff, width= 11, byid = TRUE) #EO: use the gBuffer function in rgeos instead, and set byid=T
+plot(spdf_all_buff)
+
+# export
+writeOGR(spdf_all_buff, dsn = "~/Desktop/Research/Cameroon/", layer = "all_shots_cameroon_buffer",
+         driver = "ESRI Shapefile" )
+
+# Check again
+check <- readOGR("~/Desktop/Research/Cameroon/", "all_shots_cameroon_buffer")
+check1 <- as(check, "data.frame")
+
+
+#---------Points of interest near camp-------------
+shot_dat <- read_csv("~/Desktop/Research/Cameroon/cameroon_interest_points_for_shp")
+summary(shot_dat)
+shot_dat <- subset (shot_dat, select = -c(...1, ...3))
+
+
+coords<- shot_dat[,c("Longitude","Latitude")]
+proj <- crs(reserve)
+spdf_shots <- SpatialPointsDataFrame(coords=coords,
+                                   data=shot_dat,
+                                   proj4string=proj)
+plot(spdf_shots)
+crs(spdf_shots)
+extent(spdf_shots)
+
+writeOGR(spdf_shots, dsn = "~/Desktop/Research/Cameroon/", layer = "shots_near_camp_cameroon",
+         driver = "ESRI Shapefile" )
+
+# Check
+check <- readOGR("~/Desktop/Research/Cameroon/", "shots_near_camp_cameroon")
+check1 <- as(check, "data.frame")
+
+# Make buffer!
+spdf_shots_buff <- spTransform(spdf_shots, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs"))
+crs(spdf_shots_buff)
+extent(spdf_shots_buff)
+
+spdf_shots_buff <- gBuffer(spdf_shots_buff, width= 11, byid = TRUE) #EO: use the gBuffer function in rgeos instead, and set byid=T
+plot(spdf_shots_buff)
+
+# export
+writeOGR(spdf_shots_buff, dsn = "~/Desktop/Research/Cameroon/", layer = "shots_near_camp_cameroon_buffer",
+         driver = "ESRI Shapefile" )
+
+# Check again
+check <- readOGR("~/Desktop/Research/Cameroon/", "shots_near_camp_cameroon_buffer")
+check1 <- as(check, "data.frame")
+
+#---------Points within 300m of any trail-------------
+#---------All Points-------------
+# Load data
+dat300 <- read_csv("~/Desktop/Research/Cameroon/cameroon_all_300m")
+summary(dat300)
+dat300 <- subset (dat300, select = -c(...1, ...3))
+
+
+coords<- dat300[,c("Longitude","Latitude")]
+proj <- crs(reserve)
+spdf_300 <- SpatialPointsDataFrame(coords=coords,
+                                   data=dat300,
+                                   proj4string=proj)
+plot(spdf_300)
+crs(spdf_300)
+extent(spdf_300)
+
+writeOGR(spdf_300, dsn = "~/Desktop/Research/Cameroon/", layer = "300m_shots_cameroon",
+         driver = "ESRI Shapefile" )
+
+# Check
+check <- readOGR("~/Desktop/Research/Cameroon/", "300m_shots_cameroon")
+check1 <- as(check, "data.frame")
+
+# Make buffer!
+spdf_300_buff <- spTransform(spdf_300, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs"))
+spdf_300_buff
+
+spdf_300_buff <- gBuffer(spdf_300_buff, width= 11, byid = TRUE) #EO: use the gBuffer function in rgeos instead, and set byid=T
+plot(spdf_300_buff)
+
+spdf_300_buff <- spTransform(spdf_300, CRS("+proj=longlat +datum=WGS84 +no_defs"))
+spdf_300_buff
+
+# export
+writeOGR(spdf_300_buff, dsn = "~/Desktop/Research/Cameroon/", layer = "300m_shots_cameroon_buffer",
+         driver = "ESRI Shapefile" )
+
+# Check again
+check <- readOGR("~/Desktop/Research/Cameroon/", "300m_shots_cameroon_buffer")
+check1 <- as(check, "data.frame")
+
+# Shape files with algoritm 3 filtering
+#---------close to camp-------------
+# Load data
+camp_a3 <- read_csv("~/Desktop/Research/Cameroon/shots_near_camp_alg3")
+summary(camp_a3)
+camp_a3 <- subset (camp_a3, select = -c(...1, ...3))
+
+
+coords<- camp_a3[,c("Longitude","Latitude")]
+proj <- crs(reserve)
+spdf_camp_a3 <- SpatialPointsDataFrame(coords=coords,
+                                   data=camp_a3,
+                                   proj4string=proj)
+plot(spdf_camp_a3)
+crs(spdf_camp_a3)
+extent(spdf_camp_a3)
+
+writeOGR(spdf_camp_a3, dsn = "~/Desktop/Research/Cameroon/", layer = "cam_camp_a3",
+         driver = "ESRI Shapefile" )
+
+# Check
+check <- readOGR("~/Desktop/Research/Cameroon/", "cam_camp_a3")
+check1 <- as(check, "data.frame")
+
+#---------close to trail-------------
+# Load data
+trail_a3 <- read_csv("~/Desktop/Research/Cameroon/full_near_any_trail_a3_filter")
+summary(trail_a3)
+trail_a3 <- subset (trail_a3, select = -c(...1, ...3))
+
+
+coords<- trail_a3[,c("Longitude","Latitude")]
+proj <- crs(reserve)
+spdf_trail_a3 <- SpatialPointsDataFrame(coords=coords,
+                                   data=trail_a3,
+                                   proj4string=proj)
+plot(spdf_trail_a3)
+crs(spdf_trail_a3)
+extent(spdf_trail_a3)
+
+writeOGR(spdf_trail_a3, dsn = "~/Desktop/Research/Cameroon/", layer = "cam_trails_a3",
+         driver = "ESRI Shapefile" )
+
+# Check
+check <- readOGR("~/Desktop/Research/Cameroon/", "cam_trails_a3")
+check1 <- as(check, "data.frame")
+
