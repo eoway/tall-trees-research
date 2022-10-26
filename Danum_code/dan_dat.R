@@ -30,7 +30,7 @@ plot(Danum_slope_aspect_TPI)
 #twi--------
 Danum_TWI <- raster("~/Desktop/Research/HCRP/dan_dat/Danum_TWI.tif"); plot(Danum_TWI)
 #Danum_TWI <- raster("G:/My Drive/Harvard/CAO_data/GIS/Danum_TWI.tif"); plot(Danum_TWI)
-cellStats(Danum_TWI, mean); cellStats(Danum_TWI, sd)
+#cellStats(Danum_TWI, mean); cellStats(Danum_TWI, sd)
 
 #Main dat--------
 dandat <- filter(dat, site == "DNM50")
@@ -179,7 +179,7 @@ dim(analysismetrics)
 
 summary(dandat_analysis)
 dandat_analysis <- filter(dandat_analysis, dbh >=10)
-
+write.csv(dandat_analysis, ("~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_2022.csv"))
 #---------------------------------------------------------------------------------------------#
 #----------------------------Surrounding Tree Analysis Dataset--------------------------------
 #---------------------------------------------------------------------------------------------#
