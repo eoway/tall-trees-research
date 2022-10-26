@@ -138,16 +138,17 @@ elev_rast <- raster(lhp_elev_df_raster)
 elev_rast
 res(elev_rast)
 plot(elev_rast)
-
 # project to WGS
 crs(elev_rast) <- CRS("+proj=utm +zone=50 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
 #crs(elev_rast) <- CRS("+proj=longlat +datum=WGS84")
 projection(elev_rast)
 extent(elev_rast)
+summary(elev_rast)
 
 # Calculate slope, aspect, and TPI
 Lambir_slope_aspect_TPI <- terrain(elev_rast, opt=c('slope', 'aspect', 'TPI'), unit='degrees')
 summary(Lambir_slope_aspect_TPI)
+plot(Lambir_slope_aspect_TPI)
 
 #---------------------------------------------------------------------------------------------#
 # use lambir.habs data where soil type is summarized into 5x5m sub-quadrats (n=1300)
@@ -267,6 +268,7 @@ TWI_20m$index <- c(seq(26,1378,by=26),seq(25,1377,by=26),seq(24,1376,by=26),
 
 #plot(elev_rast_20m$elev)
 plot(TWI_20m$index)
+summary(TWI_20m$index)
 length(unique(TWI_20m$index))
 
 #---------------------------------------------------------------------------------------------#
@@ -308,6 +310,9 @@ write.csv(lambir_topo, "~/Desktop/Research_2022/Data/Southeast_Asia/Lambir/lambi
 #----------------------------Surrounding Tree Analysis Dataset--------------------------------#
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
+# add tree labels
+lambir_topo$tree_type <- ifelse(lambir_topo$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
+
 #-1
 coords<- lambir_topo[,c("treex","treey")]
 lam_proj <- crs(elev_rast)
@@ -317,8 +322,6 @@ lam_analysis_spdf <- SpatialPointsDataFrame(coords=coords,
 plot(lam_analysis_spdf)
 
 #0
-lam_analysis_spdf$tree_type <- ifelse(lam_analysis_spdf$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
-
 lamdatemerg <- subset(lambir_topo, dbh >= quantile99dbh)
 lamdatsamp <- subset(lambir_topo, dbh < quantile99dbh)
 lamdatsamp <- sample_n(lamdatsamp, 10400)
@@ -379,9 +382,9 @@ hist(trees_within_buff$n)
 
 #6. Summarize neighboring trees
 #EO: enter what you want to summarize in the code below
-buff_summaries <- lam_spdf %>% group_by(poly.ID, treeID) %>% dplyr::summarize(heightmean=mean(height),
-                                                                              dbhmean=mean(dbh),
-                                                                              height99 = quantile(height, probs = 0.99, na.rm = TRUE),
+buff_summaries <- lam_spdf %>% group_by(poly.ID, treeID) %>% dplyr::summarize(heightmeansurr=mean(height),
+                                                                              dbhmeansurr=mean(dbh),
+                                                                              height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
                                                                               n_trees = n())
 
 
