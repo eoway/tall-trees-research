@@ -10,18 +10,17 @@ library(readxl)
 library(raster)
 library(fgeo)
 
-lam_data <- read_csv("~/Desktop/Research/HCRP/Lambir Data/lam_topo.csv")
+lam_data <- read_csv("~/Desktop/Research/HCRP/Lambir Data/lam_topo_2022.csv")
 summary(lam_data$dbh)
 summary(lam_data$CensusID)
-
-#Add individual and quadrat level emergent labeling-------------
+# Add individual and quadrat level emergent labeling-------------
 # Import Heights.R
 source("~/Documents/GitHub/tall-trees-research/heights.r")
 # Set 99th percentile dbh for emergent cut off
 dbh99 <- quantile99dbh #from heights.r
 #dbh99 <- 95
 
-# Add emergent/nonemergent labelling
+# Add emergent/nonemergent labeling
 # Make a column labelling each individual as emergent/non emergent
 lam_data$tree_type <- ifelse(lam_data$dbh>=dbh99, "emrgnt", "nonemrgnt")
 # Create a binomial term that is equivalent to emergent/non emergent labelling
@@ -92,8 +91,10 @@ check42 = length(lam_stat2$quadrat)
 check42
 
 check3 = length(unique(lam_stat$quadrat))
+check3
 ### check3 = 1300
 check4 = length(lam_stat$quadrat)
+check4
 ### Check4 = 1301 - Here's the issue!
 
 # Quadrat 172 is being double counted
@@ -101,10 +102,6 @@ quad172 <- filter(lam_stat, quadrat == 172)
 table(quad172)
 
 # Remove one of the Quadrat 172s
-
-#---------------------------------------------------------------------------------
-#---------------------------------------Elsa Help---------------------------------
-#---------------------------------------------------------------------------------
 # Label quadrat based on emergent quadrat list previously made
 lam_stat$quad_type <- ifelse(lam_stat$quadrat %in% emergentquad, "emrgnt", "nonemrgnt")
 # Check
