@@ -20,6 +20,8 @@ dat <- read_csv("~/Desktop/Research/Danum_GEDIdata/dan_GEDIdat.csv")
 # small file -> just danum
 Danum_elev <- raster("~/Desktop/Research/HCRP/dan_dat/ASU_GAO_Danum_50HaPlot_GroundElev.tif")
 plot(Danum_elev)
+slope_aspect_TPI <- terrain(Danum_elev, opt=c('slope', 'aspect', 'TPI'), unit='degrees')
+summary(slope_aspect_TPI)
 # big file -> all of SE asia
 delev <- raster("~/Google Drive/My Drive/Research/elevdat/elevdat.tif")
 #summary(delev)
