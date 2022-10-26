@@ -131,6 +131,9 @@ ggplot() +
 #---------------------------------------------------------------------------------------------#
 ## add geographic (lat/lon) coordinates
 #---------------------------------------------------------------------------------------------#
+lam4$treex <- 168797+lam4$gx
+lam4$treey <- 463372+lam4$gy
+
 lhp_elev_df$x <- 168797+lhp_elev_df$x
 lhp_elev_df$y <- 463372+lhp_elev_df$y
 
@@ -184,7 +187,7 @@ elev_rast_20m$index <- c(seq(26,1378,by=26),seq(25,1377,by=26),seq(24,1376,by=26
 plot(elev_rast_20m)
 elev_rast_20m
 summary(elev_rast)
-summary(elev_rast_20m_df)
+summary(elev_rast_20m)
 plot(elev_rast_20m$index)
 length(unique(elev_rast_20m$index))
 #---------------------------------------------------------------------------------------------#
@@ -237,7 +240,7 @@ lambir <- subset(lambir, select = -c(HabType.y, soil.y))
 lambir <- rename(lambir, replace= c("HabType.x" = "HabType", "soil.x" = "soil"))
 
 # Calculate height metrics to be added to full dataset (allows for dataset to be by individual instead of by quadrat while still having height values)
-heightmetrics <- lam4 %>% group_by(quadrat) %>% dplyr::summarize(HabType=HabType, soil=soil, sp=sp,
+heightmetrics <- lam4 %>% group_by(quadrat, index, soil, HabType) %>% dplyr::summarize(
                                                                 dbhmean = mean(dbh, na.rm=T),
                                                                 heightmean = mean(height, na.rm=T),
                                                                 heightmedian = median(height, na.rm=T),
@@ -330,6 +333,7 @@ ggplot() +
   theme_classic()
 
 #join full dataset with TWI and Soil metrics
+lambir_all <- rename(lambir_all, replace = c("index.x" = "index"))
 lambir_topo <- inner_join(lambir_all, twi_soil, by="index")
 # Remove duplicate columns
 lambir_topo <- subset(lambir_topo, select = -c(HabType.y, soil.y,x.x,y.x, sp.y))
@@ -337,7 +341,11 @@ lambir_topo <- rename(lambir_topo, replace = c("HabType.x" = "HabType", "soil.x"
 summary(lambir_topo)
 
 # Export data file
-write.csv(lambir_topo, here("Desktop","Research","HCRP","Lambir Data", "lam_topo.csv"))
+write.csv(lambir_topo, "~/Desktop/Research/HCRP/Lambir Data/lam_topo_2022.csv")
+
+
+
+
 
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
@@ -345,33 +353,32 @@ write.csv(lambir_topo, here("Desktop","Research","HCRP","Lambir Data", "lam_topo
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 #-1
-coords<- lambir_topo[,c("x","y")]
+coords<- lambir_topo[,c("treex","treey")]
 lam_proj <- crs(elev_rast)
 lam_analysis_spdf <- SpatialPointsDataFrame(coords=coords,
-                                data=lambir_topo,
-                                proj4string=lam_proj)
+                                            data=lambir_topo,
+                                            proj4string=lam_proj)
+plot(lam_analysis_spdf)
 
 #0
 lam_analysis_spdf$tree_type <- ifelse(lam_analysis_spdf$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
 
-#1 & 2
+
 lamdatemerg <- subset(lambir_topo, dbh >= quantile99dbh)
-dim(lamdatemerg)
-summary(lamdatemerg)
 lamdatsamp <- subset(lambir_topo, dbh < quantile99dbh)
 lamdatsamp <- sample_n(lamdatsamp, 10400)
 summary(lamdatsamp)
-lamdat_emerg <- rbind(lamdatsamp, lamdatemerg)
-
-coords<- lamdat_emerg[,c("x","y")]
+lamdatemerg <- rbind(lamdatsamp, lamdatemerg)
+dim(lamdatemerg)
+coords<- lamdatemerg[,c("treex","treey")]
 lamdat_emerg <- SpatialPointsDataFrame(coords=coords,
-                                       data=lamdat_emerg,
+                                       data=lamdatemerg,
                                        proj4string=lam_proj)
 
 
 #dandat_emerg <- subset(dandat_analysis_spdf, dbh >= quantile99dbh)
-dim(lam_analysis_spdf); dim(lamdat_emerg)
-lamdat_emerg$ID <- 1:nrow(lamdat_emerg)
+dim(lamdat_emerg); dim(lamdat_emerg)
+#lamdat_emerg$ID <- 1:nrow(lamdat_emerg)
 # coords<- dandat_emerg[,c("x_utm","y_utm")]
 # emdan <- SpatialPointsDataFrame(coords=coords,
 #                                 data=dandat_emerg,
@@ -417,31 +424,19 @@ hist(trees_within_buff$n)
 
 #6. Summarize neighboring trees
 #EO: enter what you want to summarize in the code below
-buff_summaries <- lam_spdf %>% group_by(poly.ID, X1) %>% dplyr::summarize(heightmean=mean(height),
-                                                                          dbhmean=mean(dbh),
-                                                                          height99 = quantile(height, probs = 0.99, na.rm = TRUE),
-                                                                          n_trees = n())
+buff_summaries <- lam_spdf %>% group_by(poly.ID, treeID) %>% dplyr::summarize(heightmean=mean(height),
+                                                                      dbhmean=mean(dbh),
+                                                                      height99 = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                      n_trees = n())
 
 
 #7. add summary variable to original dataset
-lamdat_analysis_surr <- merge(lambir_topo,buff_summaries, by="X1")
+lamdat_analysis_surr <- merge(lambir_topo,buff_summaries, by="treeID")
 summary(lamdat_analysis_surr)
+
+# Export data file
+write.csv(lamdat_analysis_surr, "~/Desktop/Research/HCRP/Lambir Data/lambir_surrounding_tree_data.csv")
+
+
 #EO: add summary variables to original dataset based on the poly.ID from buff_sumaries and ...
 #EO: ...the X1 or treeID value from dandat_emerg_buff, where the rows correspond to poly.ID 1:270
-#EO: let me know if you run into more questions here
-
-#---------------------------------------------------------------------------------------------#
-#---------------------------------------------------------------------------------------------#
-
-#DNM_50_TWI <- mask(Danum_TWI, DNM_50); DNM_50_TWI <- crop(DNM_50_TWI, DNM_50, snap="out"); plot(DNM_50_TWI, col=rev(r2))
-#cellStats(DNM_50_TWI, mean); cellStats(DNM_50_TWI, sd)
-
-#SPKA_fp_TWI <- mask(Sepilok_TWI, spka); SPKA_fp_TWI <- crop(SPKA_fp_TWI, spka, snap="out"); plot(SPKA_fp_TWI, col=rev(r2))
-#SPKS_fp_TWI <- mask(Sepilok_TWI, spks); SPKS_fp_TWI <- crop(SPKS_fp_TWI, spks, snap="out"); plot(SPKS_fp_TWI, col=rev(r2))
-#SPKH_fp_TWI <- mask(Sepilok_TWI, spkh); SPKH_fp_TWI <- crop(SPKH_fp_TWI, spkh, snap="out"); plot(SPKH_fp_TWI, col=rev(r2))
-
-#cellStats(SPKA_fp_TWI, mean); cellStats(SPKA_fp_TWI, sd)
-#cellStats(SPKS_fp_TWI, mean); cellStats(SPKS_fp_TWI, sd)
-#cellStats(SPKH_fp_TWI, mean); cellStats(SPKH_fp_TWI, sd)
-#---------------------------------------------------------------------------------#
-#---------------------------------------------------------------------------------#
