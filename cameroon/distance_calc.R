@@ -34,7 +34,7 @@ extent(camp)
 crs(camp)
 
 # Load GEDI data
-gedi_dat <- read_csv("~/Desktop/Research/Cameroon/cameroon_filtered_all_95")
+gedi_dat <- read_csv("~/Desktop/Research_2022/Data/GEDI/Cameroon_2a_filtered.csv")
 gedi_dat$Shot_Number
 summary(gedi_dat)
 
@@ -69,6 +69,11 @@ summary(gedi_dat$distance_to_camp)
 #calculate distance to IRD Plots
 gedi_dat$distance_to_IRD <- apply(gDistance(cam_utm, irdplot,byid=TRUE),2,min)/1000
 summary(gedi_dat$distance_to_IRD)
+
+#-----------------------------------------------------#
+#------------------------Export!----------------------
+#-----------------------------------------------------#
+write.csv(gedi_dat, "~/Desktop/Research_2022/Data/GEDI/cameroon_filtered_with_distances.csv")
 
 # filter out distances larger than half a kilometer
 #gedi_low_distance <- filter(gedi_dat, distance <= .5)
@@ -246,5 +251,52 @@ writeOGR(spdf_trail_a3, dsn = "~/Desktop/Research/Cameroon/", layer = "cam_trail
 
 # Check
 check <- readOGR("~/Desktop/Research/Cameroon/", "cam_trails_a3")
+check1 <- as(check, "data.frame")
+
+
+#--------->60 trees-------------
+# Load data
+tall <- read_csv("~/Desktop/Research/Cameroon/tall_shots")
+summary(tall)
+tall <- subset (tall, select = -c(...1, ...3))
+
+
+coords<- tall[,c("Longitude","Latitude")]
+proj <- crs(reserve)
+spdf_tall <- SpatialPointsDataFrame(coords=coords,
+                                        data=tall,
+                                        proj4string=proj)
+plot(spdf_tall)
+crs(spdf_tall)
+extent(spdf_tall)
+
+writeOGR(spdf_tall, dsn = "~/Desktop/Research/Cameroon/", layer = "tall_shots",
+         driver = "ESRI Shapefile" )
+
+# Check
+check <- readOGR("~/Desktop/Research/Cameroon/", "tall_shots")
+check1 <- as(check, "data.frame")
+
+#--------->60 trees-------------
+# Load data
+tall_75 <- read_csv("~/Desktop/Research/Cameroon/tall_shots_75")
+summary(tall_75)
+tall_75 <- subset (tall_75, select = -c(...1, ...3))
+
+
+coords<- tall_75[,c("Longitude","Latitude")]
+proj <- crs(reserve)
+spdf_tall_75 <- SpatialPointsDataFrame(coords=coords,
+                                    data=tall_75,
+                                    proj4string=proj)
+plot(spdf_tall_75)
+crs(spdf_tall_75)
+extent(spdf_tall_75)
+
+writeOGR(spdf_tall_75, dsn = "~/Desktop/Research/Cameroon/", layer = "tall_shots_75",
+         driver = "ESRI Shapefile" )
+
+# Check
+check <- readOGR("~/Desktop/Research/Cameroon/", "tall_shots_75")
 check1 <- as(check, "data.frame")
 
