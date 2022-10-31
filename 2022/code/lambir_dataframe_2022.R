@@ -304,18 +304,20 @@ summary(lambir_topo)
 write.csv(lambir_topo, "~/Desktop/Research_2022/Data/Southeast_Asia/Lambir/lambir_2022.csv")
 
 
-
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
 #----------------------------Surrounding Tree Analysis Dataset--------------------------------#
 #---------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------------------------------------#
+
+lambir_topo <- read_csv("~/Desktop/Research_2022/Data/Southeast_Asia/Lambir/lambir_2022.csv")
 # add tree labels
+quantile99dbh = 95
 lambir_topo$tree_type <- ifelse(lambir_topo$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
 
 #-1
 coords<- lambir_topo[,c("treex","treey")]
-lam_proj <- crs(elev_rast)
+lam_proj <- CRS("+proj=utm +zone=50 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
 lam_analysis_spdf <- SpatialPointsDataFrame(coords=coords,
                                             data=lambir_topo,
                                             proj4string=lam_proj)
@@ -327,6 +329,7 @@ lamdatsamp <- subset(lambir_topo, dbh < quantile99dbh)
 lamdatsamp <- sample_n(lamdatsamp, 10400)
 summary(lamdatsamp)
 lamdatemerg <- rbind(lamdatsamp, lamdatemerg)
+emerg_ID <- lamdatemerg$treeID
 dim(lamdatemerg)
 coords<- lamdatemerg[,c("treex","treey")]
 lamdat_emerg <- SpatialPointsDataFrame(coords=coords,
@@ -347,7 +350,7 @@ plot(lamdat_emerg)
 #3
 library(rgeos)
 #dandat_emerg <- buffer(dandat_emerg, width=5)
-lamdat_emerg_buff <- gBuffer(lamdat_emerg, byid=T, width=5) #EO: use the gBuffer function in rgeos instead, and set byid=T
+lamdat_emerg_buff <- gBuffer(lamdat_emerg, byid=T, width=2.5) #EO: use the gBuffer function in rgeos instead, and set byid=T
 plot(lamdat_emerg_buff)
 dim(lamdat_emerg_buff); dim(lamdat_emerg)
 #EO: You should still have a separate row for each buffer polygon, equal to the number of points in dandat_emerg 
@@ -380,10 +383,12 @@ summary(trees_within_buff)
 #EO: now the max number of trees within an emergent buffer is 75
 hist(trees_within_buff$n)
 
+# 5.5: remove trees that were the center
+lam_spdf <- lam_spdf[lam_spdf$treeID %in% emerg_ID, ]
 #6. Summarize neighboring trees
 #EO: enter what you want to summarize in the code below
-buff_summaries <- lam_spdf %>% group_by(poly.ID, treeID) %>% dplyr::summarize(heightmeansurr=mean(height),
-                                                                              dbhmeansurr=mean(dbh),
+buff_summaries <- lam_spdf %>% group_by(poly.ID, treeID) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
+                                                                              dbhmeansurr=mean(dbh, na.rm = TRUE),
                                                                               height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
                                                                               n_trees = n())
 
@@ -398,3 +403,71 @@ write.csv(lamdat_analysis_surr, "~/Desktop/Research_2022/Data/Southeast_Asia/Lam
 
 #EO: add summary variables to original dataset based on the poly.ID from buff_sumaries and ...
 #EO: ...the X1 or treeID value from dandat_emerg_buff, where the rows correspond to poly.ID 1:270
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+#------------------------------Surrounding Tree Analysis Debug--------------------------------#
+#---------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------#
+
+# crop -> coor -> spatial point
+# exract
+# merge -> spatial point, cropdata
+
+lambir_topo <- read_csv("~/Desktop/Research_2022/Data/Southeast_Asia/Lambir/lambir_2022.csv")
+table(lambir_topo$treeID)
+
+# add tree labels
+quantile99dbh = 95
+lambir_topo$tree_type <- ifelse(lambir_topo$dbh>=quantile99dbh, "emrgnt", "nonemrgnt")
+lam_heights <- subset(lambir_topo, select = c(height, treex, treey))
+
+#-1
+coords<- lam_heights[,c("treex","treey")]
+lam_proj <- CRS("+proj=utm +zone=50 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
+lam_analysis_spdf <- SpatialPointsDataFrame(coords=coords,
+                                            data=lam_heights,
+                                            proj4string=lam_proj)
+plot(lam_analysis_spdf)
+summary(lam_analysis_spdf)
+
+#0
+lam_small <- subset(lambir_topo, lambir_topo$species == "QUASBO")
+emerg_ID <- lam_small$treeID
+coords<- lam_small[,c("treex","treey")]
+lamdat_emerg <- SpatialPointsDataFrame(coords=coords,
+                              data = lam_small,
+                                       proj4string=lam_proj)
+plot(lamdat_emerg)
+
+#3
+library(rgeos)
+lamdat_emerg_buff <- gBuffer(lamdat_emerg, byid=T, width=5) #EO: use the gBuffer function in rgeos instead, and set byid=T
+plot(lamdat_emerg_buff)
+
+#4 & 5
+lam_analysis_spdf_crop <- lam_analysis_spdf  %>%  crop(lamdat_emerg_buff)
+
+plot(lamdat_emerg_buff)
+plot(lam_analysis_spdf_crop, add = T)
+
+lam_spdf <- extract(lamdat_emerg_buff, lam_analysis_spdf_crop)
+summary(lam_spdf)
+table(lam_spdf$treeID)
+
+check <- subset(lam_analysis_spdf_crop, treeID==25076)
+check <- subset(lamdat_emerg_buff, treeID==25076)
+table(check$treeID)
+# 5.5: remove trees that were the center
+lam_spdf <- lam_spdf[lam_spdf$treeID %in% emerg_ID, ]
+summary(buff_summaries)
+#6. Summarize neighboring trees
+#EO: enter what you want to summarize in the code below
+buff_summaries <- lam_spdf %>% group_by(poly.ID, treeID) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
+                                                                              dbhmeansurr=mean(dbh, na.rm = TRUE),
+                                                                              height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                              n_trees = n())
+str(lam_spdf$height)
+
+#7. add summary variable to original dataset
+lamdat_analysis_surr <- merge(lambir_topo,buff_summaries, by="treeID")
+summary(lamdat_analysis_surr)
