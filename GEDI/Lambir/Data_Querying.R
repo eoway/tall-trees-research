@@ -53,7 +53,7 @@ gedi_finder <- function(product, bbox) {
 
 # User-provided inputs (UPDATE FOR YOUR DESIRED PRODUCT AND BOUNDING BOX REGION OF INTEREST)
 product <- 'GEDI02_A.002'           # Options include 'GEDI01_B.002', 'GEDI02_A.002', 'GEDI02_B.002'
-bbox <- '102.269106,2.962146,102.348169,3.014783'  # bounding box coords in LL Longitude, LL Latitude, UR Longitude, UR Latitude format
+bbox <- '15.1524,6.6755,33.5267,13.5762'  # bounding box coords in LL Longitude, LL Latitude, UR Longitude, UR Latitude format
 
 # Call the gedi_finder function using the user-provided inputs
 granules <- gedi_finder(product, bbox)
