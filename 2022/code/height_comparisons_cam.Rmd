@@ -1,9 +1,9 @@
 ---
 title: "Cameroon Height Comparisons"
 output:
-  html_notebook: default
-  word_document: default
   pdf_document: default
+  word_document: default
+  html_notebook: default
 ---
 
 #### This notebook contains:
@@ -88,6 +88,15 @@ pear_cor_100_test <- cor.test(plotdat$rh100,plotdat$height100, method = "pearson
 spear_cor_100_test <- cor.test(plotdat$rh100,plotdat$height100, method = "spearman")
 bias100 <- round(bias(plotdat$rh100,plotdat$height100), digits = 4)
 
+RMSE100
+r2_100
+pear_cor_100
+pear_cor_100_test
+spear_cor_100
+spear_cor_100_test
+bias100
+
+
 RMSE99 <-round(hydroGOF::rmse(plotdat$rh99,plotdat$height99), digits = 4)
 r2_99 <- round(rsq(plotdat$rh99,plotdat$height99), digits = 4)
 pear_cor_99 <- cor(plotdat$rh99,plotdat$height99, method = "pearson")
@@ -95,6 +104,14 @@ spear_cor_99 <- cor(plotdat$rh99,plotdat$height99, method = "spearman")
 pear_cor_99_test <- cor.test(plotdat$rh99,plotdat$height99, method = "pearson")
 spear_cor_99_test <- cor.test(plotdat$rh99,plotdat$height99, method = "spearman")
 bias99 <-round(bias(plotdat$rh99,plotdat$height99), digits = 4)
+
+RMSE99
+r2_99
+pear_cor_99
+pear_cor_99_test
+spear_cor_99
+spear_cor_99_test
+bias99
 
 RMSE98 <-round(hydroGOF::rmse(plotdat$rh98,plotdat$height98), digits = 4)
 r2_98 <- round(rsq(plotdat$rh98,plotdat$height98), digits = 4)
@@ -104,6 +121,14 @@ pear_cor_98_test <- cor.test(plotdat$rh98,plotdat$height98, method = "pearson")
 spear_cor_98_test <- cor.test(plotdat$rh98,plotdat$height98, method = "spearman")
 bias98 <-round(bias(plotdat$rh98,plotdat$height98), digits = 4)
 
+RMSE98
+r2_98
+pear_cor_98
+pear_cor_98_test
+spear_cor_98
+spear_cor_98_test
+bias98
+
 RMSE95 <-round(hydroGOF::rmse(plotdat$rh95,plotdat$height95), digits = 4)
 r2_95 <- round(rsq(plotdat$rh95,plotdat$height95), digits = 4)
 pear_cor_95 <- cor(plotdat$rh95,plotdat$height95, method = "pearson")
@@ -111,6 +136,14 @@ spear_cor_95 <- cor(plotdat$rh95,plotdat$height95, method = "spearman")
 pear_cor_95_test <- cor.test(plotdat$rh95,plotdat$height95, method = "pearson")
 spear_cor_95_test <- cor.test(plotdat$rh95,plotdat$height95, method = "spearman")
 bias95 <-round(bias(plotdat$rh95,plotdat$height95), digits = 4)
+
+RMSE95
+r2_95
+pear_cor_95
+pear_cor_95_test
+spear_cor_95
+spear_cor_95_test
+bias95
 
 RMSE90 <-round(hydroGOF::rmse(plotdat$rh90,plotdat$height90), digits = 4)
 r2_90 <- round(rsq(plotdat$rh90,plotdat$height90), digits = 4)
@@ -120,6 +153,14 @@ pear_cor_90_test <- cor.test(plotdat$rh90,plotdat$height90, method = "pearson")
 spear_cor_90_test <- cor.test(plotdat$rh90,plotdat$height90, method = "spearman")
 bias90 <-round(bias(plotdat$rh90,plotdat$height90), digits = 4)
 
+RMSE90
+r2_90
+pear_cor_90
+pear_cor_90_test
+spear_cor_90
+spear_cor_90_test
+bias90
+
 RMSE85 <-round(hydroGOF::rmse(plotdat$rh85,plotdat$height85), digits = 4)
 r2_85 <- round(rsq(plotdat$rh85,plotdat$height85), digits = 4)
 pear_cor_85 <- cor(plotdat$rh85,plotdat$height85, method = "pearson")
@@ -127,6 +168,14 @@ spear_cor_85 <- cor(plotdat$rh85,plotdat$height85, method = "spearman")
 pear_cor_85_test <- cor.test(plotdat$rh85,plotdat$height85, method = "pearson")
 spear_cor_85_test <- cor.test(plotdat$rh85,plotdat$height85, method = "spearman")
 bias85 <-round(bias(plotdat$rh85,plotdat$height85), digits = 4)
+
+RMSE85
+r2_85
+pear_cor_85
+pear_cor_85_test
+spear_cor_85
+spear_cor_85_test
+bias85
 
 RMSE80 <-round(hydroGOF::rmse(plotdat$rh80,plotdat$height80), digits = 4)
 r2_80 <- round(rsq(plotdat$rh80,plotdat$height80), digits = 4)
@@ -136,6 +185,14 @@ pear_cor_80_test <- cor.test(plotdat$rh80,plotdat$height80, method = "pearson")
 spear_cor_80_test <- cor.test(plotdat$rh80,plotdat$height80, method = "spearman")
 bias80 <-round(bias(plotdat$rh80,plotdat$height80), digits = 4)
 
+RMSE80
+r2_80
+pear_cor_80
+pear_cor_80_test
+spear_cor_80
+spear_cor_80_test
+bias80
+
 RMSE75 <-round(hydroGOF::rmse(plotdat$rh75,plotdat$height75), digits = 4)
 r2_75 <- round(rsq(plotdat$rh75,plotdat$height75), digits = 4)
 pear_cor_75 <- cor(plotdat$rh75,plotdat$height75, method = "pearson")
@@ -143,6 +200,15 @@ spear_cor_75 <- cor(plotdat$rh75,plotdat$height75, method = "spearman")
 pear_cor_75_test <- cor.test(plotdat$rh75,plotdat$height75, method = "pearson")
 spear_cor_75_test <- cor.test(plotdat$rh75,plotdat$height75, method = "spearman")
 bias75 <-round(bias(plotdat$rh75,plotdat$height75), digits = 4)
+
+RMSE75
+r2_75
+pear_cor_75
+pear_cor_75_test
+spear_cor_75
+spear_cor_75_test
+bias75
+
 
 RMSE70 <-round(hydroGOF::rmse(plotdat$rh70,plotdat$height70), digits = 4)
 r2_70 <- round(rsq(plotdat$rh70,plotdat$height70), digits = 4)
@@ -152,6 +218,15 @@ pear_cor_70_test <- cor.test(plotdat$rh70,plotdat$height70, method = "pearson")
 spear_cor_70_test <- cor.test(plotdat$rh70,plotdat$height70, method = "spearman")
 bias70 <-round(bias(plotdat$rh70,plotdat$height70), digits = 4)
 
+RMSE70
+r2_70
+pear_cor_70
+pear_cor_70_test
+spear_cor_70
+spear_cor_70_test
+bias70
+
+
 RMSE65 <-round(hydroGOF::rmse(plotdat$rh65,plotdat$height65), digits = 4)
 r2_65 <- round(rsq(plotdat$rh65,plotdat$height65), digits = 4)
 pear_cor_65 <- cor(plotdat$rh65,plotdat$height65, method = "pearson")
@@ -159,6 +234,14 @@ spear_cor_65 <- cor(plotdat$rh65,plotdat$height65, method = "spearman")
 pear_cor_65_test <- cor.test(plotdat$rh65,plotdat$height65, method = "pearson")
 spear_cor_65_test <- cor.test(plotdat$rh65,plotdat$height65, method = "spearman")
 bias65 <-round(bias(plotdat$rh65,plotdat$height65), digits = 4)
+
+RMSE65
+r2_65
+pear_cor_65
+pear_cor_65_test
+spear_cor_65
+spear_cor_65_test
+bias65
 
 # 80/75 are best (r2 same)
 
@@ -176,50 +259,134 @@ bias65 <-round(bias(plotdat$rh65,plotdat$height65), digits = 4)
 par(mfrow=c(2,1))
 p1 <- plotdat %>%
   ggplot() + 
-  geom_point(mapping = aes(height100,rh100), col = "blue")+
+  geom_point(mapping = aes(height100,rh100), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
-  geom_label(aes(x = 15, y = 50, label = RMSE100), col = "red")+
-  geom_label(aes(x = 15, y = 40, label = r2_100), col = "green")+
-  geom_label(aes(x = 15, y = 30, label = bias100), col = "purple")
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("100th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE100), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_100), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias100), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
 p2 <- plotdat %>%
   ggplot() + 
-  geom_point(mapping = aes(height99,rh99), col = "blue")+
+  geom_point(mapping = aes(height99,rh99), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
-  geom_label(aes(x = 15, y = 50, label = RMSE99), col = "red")+
-  geom_label(aes(x = 15, y = 40, label = r2_99), col = "green")+
-  geom_label(aes(x = 15, y = 30, label = bias99), col = "purple")
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("99th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE99), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_99), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias99), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
 p3 <- plotdat %>%
   ggplot() + 
-  geom_point(mapping = aes(height98,rh98), col = "blue")+
+  geom_point(mapping = aes(height98,rh98), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
-  geom_label(aes(x = 15, y = 50, label = RMSE98), col = "red")+
-  geom_label(aes(x = 15, y = 40, label = r2_98), col = "green")+
-  geom_label(aes(x = 15, y = 30, label = bias98), col = "purple")
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("98th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE98), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_98), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias98), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
 p4 <- plotdat %>%
   ggplot() + 
-  geom_point(mapping = aes(height95,rh95), col = "blue")+
+  geom_point(mapping = aes(height95,rh95), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
-  geom_label(aes(x = 15, y = 50, label = RMSE95), col = "red")+
-  geom_label(aes(x = 15, y = 40, label = r2_95), col = "green")+
-  geom_label(aes(x = 15, y = 30, label = bias95), col = "purple")
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("95th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE95), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_95), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias95), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
 p5 <- plotdat %>%
   ggplot() + 
-  geom_point(mapping = aes(height90,rh90), col = "blue")+
+  geom_point(mapping = aes(height90,rh90), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
-  geom_label(aes(x = 15, y = 50, label = RMSE90), col = "red")+
-  geom_label(aes(x = 15, y = 40, label = r2_90), col = "green")+
-  geom_label(aes(x = 15, y = 30, label = bias90), col = "purple")
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("90th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE90), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_90), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias90), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
 p6 <- plotdat %>%
   ggplot() + 
-  geom_point(mapping = aes(height85,rh85), col = "blue")+
+  geom_point(mapping = aes(height85,rh85), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
-  geom_label(aes(x = 15, y = 50, label = RMSE85), col = "red")+
-  geom_label(aes(x = 15, y = 40, label = r2_85), col = "green")+
-  geom_label(aes(x = 15, y = 30, label = bias85), col = "purple")
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("85th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE85), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_85), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias85), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p7 <- plotdat %>%
+  ggplot() + 
+  geom_point(mapping = aes(height80,rh80), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("80th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE80), alpha = .5,col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_80), alpha = .5,col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias80), alpha = .5,col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p8 <- plotdat %>%
+  ggplot() + 
+  geom_point(mapping = aes(height75,rh75), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("75th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE75), alpha = .5,col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_75), alpha = .5,col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias75), alpha = .5,col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p9 <- plotdat %>%
+  ggplot() + 
+  geom_point(mapping = aes(height70,rh70), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("70th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE70), alpha = .5,col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_70), alpha = .5,col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias70), alpha = .5,col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
 ```
 
 ```{r}
-multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+multiplot(p1, p2, p3, p4, p5, p6, cols=3)
 ```
 
 
@@ -316,6 +483,47 @@ spear_cor_85 <- cor(plotdat$rh85_a2,plotdat$height85, method = "spearman")
 pear_cor_85_test <- cor.test(plotdat$rh85_a2,plotdat$height85, method = "pearson")
 spear_cor_85_test <- cor.test(plotdat$rh85_a2,plotdat$height85, method = "spearman")
 bias85 <-round(bias(plotdat$rh85_a2,plotdat$height85), digits = 4)
+
+RMSE80 <-round(hydroGOF::rmse(plotdat$rh80_a2,plotdat$height80), digits = 4)
+r2_80 <- round(rsq(plotdat$rh80_a2,plotdat$height80), digits = 4)
+pear_cor_80 <- cor(plotdat$rh80_a2,plotdat$height80, method = "pearson")
+spear_cor_80 <- cor(plotdat$rh80_a2,plotdat$height80, method = "spearman")
+pear_cor_80_test <- cor.test(plotdat$rh80_a2,plotdat$height80, method = "pearson")
+spear_cor_80_test <- cor.test(plotdat$rh80_a2,plotdat$height80, method = "spearman")
+bias80 <-round(bias(plotdat$rh80_a2,plotdat$height80), digits = 4)
+
+RMSE80
+RMSE75
+r2_80
+r2_75
+r2_70
+r2_65
+bias80
+bias75
+
+RMSE75 <-round(hydroGOF::rmse(plotdat$rh75_a2,plotdat$height75), digits = 4)
+r2_75 <- round(rsq(plotdat$rh75_a2,plotdat$height75), digits = 4)
+pear_cor_75 <- cor(plotdat$rh75_a2,plotdat$height75, method = "pearson")
+spear_cor_75 <- cor(plotdat$rh75_a2,plotdat$height75, method = "spearman")
+pear_cor_75_test <- cor.test(plotdat$rh75_a2,plotdat$height75, method = "pearson")
+spear_cor_75_test <- cor.test(plotdat$rh75_a2,plotdat$height75, method = "spearman")
+bias75 <-round(bias(plotdat$rh75_a2,plotdat$height75), digits = 4)
+
+RMSE70 <-round(hydroGOF::rmse(plotdat$rh70_a2,plotdat$height70), digits = 4)
+r2_70 <- round(rsq(plotdat$rh70_a2,plotdat$height70), digits = 4)
+pear_cor_70 <- cor(plotdat$rh70_a2,plotdat$height70, method = "pearson")
+spear_cor_70 <- cor(plotdat$rh70_a2,plotdat$height70, method = "spearman")
+pear_cor_70_test <- cor.test(plotdat$rh70_a2,plotdat$height70, method = "pearson")
+spear_cor_70_test <- cor.test(plotdat$rh70_a2,plotdat$height70, method = "spearman")
+bias70 <-round(bias(plotdat$rh70_a2,plotdat$height70), digits = 4)
+
+RMSE65 <-round(hydroGOF::rmse(plotdat$rh65_a2,plotdat$height65), digits = 4)
+r2_65 <- round(rsq(plotdat$rh65_a2,plotdat$height65), digits = 4)
+pear_cor_65 <- cor(plotdat$rh65_a2,plotdat$height65, method = "pearson")
+spear_cor_65 <- cor(plotdat$rh65_a2,plotdat$height65, method = "spearman")
+pear_cor_65_test <- cor.test(plotdat$rh65_a2,plotdat$height65, method = "pearson")
+spear_cor_65_test <- cor.test(plotdat$rh65_a2,plotdat$height65, method = "spearman")
+bias65 <-round(bias(plotdat$rh65_a2,plotdat$height65), digits = 4)
 
 pear_cor_85
 spear_cor_85
@@ -428,6 +636,64 @@ spear_cor_95 <- cor(plotdat$rh95_a3,plotdat$height95, method = "spearman")
 pear_cor_95_test <- cor.test(plotdat$rh95_a3,plotdat$height95, method = "pearson")
 spear_cor_95_test <- cor.test(plotdat$rh95_a3,plotdat$height95, method = "spearman")
 bias95 <-round(bias(plotdat$rh95_a3,plotdat$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(plotdat$rh90_a3,plotdat$height90), digits = 4)
+r2_90 <- round(rsq(plotdat$rh90_a3,plotdat$height90), digits = 4)
+pear_cor_90 <- cor(plotdat$rh90_a3,plotdat$height90, method = "pearson")
+spear_cor_90 <- cor(plotdat$rh90_a3,plotdat$height90, method = "spearman")
+pear_cor_90_test <- cor.test(plotdat$rh90_a3,plotdat$height90, method = "pearson")
+spear_cor_90_test <- cor.test(plotdat$rh90_a3,plotdat$height90, method = "spearman")
+bias90 <-round(bias(plotdat$rh90_a3,plotdat$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(plotdat$rh85_a3,plotdat$height85), digits = 4)
+r2_85 <- round(rsq(plotdat$rh85_a3,plotdat$height85), digits = 4)
+pear_cor_85 <- cor(plotdat$rh85_a3,plotdat$height85, method = "pearson")
+spear_cor_85 <- cor(plotdat$rh85_a3,plotdat$height85, method = "spearman")
+pear_cor_85_test <- cor.test(plotdat$rh85_a3,plotdat$height85, method = "pearson")
+spear_cor_85_test <- cor.test(plotdat$rh85_a3,plotdat$height85, method = "spearman")
+bias85 <-round(bias(plotdat$rh85_a3,plotdat$height85), digits = 4)
+
+RMSE80 <-round(hydroGOF::rmse(plotdat$rh80_a3,plotdat$height80), digits = 4)
+r2_80 <- round(rsq(plotdat$rh80_a3,plotdat$height80), digits = 4)
+pear_cor_80 <- cor(plotdat$rh80_a3,plotdat$height80, method = "pearson")
+spear_cor_80 <- cor(plotdat$rh80_a3,plotdat$height80, method = "spearman")
+pear_cor_80_test <- cor.test(plotdat$rh80_a3,plotdat$height80, method = "pearson")
+spear_cor_80_test <- cor.test(plotdat$rh80_a3,plotdat$height80, method = "spearman")
+bias80 <-round(bias(plotdat$rh80_a3,plotdat$height80), digits = 4)
+
+RMSE80
+RMSE75
+r2_85
+r2_80
+r2_75
+r2_70
+r2_65
+bias80
+bias75
+
+RMSE75 <-round(hydroGOF::rmse(plotdat$rh75_a3,plotdat$height75), digits = 4)
+r2_75 <- round(rsq(plotdat$rh75_a3,plotdat$height75), digits = 4)
+pear_cor_75 <- cor(plotdat$rh75_a3,plotdat$height75, method = "pearson")
+spear_cor_75 <- cor(plotdat$rh75_a3,plotdat$height75, method = "spearman")
+pear_cor_75_test <- cor.test(plotdat$rh75_a3,plotdat$height75, method = "pearson")
+spear_cor_75_test <- cor.test(plotdat$rh75_a3,plotdat$height75, method = "spearman")
+bias75 <-round(bias(plotdat$rh75_a3,plotdat$height75), digits = 4)
+
+RMSE70 <-round(hydroGOF::rmse(plotdat$rh70_a3,plotdat$height70), digits = 4)
+r2_70 <- round(rsq(plotdat$rh70_a3,plotdat$height70), digits = 4)
+pear_cor_70 <- cor(plotdat$rh70_a3,plotdat$height70, method = "pearson")
+spear_cor_70 <- cor(plotdat$rh70_a3,plotdat$height70, method = "spearman")
+pear_cor_70_test <- cor.test(plotdat$rh70_a3,plotdat$height70, method = "pearson")
+spear_cor_70_test <- cor.test(plotdat$rh70_a3,plotdat$height70, method = "spearman")
+bias70 <-round(bias(plotdat$rh70_a3,plotdat$height70), digits = 4)
+
+RMSE65 <-round(hydroGOF::rmse(plotdat$rh65_a3,plotdat$height65), digits = 4)
+r2_65 <- round(rsq(plotdat$rh65_a3,plotdat$height65), digits = 4)
+pear_cor_65 <- cor(plotdat$rh65_a3,plotdat$height65, method = "pearson")
+spear_cor_65 <- cor(plotdat$rh65_a3,plotdat$height65, method = "spearman")
+pear_cor_65_test <- cor.test(plotdat$rh65_a3,plotdat$height65, method = "pearson")
+spear_cor_65_test <- cor.test(plotdat$rh65_a3,plotdat$height65, method = "spearman")
+bias65 <-round(bias(plotdat$rh65_a3,plotdat$height65), digits = 4)
 ```
 
 ```{r,}
