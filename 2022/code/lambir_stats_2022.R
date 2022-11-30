@@ -21,8 +21,8 @@ summary(lam_data$CensusID)
 #------------------individual and quadrat level emergent labeling-----------------------------# 
 #---------------------------------------------------------------------------------------------#
 # Set 99th percentile dbh for emergent cut off
-dbh99 <- quantile99dbh #from heights.r
-#dbh99 <- 95
+# dbh99 <- quantile99dbh #from heights.r
+dbh99 <- 95
 
 # Make a column labeling each individual as emergent/non emergent (text and binomial)
 lam_data$tree_type <- ifelse(lam_data$dbh>=dbh99, "emrgnt", "nonemrgnt")
@@ -86,7 +86,7 @@ table(lam_stat$bitype)
 emerg <- filter(indlam_stat, tree_type=="emrgnt")
 summary(emerg)
 lamspecies <- as.data.frame(unique(emerg$species))
-
+table(lamspecies)
 #Binned plots------
 #individual level
 summary(indlam_stat$elev)
@@ -138,6 +138,7 @@ lam_stat %>%
 #Quad Level
 quad <- lm(height99~soil+Lambir_TWI+(Lambir_TWI*soil)+quad_x+quad_y, data=lam_stat)
 summary(quad)
+AIC(quad)
 
 indiv <- lm(height~soil+Lambir_TWI+(Lambir_TWI*soil)+x+y, data=indlam_stat)
 summary(indiv)
