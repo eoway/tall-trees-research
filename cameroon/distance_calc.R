@@ -9,6 +9,10 @@ require(rgdal)
 require(raster)
 library(rgeos)
 
+
+#ignore
+gedi_dat <- read_csv("~/Desktop/SEAsia_test00100.csv")
+
 # Load data to obtain CRS from
 #irdplot <- readOGR('~/Desktop/Research/Cameroon/IRDplot',"Bouamir_IRDPlot")
 #plot(irdplot)
