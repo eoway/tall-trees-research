@@ -28,10 +28,11 @@ library(hydroGOF)
 library(SimDesign)
 library(rgeos)
 library(ggspatial)
-plotdat <- read.csv( "~/Desktop/Research_2022/Data/GEDI/cam_field_gedi_lidar.csv")
+library(gridExtra)
+plotdat <- read.csv("~/Desktop/Research_2022/Data/GEDI/cam_field_gedi_lidar_all.csv")
 
-summary(plotdat)
-class(plotdat$rh100)
+coverage <- subset(plotdat, Beam == "BEAM0000" | Beam == "BEAM0001" | Beam == "BEAM0010" | Beam == "BEAM0011")
+fullpower <- subset(plotdat, Beam == "BEAM0101" | Beam == "BEAM0110" | Beam == "BEAM1000" |  Beam == "BEAM1011")
 # r squared calculation
 rsq <-  function(x, y) summary(lm(y~x))$r.squared
 ```
@@ -77,187 +78,101 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 ```
 
 
-## Default Algorithm 
+
+#----------------------------------------------#
+#----------------------------------------------#
+##------------- Default Algorithm--------------
+#----------------------------------------------#
+#----------------------------------------------#
+
 ```{r}
 # Calculate R squared and RMSE 
-RMSE100 <- round(hydroGOF::rmse(plotdat$rh100,plotdat$height100), digits = 4)
-r2_100 <- round(rsq(plotdat$rh100,plotdat$height100), digits = 4)
-pear_cor_100 <- cor(plotdat$rh100,plotdat$height100, method = "pearson")
-spear_cor_100 <- cor(plotdat$rh100,plotdat$height100, method = "spearman")
-pear_cor_100_test <- cor.test(plotdat$rh100,plotdat$height100, method = "pearson")
-spear_cor_100_test <- cor.test(plotdat$rh100,plotdat$height100, method = "spearman")
-bias100 <- round(bias(plotdat$rh100,plotdat$height100), digits = 4)
+RMSE100_default <- round(hydroGOF::rmse(coverage$rh100,coverage$height100), digits = 4)
+r2_100_default <- round(rsq(coverage$rh100,coverage$height100), digits = 4)
+pear_cor_100_default <- cor(coverage$rh100,coverage$height100, method = "pearson")
+spear_cor_100_default <- cor(coverage$rh100,coverage$height100, method = "spearman")
+pear_cor_100_test_default <- cor.test(coverage$rh100,coverage$height100, method = "pearson")
+spear_cor_100_test_default <- cor.test(coverage$rh100,coverage$height100, method = "spearman")
+bias100_default <- round(bias(coverage$rh100,coverage$height100), digits = 4)
 
-RMSE100
-r2_100
-pear_cor_100
-pear_cor_100_test
-spear_cor_100
-spear_cor_100_test
-bias100
+RMSE99_default <-round(hydroGOF::rmse(coverage$rh99,coverage$height99), digits = 4)
+r2_99_default <- round(rsq(coverage$rh99,coverage$height99), digits = 4)
+pear_cor_99_default <- cor(coverage$rh99,coverage$height99, method = "pearson")
+spear_cor_99_default <- cor(coverage$rh99,coverage$height99, method = "spearman")
+pear_cor_99_test_default <- cor.test(coverage$rh99,coverage$height99, method = "pearson")
+spear_cor_99_test_default <- cor.test(coverage$rh99,coverage$height99, method = "spearman")
+bias99_default <-round(bias(coverage$rh99,coverage$height99), digits = 4)
 
+RMSE98_default <-round(hydroGOF::rmse(coverage$rh98,coverage$height98), digits = 4)
+r2_98_default <- round(rsq(coverage$rh98,coverage$height98), digits = 4)
+pear_cor_98_default <- cor(coverage$rh98,coverage$height98, method = "pearson")
+spear_cor_98_default <- cor(coverage$rh98,coverage$height98, method = "spearman")
+pear_cor_98_test_default <- cor.test(coverage$rh98,coverage$height98, method = "pearson")
+spear_cor_98_test_default <- cor.test(coverage$rh98,coverage$height98, method = "spearman")
+bias98_default <-round(bias(coverage$rh98,coverage$height98), digits = 4)
 
-RMSE99 <-round(hydroGOF::rmse(plotdat$rh99,plotdat$height99), digits = 4)
-r2_99 <- round(rsq(plotdat$rh99,plotdat$height99), digits = 4)
-pear_cor_99 <- cor(plotdat$rh99,plotdat$height99, method = "pearson")
-spear_cor_99 <- cor(plotdat$rh99,plotdat$height99, method = "spearman")
-pear_cor_99_test <- cor.test(plotdat$rh99,plotdat$height99, method = "pearson")
-spear_cor_99_test <- cor.test(plotdat$rh99,plotdat$height99, method = "spearman")
-bias99 <-round(bias(plotdat$rh99,plotdat$height99), digits = 4)
+RMSE95_default <-round(hydroGOF::rmse(coverage$rh95,coverage$height95), digits = 4)
+r2_95_default <- round(rsq(coverage$rh95,coverage$height95), digits = 4)
+pear_cor_95_default <- cor(coverage$rh95,coverage$height95, method = "pearson")
+spear_cor_95_default <- cor(coverage$rh95,coverage$height95, method = "spearman")
+pear_cor_95_test_default <- cor.test(coverage$rh95,coverage$height95, method = "pearson")
+spear_cor_95_test_default <- cor.test(coverage$rh95,coverage$height95, method = "spearman")
+bias95_default <-round(bias(coverage$rh95,coverage$height95), digits = 4)
 
-RMSE99
-r2_99
-pear_cor_99
-pear_cor_99_test
-spear_cor_99
-spear_cor_99_test
-bias99
+RMSE90_default <-round(hydroGOF::rmse(coverage$rh90,coverage$height90), digits = 4)
+r2_90_default <- round(rsq(coverage$rh90,coverage$height90), digits = 4)
+pear_cor_90_default <- cor(coverage$rh90,coverage$height90, method = "pearson")
+spear_cor_90_default <- cor(coverage$rh90,coverage$height90, method = "spearman")
+pear_cor_90_test_default <- cor.test(coverage$rh90,coverage$height90, method = "pearson")
+spear_cor_90_test_default <- cor.test(coverage$rh90,coverage$height90, method = "spearman")
+bias90_default <-round(bias(coverage$rh90,coverage$height90), digits = 4)
 
-RMSE98 <-round(hydroGOF::rmse(plotdat$rh98,plotdat$height98), digits = 4)
-r2_98 <- round(rsq(plotdat$rh98,plotdat$height98), digits = 4)
-pear_cor_98 <- cor(plotdat$rh98,plotdat$height98, method = "pearson")
-spear_cor_98 <- cor(plotdat$rh98,plotdat$height98, method = "spearman")
-pear_cor_98_test <- cor.test(plotdat$rh98,plotdat$height98, method = "pearson")
-spear_cor_98_test <- cor.test(plotdat$rh98,plotdat$height98, method = "spearman")
-bias98 <-round(bias(plotdat$rh98,plotdat$height98), digits = 4)
+RMSE85_default <-round(hydroGOF::rmse(coverage$rh85,coverage$height85), digits = 4)
+r2_85_default <- round(rsq(coverage$rh85,coverage$height85), digits = 4)
+pear_cor_85_default <- cor(coverage$rh85,coverage$height85, method = "pearson")
+spear_cor_85_default <- cor(coverage$rh85,coverage$height85, method = "spearman")
+pear_cor_85_test_default <- cor.test(coverage$rh85,coverage$height85, method = "pearson")
+spear_cor_85_test_default <- cor.test(coverage$rh85,coverage$height85, method = "spearman")
+bias85_default <-round(bias(coverage$rh85,coverage$height85), digits = 4)
 
-RMSE98
-r2_98
-pear_cor_98
-pear_cor_98_test
-spear_cor_98
-spear_cor_98_test
-bias98
+RMSE80_default <-round(hydroGOF::rmse(coverage$rh80,coverage$height80), digits = 4)
+r2_80_default <- round(rsq(coverage$rh80,coverage$height80), digits = 4)
+pear_cor_80_default <- cor(coverage$rh80,coverage$height80, method = "pearson")
+spear_cor_80_default <- cor(coverage$rh80,coverage$height80, method = "spearman")
+pear_cor_80_test_default <- cor.test(coverage$rh80,coverage$height80, method = "pearson")
+spear_cor_80_test_default <- cor.test(coverage$rh80,coverage$height80, method = "spearman")
+bias80_default <-round(bias(coverage$rh80,coverage$height80), digits = 4)
 
-RMSE95 <-round(hydroGOF::rmse(plotdat$rh95,plotdat$height95), digits = 4)
-r2_95 <- round(rsq(plotdat$rh95,plotdat$height95), digits = 4)
-pear_cor_95 <- cor(plotdat$rh95,plotdat$height95, method = "pearson")
-spear_cor_95 <- cor(plotdat$rh95,plotdat$height95, method = "spearman")
-pear_cor_95_test <- cor.test(plotdat$rh95,plotdat$height95, method = "pearson")
-spear_cor_95_test <- cor.test(plotdat$rh95,plotdat$height95, method = "spearman")
-bias95 <-round(bias(plotdat$rh95,plotdat$height95), digits = 4)
+RMSE75_default <-round(hydroGOF::rmse(coverage$rh75,coverage$height75), digits = 4)
+r2_75_default <- round(rsq(coverage$rh75,coverage$height75), digits = 4)
+pear_cor_75_default <- cor(coverage$rh75,coverage$height75, method = "pearson")
+spear_cor_75_default <- cor(coverage$rh75,coverage$height75, method = "spearman")
+pear_cor_75_test_default <- cor.test(coverage$rh75,coverage$height75, method = "pearson")
+spear_cor_75_test_default <- cor.test(coverage$rh75,coverage$height75, method = "spearman")
+bias75_default <-round(bias(coverage$rh75,coverage$height75), digits = 4)
 
-RMSE95
-r2_95
-pear_cor_95
-pear_cor_95_test
-spear_cor_95
-spear_cor_95_test
-bias95
+RMSE70_default <-round(hydroGOF::rmse(coverage$rh70,coverage$height70), digits = 4)
+r2_70_default <- round(rsq(coverage$rh70,coverage$height70), digits = 4)
+pear_cor_70_default <- cor(coverage$rh70,coverage$height70, method = "pearson")
+spear_cor_70_default <- cor(coverage$rh70,coverage$height70, method = "spearman")
+pear_cor_70_test_default <- cor.test(coverage$rh70,coverage$height70, method = "pearson")
+spear_cor_70_test_default <- cor.test(coverage$rh70,coverage$height70, method = "spearman")
+bias70_default <-round(bias(coverage$rh70,coverage$height70), digits = 4)
 
-RMSE90 <-round(hydroGOF::rmse(plotdat$rh90,plotdat$height90), digits = 4)
-r2_90 <- round(rsq(plotdat$rh90,plotdat$height90), digits = 4)
-pear_cor_90 <- cor(plotdat$rh90,plotdat$height90, method = "pearson")
-spear_cor_90 <- cor(plotdat$rh90,plotdat$height90, method = "spearman")
-pear_cor_90_test <- cor.test(plotdat$rh90,plotdat$height90, method = "pearson")
-spear_cor_90_test <- cor.test(plotdat$rh90,plotdat$height90, method = "spearman")
-bias90 <-round(bias(plotdat$rh90,plotdat$height90), digits = 4)
+RMSE65_default <-round(hydroGOF::rmse(coverage$rh65,coverage$height65), digits = 4)
+r2_65_default <- round(rsq(coverage$rh65,coverage$height65), digits = 4)
+pear_cor_65_default <- cor(coverage$rh65,coverage$height65, method = "pearson")
+spear_cor_65_default <- cor(coverage$rh65,coverage$height65, method = "spearman")
+pear_cor_65_test_default <- cor.test(coverage$rh65,coverage$height65, method = "pearson")
+spear_cor_65_test_default <- cor.test(coverage$rh65,coverage$height65, method = "spearman")
+bias65_default <-round(bias(coverage$rh65,coverage$height65), digits = 4)
 
-RMSE90
-r2_90
-pear_cor_90
-pear_cor_90_test
-spear_cor_90
-spear_cor_90_test
-bias90
-
-RMSE85 <-round(hydroGOF::rmse(plotdat$rh85,plotdat$height85), digits = 4)
-r2_85 <- round(rsq(plotdat$rh85,plotdat$height85), digits = 4)
-pear_cor_85 <- cor(plotdat$rh85,plotdat$height85, method = "pearson")
-spear_cor_85 <- cor(plotdat$rh85,plotdat$height85, method = "spearman")
-pear_cor_85_test <- cor.test(plotdat$rh85,plotdat$height85, method = "pearson")
-spear_cor_85_test <- cor.test(plotdat$rh85,plotdat$height85, method = "spearman")
-bias85 <-round(bias(plotdat$rh85,plotdat$height85), digits = 4)
-
-RMSE85
-r2_85
-pear_cor_85
-pear_cor_85_test
-spear_cor_85
-spear_cor_85_test
-bias85
-
-RMSE80 <-round(hydroGOF::rmse(plotdat$rh80,plotdat$height80), digits = 4)
-r2_80 <- round(rsq(plotdat$rh80,plotdat$height80), digits = 4)
-pear_cor_80 <- cor(plotdat$rh80,plotdat$height80, method = "pearson")
-spear_cor_80 <- cor(plotdat$rh80,plotdat$height80, method = "spearman")
-pear_cor_80_test <- cor.test(plotdat$rh80,plotdat$height80, method = "pearson")
-spear_cor_80_test <- cor.test(plotdat$rh80,plotdat$height80, method = "spearman")
-bias80 <-round(bias(plotdat$rh80,plotdat$height80), digits = 4)
-
-RMSE80
-r2_80
-pear_cor_80
-pear_cor_80_test
-spear_cor_80
-spear_cor_80_test
-bias80
-
-RMSE75 <-round(hydroGOF::rmse(plotdat$rh75,plotdat$height75), digits = 4)
-r2_75 <- round(rsq(plotdat$rh75,plotdat$height75), digits = 4)
-pear_cor_75 <- cor(plotdat$rh75,plotdat$height75, method = "pearson")
-spear_cor_75 <- cor(plotdat$rh75,plotdat$height75, method = "spearman")
-pear_cor_75_test <- cor.test(plotdat$rh75,plotdat$height75, method = "pearson")
-spear_cor_75_test <- cor.test(plotdat$rh75,plotdat$height75, method = "spearman")
-bias75 <-round(bias(plotdat$rh75,plotdat$height75), digits = 4)
-
-RMSE75
-r2_75
-pear_cor_75
-pear_cor_75_test
-spear_cor_75
-spear_cor_75_test
-bias75
-
-
-RMSE70 <-round(hydroGOF::rmse(plotdat$rh70,plotdat$height70), digits = 4)
-r2_70 <- round(rsq(plotdat$rh70,plotdat$height70), digits = 4)
-pear_cor_70 <- cor(plotdat$rh70,plotdat$height70, method = "pearson")
-spear_cor_70 <- cor(plotdat$rh70,plotdat$height70, method = "spearman")
-pear_cor_70_test <- cor.test(plotdat$rh70,plotdat$height70, method = "pearson")
-spear_cor_70_test <- cor.test(plotdat$rh70,plotdat$height70, method = "spearman")
-bias70 <-round(bias(plotdat$rh70,plotdat$height70), digits = 4)
-
-RMSE70
-r2_70
-pear_cor_70
-pear_cor_70_test
-spear_cor_70
-spear_cor_70_test
-bias70
-
-
-RMSE65 <-round(hydroGOF::rmse(plotdat$rh65,plotdat$height65), digits = 4)
-r2_65 <- round(rsq(plotdat$rh65,plotdat$height65), digits = 4)
-pear_cor_65 <- cor(plotdat$rh65,plotdat$height65, method = "pearson")
-spear_cor_65 <- cor(plotdat$rh65,plotdat$height65, method = "spearman")
-pear_cor_65_test <- cor.test(plotdat$rh65,plotdat$height65, method = "pearson")
-spear_cor_65_test <- cor.test(plotdat$rh65,plotdat$height65, method = "spearman")
-bias65 <-round(bias(plotdat$rh65,plotdat$height65), digits = 4)
-
-RMSE65
-r2_65
-pear_cor_65
-pear_cor_65_test
-spear_cor_65
-spear_cor_65_test
-bias65
-
-# 80/75 are best (r2 same)
-
-# put rh95 as a point of comparison
-# there is a bias in the measurements 
-## what argument can you formulate from why
-## any other information or analyses you can do 
-## can do reading about it
-## not noise, introduces scatter, not bias
-## not ground a
-
+# 90 is best with r2 of 0.6606
 ```
 
 ```{r,}
 par(mfrow=c(2,1))
-p1 <- plotdat %>%
+p1 <- coverage %>%
   ggplot() + 
   geom_point(mapping = aes(height100,rh100), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
@@ -271,7 +186,7 @@ p1 <- plotdat %>%
                                                                                                            family="serif"),
                                                                                   axis.title.y=element_text(size=10, 
                                                                                                            family="serif"))
-p2 <- plotdat %>%
+p2 <- coverage %>%
   ggplot() + 
   geom_point(mapping = aes(height99,rh99), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
@@ -285,7 +200,7 @@ p2 <- plotdat %>%
                                                                                                            family="serif"),
                                                                                   axis.title.y=element_text(size=10, 
                                                                                                            family="serif"))
-p3 <- plotdat %>%
+p3 <- coverage %>%
   ggplot() + 
   geom_point(mapping = aes(height98,rh98), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
@@ -299,7 +214,7 @@ p3 <- plotdat %>%
                                                                                                            family="serif"),
                                                                                   axis.title.y=element_text(size=10, 
                                                                                                            family="serif"))
-p4 <- plotdat %>%
+p4 <- coverage %>%
   ggplot() + 
   geom_point(mapping = aes(height95,rh95), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
@@ -313,7 +228,7 @@ p4 <- plotdat %>%
                                                                                                            family="serif"),
                                                                                   axis.title.y=element_text(size=10, 
                                                                                                            family="serif"))
-p5 <- plotdat %>%
+p5 <- coverage %>%
   ggplot() + 
   geom_point(mapping = aes(height90,rh90), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
@@ -327,7 +242,7 @@ p5 <- plotdat %>%
                                                                                                            family="serif"),
                                                                                   axis.title.y=element_text(size=10, 
                                                                                                            family="serif"))
-p6 <- plotdat %>%
+p6 <- coverage %>%
   ggplot() + 
   geom_point(mapping = aes(height85,rh85), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
@@ -341,7 +256,7 @@ p6 <- plotdat %>%
                                                                                                            family="serif"),
                                                                                   axis.title.y=element_text(size=10, 
                                                                                                            family="serif"))
-p7 <- plotdat %>%
+p7 <- coverage %>%
   ggplot() + 
   geom_point(mapping = aes(height80,rh80), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
@@ -355,7 +270,7 @@ p7 <- plotdat %>%
                                                                                                            family="serif"),
                                                                                   axis.title.y=element_text(size=10, 
                                                                                                            family="serif"))
-p8 <- plotdat %>%
+p8 <- coverage %>%
   ggplot() + 
   geom_point(mapping = aes(height75,rh75), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
@@ -369,7 +284,7 @@ p8 <- plotdat %>%
                                                                                                            family="serif"),
                                                                                   axis.title.y=element_text(size=10, 
                                                                                                            family="serif"))
-p9 <- plotdat %>%
+p9 <- coverage %>%
   ggplot() + 
   geom_point(mapping = aes(height70,rh70), alpha = .5,col = "blue")+
   geom_abline(intercept = 0, slope = 1)+
@@ -390,6 +305,739 @@ multiplot(p1, p2, p3, p4, p5, p6, cols=3)
 ```
 
 
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 2------------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a2 <- round(hydroGOF::rmse(coverage$rh100_a2,coverage$height100), digits = 4)
+r2_100_a2 <- round(rsq(coverage$rh100_a2,coverage$height100), digits = 4)
+pear_cor_100_a2 <- cor(coverage$rh100_a2,coverage$height100, method = "pearson")
+spear_cor_100_a2 <- cor(coverage$rh100_a2,coverage$height100, method = "spearman")
+pear_cor_100_test_a2 <- cor.test(coverage$rh100_a2,coverage$height100, method = "pearson")
+spear_cor_100_test_a2 <- cor.test(coverage$rh100_a2,coverage$height100, method = "spearman")
+bias100_a2 <- round(bias(coverage$rh100_a2,coverage$height100), digits = 4)
+
+RMSE99_a2 <-round(hydroGOF::rmse(coverage$rh99_a2,coverage$height99), digits = 4)
+r2_99_a2 <- round(rsq(coverage$rh99_a2,coverage$height99), digits = 4)
+pear_cor_99_a2 <- cor(coverage$rh99_a2,coverage$height99, method = "pearson")
+spear_cor_99_a2 <- cor(coverage$rh99_a2,coverage$height99, method = "spearman")
+pear_cor_99_test_a2 <- cor.test(coverage$rh99_a2,coverage$height99, method = "pearson")
+spear_cor_99_test_a2 <- cor.test(coverage$rh99_a2,coverage$height99, method = "spearman")
+bias99_a2 <-round(bias(coverage$rh99_a2,coverage$height99), digits = 4)
+
+RMSE98_a2 <-round(hydroGOF::rmse(coverage$rh98_a2,coverage$height98), digits = 4)
+r2_98_a2 <- round(rsq(coverage$rh98_a2,coverage$height98), digits = 4)
+pear_cor_98_a2 <- cor(coverage$rh98_a2,coverage$height98, method = "pearson")
+spear_cor_98_a2 <- cor(coverage$rh98_a2,coverage$height98, method = "spearman")
+pear_cor_98_test_a2 <- cor.test(coverage$rh98_a2,coverage$height98, method = "pearson")
+spear_cor_98_test_a2 <- cor.test(coverage$rh98_a2,coverage$height98, method = "spearman")
+bias98_a2 <-round(bias(coverage$rh98_a2,coverage$height98), digits = 4)
+
+RMSE95_a2 <-round(hydroGOF::rmse(coverage$rh95_a2,coverage$height95), digits = 4)
+r2_95_a2 <- round(rsq(coverage$rh95_a2,coverage$height95), digits = 4)
+pear_cor_95_a2 <- cor(coverage$rh95_a2,coverage$height95, method = "pearson")
+spear_cor_95_a2 <- cor(coverage$rh95_a2,coverage$height95, method = "spearman")
+pear_cor_95_test_a2 <- cor.test(coverage$rh95_a2,coverage$height95, method = "pearson")
+spear_cor_95_test_a2 <- cor.test(coverage$rh95_a2,coverage$height95, method = "spearman")
+bias95_a2 <-round(bias(coverage$rh95_a2,coverage$height95), digits = 4)
+
+RMSE90_a2 <-round(hydroGOF::rmse(coverage$rh90_a2,coverage$height90), digits = 4)
+r2_90_a2 <- round(rsq(coverage$rh90_a2,coverage$height90), digits = 4)
+pear_cor_90_a2 <- cor(coverage$rh90_a2,coverage$height90, method = "pearson")
+spear_cor_90_a2 <- cor(coverage$rh90_a2,coverage$height90, method = "spearman")
+pear_cor_90_test_a2 <- cor.test(coverage$rh90_a2,coverage$height90, method = "pearson")
+spear_cor_90_test_a2 <- cor.test(coverage$rh90_a2,coverage$height90, method = "spearman")
+bias90_a2 <-round(bias(coverage$rh90_a2,coverage$height90), digits = 4)
+
+RMSE85_a2 <-round(hydroGOF::rmse(coverage$rh85_a2,coverage$height85), digits = 4)
+r2_85_a2 <- round(rsq(coverage$rh85_a2,coverage$height85), digits = 4)
+pear_cor_85_a2 <- cor(coverage$rh85_a2,coverage$height85, method = "pearson")
+spear_cor_85_a2 <- cor(coverage$rh85_a2,coverage$height85, method = "spearman")
+pear_cor_85_test_a2 <- cor.test(coverage$rh85_a2,coverage$height85, method = "pearson")
+spear_cor_85_test_a2 <- cor.test(coverage$rh85_a2,coverage$height85, method = "spearman")
+bias85_a2 <-round(bias(coverage$rh85_a2,coverage$height85), digits = 4)
+
+RMSE80_a2 <-round(hydroGOF::rmse(coverage$rh80_a2,coverage$height80), digits = 4)
+r2_80_a2 <- round(rsq(coverage$rh80_a2,coverage$height80), digits = 4)
+pear_cor_80_a2 <- cor(coverage$rh80_a2,coverage$height80, method = "pearson")
+spear_cor_80_a2 <- cor(coverage$rh80_a2,coverage$height80, method = "spearman")
+pear_cor_80_test_a2 <- cor.test(coverage$rh80_a2,coverage$height80, method = "pearson")
+spear_cor_80_test_a2 <- cor.test(coverage$rh80_a2,coverage$height80, method = "spearman")
+bias80_a2 <-round(bias(coverage$rh80_a2,coverage$height80), digits = 4)
+
+RMSE75_a2 <-round(hydroGOF::rmse(coverage$rh75_a2,coverage$height75), digits = 4)
+r2_75_a2 <- round(rsq(coverage$rh75_a2,coverage$height75), digits = 4)
+pear_cor_75_a2 <- cor(coverage$rh75_a2,coverage$height75, method = "pearson")
+spear_cor_75_a2 <- cor(coverage$rh75_a2,coverage$height75, method = "spearman")
+pear_cor_75_test_a2 <- cor.test(coverage$rh75_a2,coverage$height75, method = "pearson")
+spear_cor_75_test_a2 <- cor.test(coverage$rh75_a2,coverage$height75, method = "spearman")
+bias75_a2 <-round(bias(coverage$rh75_a2,coverage$height75), digits = 4)
+
+RMSE70_a2 <-round(hydroGOF::rmse(coverage$rh70_a2,coverage$height70), digits = 4)
+r2_70_a2 <- round(rsq(coverage$rh70_a2,coverage$height70), digits = 4)
+pear_cor_70_a2 <- cor(coverage$rh70_a2,coverage$height70, method = "pearson")
+spear_cor_70_a2 <- cor(coverage$rh70_a2,coverage$height70, method = "spearman")
+pear_cor_70_test_a2 <- cor.test(coverage$rh70_a2,coverage$height70, method = "pearson")
+spear_cor_70_test_a2 <- cor.test(coverage$rh70_a2,coverage$height70, method = "spearman")
+bias70_a2 <-round(bias(coverage$rh70_a2,coverage$height70), digits = 4)
+
+RMSE65_a2 <-round(hydroGOF::rmse(coverage$rh65_a2,coverage$height65), digits = 4)
+r2_65_a2 <- round(rsq(coverage$rh65_a2,coverage$height65), digits = 4)
+pear_cor_65_a2<- cor(coverage$rh65_a2,coverage$height65, method = "pearson")
+spear_cor_65_a2 <- cor(coverage$rh65_a2,coverage$height65, method = "spearman")
+pear_cor_65_test_a2 <- cor.test(coverage$rh65_a2,coverage$height65, method = "pearson")
+spear_cor_65_test_a2 <- cor.test(coverage$rh65_a2,coverage$height65, method = "spearman")
+bias65_a2 <-round(bias(coverage$rh65_a2,coverage$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a2), col = "purple")
+p2 <-coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a2), col = "purple")
+p3 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a2), col = "purple")
+p4 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a2), col = "purple")
+p5 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a2), col = "purple")
+p6 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a2), col = "purple")
+```
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 3------------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a3 <- round(hydroGOF::rmse(coverage$rh100_a3,coverage$height100), digits = 4)
+r2_100_a3 <- round(rsq(coverage$rh100_a3,coverage$height100), digits = 4)
+pear_cor_100_a3 <- cor(coverage$rh100_a3,coverage$height100, method = "pearson")
+spear_cor_100_a3 <- cor(coverage$rh100_a3,coverage$height100, method = "spearman")
+pear_cor_100_test_a3 <- cor.test(coverage$rh100_a3,coverage$height100, method = "pearson")
+spear_cor_100_test_a3 <- cor.test(coverage$rh100_a3,coverage$height100, method = "spearman")
+bias100_a3 <- round(bias(coverage$rh100_a3,coverage$height100), digits = 4)
+
+RMSE99_a3 <-round(hydroGOF::rmse(coverage$rh99_a3,coverage$height99), digits = 4)
+r2_99_a3 <- round(rsq(coverage$rh99_a3,coverage$height99), digits = 4)
+pear_cor_99_a3 <- cor(coverage$rh99_a3,coverage$height99, method = "pearson")
+spear_cor_99_a3 <- cor(coverage$rh99_a3,coverage$height99, method = "spearman")
+pear_cor_99_test_a3 <- cor.test(coverage$rh99_a3,coverage$height99, method = "pearson")
+spear_cor_99_test_a3 <- cor.test(coverage$rh99_a3,coverage$height99, method = "spearman")
+bias99_a3 <-round(bias(coverage$rh99_a3,coverage$height99), digits = 4)
+
+RMSE98_a3 <-round(hydroGOF::rmse(coverage$rh98_a3,coverage$height98), digits = 4)
+r2_98_a3 <- round(rsq(coverage$rh98_a3,coverage$height98), digits = 4)
+pear_cor_98_a3 <- cor(coverage$rh98_a3,coverage$height98, method = "pearson")
+spear_cor_98_a3 <- cor(coverage$rh98_a3,coverage$height98, method = "spearman")
+pear_cor_98_test_a3 <- cor.test(coverage$rh98_a3,coverage$height98, method = "pearson")
+spear_cor_98_test_a3 <- cor.test(coverage$rh98_a3,coverage$height98, method = "spearman")
+bias98_a3 <-round(bias(coverage$rh98_a3,coverage$height98), digits = 4)
+
+RMSE95_a3 <-round(hydroGOF::rmse(coverage$rh95_a3,coverage$height95), digits = 4)
+r2_95_a3 <- round(rsq(coverage$rh95_a3,coverage$height95), digits = 4)
+pear_cor_95_a3 <- cor(coverage$rh95_a3,coverage$height95, method = "pearson")
+spear_cor_95_a3 <- cor(coverage$rh95_a3,coverage$height95, method = "spearman")
+pear_cor_95_test_a3 <- cor.test(coverage$rh95_a3,coverage$height95, method = "pearson")
+spear_cor_95_test_a3 <- cor.test(coverage$rh95_a3,coverage$height95, method = "spearman")
+bias95_a3 <-round(bias(coverage$rh95_a3,coverage$height95), digits = 4)
+
+RMSE90_a3 <-round(hydroGOF::rmse(coverage$rh90_a3,coverage$height90), digits = 4)
+r2_90_a3 <- round(rsq(coverage$rh90_a3,coverage$height90), digits = 4)
+pear_cor_90_a3 <- cor(coverage$rh90_a3,coverage$height90, method = "pearson")
+spear_cor_90_a3 <- cor(coverage$rh90_a3,coverage$height90, method = "spearman")
+pear_cor_90_test_a3 <- cor.test(coverage$rh90_a3,coverage$height90, method = "pearson")
+spear_cor_90_test_a3 <- cor.test(coverage$rh90_a3,coverage$height90, method = "spearman")
+bias90_a3 <-round(bias(coverage$rh90_a3,coverage$height90), digits = 4)
+
+RMSE85_a3 <-round(hydroGOF::rmse(coverage$rh85_a3,coverage$height85), digits = 4)
+r2_85_a3 <- round(rsq(coverage$rh85_a3,coverage$height85), digits = 4)
+pear_cor_85_a3 <- cor(coverage$rh85_a3,coverage$height85, method = "pearson")
+spear_cor_85_a3 <- cor(coverage$rh85_a3,coverage$height85, method = "spearman")
+pear_cor_85_test_a3 <- cor.test(coverage$rh85_a3,coverage$height85, method = "pearson")
+spear_cor_85_test_a3 <- cor.test(coverage$rh85_a3,coverage$height85, method = "spearman")
+bias85_a3 <-round(bias(coverage$rh85_a3,coverage$height85), digits = 4)
+
+RMSE80_a3 <-round(hydroGOF::rmse(coverage$rh80_a3,coverage$height80), digits = 4)
+r2_80_a3 <- round(rsq(coverage$rh80_a3,coverage$height80), digits = 4)
+pear_cor_80_a3 <- cor(coverage$rh80_a3,coverage$height80, method = "pearson")
+spear_cor_80_a3 <- cor(coverage$rh80_a3,coverage$height80, method = "spearman")
+pear_cor_80_test_a3 <- cor.test(coverage$rh80_a3,coverage$height80, method = "pearson")
+spear_cor_80_test_a3 <- cor.test(coverage$rh80_a3,coverage$height80, method = "spearman")
+bias80_a3 <-round(bias(coverage$rh80_a3,coverage$height80), digits = 4)
+
+RMSE75_a3 <-round(hydroGOF::rmse(coverage$rh75_a3,coverage$height75), digits = 4)
+r2_75_a3 <- round(rsq(coverage$rh75_a3,coverage$height75), digits = 4)
+pear_cor_75_a3 <- cor(coverage$rh75_a3,coverage$height75, method = "pearson")
+spear_cor_75_a3 <- cor(coverage$rh75_a3,coverage$height75, method = "spearman")
+pear_cor_75_test_a3 <- cor.test(coverage$rh75_a3,coverage$height75, method = "pearson")
+spear_cor_75_test_a3 <- cor.test(coverage$rh75_a3,coverage$height75, method = "spearman")
+bias75_a3 <-round(bias(coverage$rh75_a3,coverage$height75), digits = 4)
+
+RMSE70_a3 <-round(hydroGOF::rmse(coverage$rh70_a3,coverage$height70), digits = 4)
+r2_70_a3 <- round(rsq(coverage$rh70_a3,coverage$height70), digits = 4)
+pear_cor_70_a3 <- cor(coverage$rh70_a3,coverage$height70, method = "pearson")
+spear_cor_70_a3 <- cor(coverage$rh70_a3,coverage$height70, method = "spearman")
+pear_cor_70_test_a3 <- cor.test(coverage$rh70_a3,coverage$height70, method = "pearson")
+spear_cor_70_test_a3 <- cor.test(coverage$rh70_a3,coverage$height70, method = "spearman")
+bias70_a3 <-round(bias(coverage$rh70_a3,coverage$height70), digits = 4)
+
+RMSE65_a3 <-round(hydroGOF::rmse(coverage$rh65_a3,coverage$height65), digits = 4)
+r2_65_a3 <- round(rsq(coverage$rh65_a3,coverage$height65), digits = 4)
+pear_cor_65_a3<- cor(coverage$rh65_a3,coverage$height65, method = "pearson")
+spear_cor_65_a3 <- cor(coverage$rh65_a3,coverage$height65, method = "spearman")
+pear_cor_65_test_a3 <- cor.test(coverage$rh65_a3,coverage$height65, method = "pearson")
+spear_cor_65_test_a3 <- cor.test(coverage$rh65_a3,coverage$height65, method = "spearman")
+bias65_a3 <-round(bias(coverage$rh65_a3,coverage$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a3), col = "purple")
+p2 <-coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a3), col = "purple")
+p3 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a3), col = "purple")
+p4 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a3), col = "purple")
+p5 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a3), col = "purple")
+p6 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a3), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+```
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 4------------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a4 <- round(hydroGOF::rmse(coverage$rh100_a4,coverage$height100), digits = 4)
+r2_100_a4 <- round(rsq(coverage$rh100_a4,coverage$height100), digits = 4)
+pear_cor_100_a4 <- cor(coverage$rh100_a4,coverage$height100, method = "pearson")
+spear_cor_100_a4 <- cor(coverage$rh100_a4,coverage$height100, method = "spearman")
+pear_cor_100_test_a4 <- cor.test(coverage$rh100_a4,coverage$height100, method = "pearson")
+spear_cor_100_test_a4 <- cor.test(coverage$rh100_a4,coverage$height100, method = "spearman")
+bias100_a4 <- round(bias(coverage$rh100_a4,coverage$height100), digits = 4)
+
+RMSE99_a4 <-round(hydroGOF::rmse(coverage$rh99_a4,coverage$height99), digits = 4)
+r2_99_a4 <- round(rsq(coverage$rh99_a4,coverage$height99), digits = 4)
+pear_cor_99_a4 <- cor(coverage$rh99_a4,coverage$height99, method = "pearson")
+spear_cor_99_a4 <- cor(coverage$rh99_a4,coverage$height99, method = "spearman")
+pear_cor_99_test_a4 <- cor.test(coverage$rh99_a4,coverage$height99, method = "pearson")
+spear_cor_99_test_a4 <- cor.test(coverage$rh99_a4,coverage$height99, method = "spearman")
+bias99_a4 <-round(bias(coverage$rh99_a4,coverage$height99), digits = 4)
+
+RMSE98_a4 <-round(hydroGOF::rmse(coverage$rh98_a4,coverage$height98), digits = 4)
+r2_98_a4 <- round(rsq(coverage$rh98_a4,coverage$height98), digits = 4)
+pear_cor_98_a4 <- cor(coverage$rh98_a4,coverage$height98, method = "pearson")
+spear_cor_98_a4 <- cor(coverage$rh98_a4,coverage$height98, method = "spearman")
+pear_cor_98_test_a4 <- cor.test(coverage$rh98_a4,coverage$height98, method = "pearson")
+spear_cor_98_test_a4 <- cor.test(coverage$rh98_a4,coverage$height98, method = "spearman")
+bias98_a4 <-round(bias(coverage$rh98_a4,coverage$height98), digits = 4)
+
+RMSE95_a4 <-round(hydroGOF::rmse(coverage$rh95_a4,coverage$height95), digits = 4)
+r2_95_a4 <- round(rsq(coverage$rh95_a4,coverage$height95), digits = 4)
+pear_cor_95_a4 <- cor(coverage$rh95_a4,coverage$height95, method = "pearson")
+spear_cor_95_a4 <- cor(coverage$rh95_a4,coverage$height95, method = "spearman")
+pear_cor_95_test_a4 <- cor.test(coverage$rh95_a4,coverage$height95, method = "pearson")
+spear_cor_95_test_a4 <- cor.test(coverage$rh95_a4,coverage$height95, method = "spearman")
+bias95_a4 <-round(bias(coverage$rh95_a4,coverage$height95), digits = 4)
+
+RMSE90_a4 <-round(hydroGOF::rmse(coverage$rh90_a4,coverage$height90), digits = 4)
+r2_90_a4 <- round(rsq(coverage$rh90_a4,coverage$height90), digits = 4)
+pear_cor_90_a4 <- cor(coverage$rh90_a4,coverage$height90, method = "pearson")
+spear_cor_90_a4 <- cor(coverage$rh90_a4,coverage$height90, method = "spearman")
+pear_cor_90_test_a4 <- cor.test(coverage$rh90_a4,coverage$height90, method = "pearson")
+spear_cor_90_test_a4 <- cor.test(coverage$rh90_a4,coverage$height90, method = "spearman")
+bias90_a4 <-round(bias(coverage$rh90_a4,coverage$height90), digits = 4)
+
+RMSE85_a4 <-round(hydroGOF::rmse(coverage$rh85_a4,coverage$height85), digits = 4)
+r2_85_a4 <- round(rsq(coverage$rh85_a4,coverage$height85), digits = 4)
+pear_cor_85_a4 <- cor(coverage$rh85_a4,coverage$height85, method = "pearson")
+spear_cor_85_a4 <- cor(coverage$rh85_a4,coverage$height85, method = "spearman")
+pear_cor_85_test_a4 <- cor.test(coverage$rh85_a4,coverage$height85, method = "pearson")
+spear_cor_85_test_a4 <- cor.test(coverage$rh85_a4,coverage$height85, method = "spearman")
+bias85_a4 <-round(bias(coverage$rh85_a4,coverage$height85), digits = 4)
+
+RMSE80_a4 <-round(hydroGOF::rmse(coverage$rh80_a4,coverage$height80), digits = 4)
+r2_80_a4 <- round(rsq(coverage$rh80_a4,coverage$height80), digits = 4)
+pear_cor_80_a4 <- cor(coverage$rh80_a4,coverage$height80, method = "pearson")
+spear_cor_80_a4 <- cor(coverage$rh80_a4,coverage$height80, method = "spearman")
+pear_cor_80_test_a4 <- cor.test(coverage$rh80_a4,coverage$height80, method = "pearson")
+spear_cor_80_test_a4 <- cor.test(coverage$rh80_a4,coverage$height80, method = "spearman")
+bias80_a4 <-round(bias(coverage$rh80_a4,coverage$height80), digits = 4)
+
+RMSE75_a4 <-round(hydroGOF::rmse(coverage$rh75_a4,coverage$height75), digits = 4)
+r2_75_a4 <- round(rsq(coverage$rh75_a4,coverage$height75), digits = 4)
+pear_cor_75_a4 <- cor(coverage$rh75_a4,coverage$height75, method = "pearson")
+spear_cor_75_a4 <- cor(coverage$rh75_a4,coverage$height75, method = "spearman")
+pear_cor_75_test_a4 <- cor.test(coverage$rh75_a4,coverage$height75, method = "pearson")
+spear_cor_75_test_a4 <- cor.test(coverage$rh75_a4,coverage$height75, method = "spearman")
+bias75_a4 <-round(bias(coverage$rh75_a4,coverage$height75), digits = 4)
+
+RMSE70_a4 <-round(hydroGOF::rmse(coverage$rh70_a4,coverage$height70), digits = 4)
+r2_70_a4 <- round(rsq(coverage$rh70_a4,coverage$height70), digits = 4)
+pear_cor_70_a4 <- cor(coverage$rh70_a4,coverage$height70, method = "pearson")
+spear_cor_70_a4 <- cor(coverage$rh70_a4,coverage$height70, method = "spearman")
+pear_cor_70_test_a4 <- cor.test(coverage$rh70_a4,coverage$height70, method = "pearson")
+spear_cor_70_test_a4 <- cor.test(coverage$rh70_a4,coverage$height70, method = "spearman")
+bias70_a4 <-round(bias(coverage$rh70_a4,coverage$height70), digits = 4)
+
+RMSE65_a4 <-round(hydroGOF::rmse(coverage$rh65_a4,coverage$height65), digits = 4)
+r2_65_a4 <- round(rsq(coverage$rh65_a4,coverage$height65), digits = 4)
+pear_cor_65_a4<- cor(coverage$rh65_a4,coverage$height65, method = "pearson")
+spear_cor_65_a4 <- cor(coverage$rh65_a4,coverage$height65, method = "spearman")
+pear_cor_65_test_a4 <- cor.test(coverage$rh65_a4,coverage$height65, method = "pearson")
+spear_cor_65_test_a4 <- cor.test(coverage$rh65_a4,coverage$height65, method = "spearman")
+bias65_a4 <-round(bias(coverage$rh65_a4,coverage$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a4), col = "purple")
+p2 <-coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a4), col = "purple")
+p3 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a4), col = "purple")
+p4 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a4), col = "purple")
+p5 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a4), col = "purple")
+p6 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a4), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+```
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 5------------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a5 <- round(hydroGOF::rmse(coverage$rh100_a5,coverage$height100), digits = 4)
+r2_100_a5 <- round(rsq(coverage$rh100_a5,coverage$height100), digits = 4)
+pear_cor_100_a5 <- cor(coverage$rh100_a5,coverage$height100, method = "pearson")
+spear_cor_100_a5 <- cor(coverage$rh100_a5,coverage$height100, method = "spearman")
+pear_cor_100_test_a5 <- cor.test(coverage$rh100_a5,coverage$height100, method = "pearson")
+spear_cor_100_test_a5 <- cor.test(coverage$rh100_a5,coverage$height100, method = "spearman")
+bias100_a5 <- round(bias(coverage$rh100_a5,coverage$height100), digits = 4)
+
+RMSE99_a5 <-round(hydroGOF::rmse(coverage$rh99_a5,coverage$height99), digits = 4)
+r2_99_a5 <- round(rsq(coverage$rh99_a5,coverage$height99), digits = 4)
+pear_cor_99_a5 <- cor(coverage$rh99_a5,coverage$height99, method = "pearson")
+spear_cor_99_a5 <- cor(coverage$rh99_a5,coverage$height99, method = "spearman")
+pear_cor_99_test_a5 <- cor.test(coverage$rh99_a5,coverage$height99, method = "pearson")
+spear_cor_99_test_a5 <- cor.test(coverage$rh99_a5,coverage$height99, method = "spearman")
+bias99_a5 <-round(bias(coverage$rh99_a5,coverage$height99), digits = 4)
+
+RMSE98_a5 <-round(hydroGOF::rmse(coverage$rh98_a5,coverage$height98), digits = 4)
+r2_98_a5 <- round(rsq(coverage$rh98_a5,coverage$height98), digits = 4)
+pear_cor_98_a5 <- cor(coverage$rh98_a5,coverage$height98, method = "pearson")
+spear_cor_98_a5 <- cor(coverage$rh98_a5,coverage$height98, method = "spearman")
+pear_cor_98_test_a5 <- cor.test(coverage$rh98_a5,coverage$height98, method = "pearson")
+spear_cor_98_test_a5 <- cor.test(coverage$rh98_a5,coverage$height98, method = "spearman")
+bias98_a5 <-round(bias(coverage$rh98_a5,coverage$height98), digits = 4)
+
+RMSE95_a5 <-round(hydroGOF::rmse(coverage$rh95_a5,coverage$height95), digits = 4)
+r2_95_a5 <- round(rsq(coverage$rh95_a5,coverage$height95), digits = 4)
+pear_cor_95_a5 <- cor(coverage$rh95_a5,coverage$height95, method = "pearson")
+spear_cor_95_a5 <- cor(coverage$rh95_a5,coverage$height95, method = "spearman")
+pear_cor_95_test_a5 <- cor.test(coverage$rh95_a5,coverage$height95, method = "pearson")
+spear_cor_95_test_a5 <- cor.test(coverage$rh95_a5,coverage$height95, method = "spearman")
+bias95_a5 <-round(bias(coverage$rh95_a5,coverage$height95), digits = 4)
+
+RMSE90_a5 <-round(hydroGOF::rmse(coverage$rh90_a5,coverage$height90), digits = 4)
+r2_90_a5 <- round(rsq(coverage$rh90_a5,coverage$height90), digits = 4)
+pear_cor_90_a5 <- cor(coverage$rh90_a5,coverage$height90, method = "pearson")
+spear_cor_90_a5 <- cor(coverage$rh90_a5,coverage$height90, method = "spearman")
+pear_cor_90_test_a5 <- cor.test(coverage$rh90_a5,coverage$height90, method = "pearson")
+spear_cor_90_test_a5 <- cor.test(coverage$rh90_a5,coverage$height90, method = "spearman")
+bias90_a5 <-round(bias(coverage$rh90_a5,coverage$height90), digits = 4)
+
+RMSE85_a5 <-round(hydroGOF::rmse(coverage$rh85_a5,coverage$height85), digits = 4)
+r2_85_a5 <- round(rsq(coverage$rh85_a5,coverage$height85), digits = 4)
+pear_cor_85_a5 <- cor(coverage$rh85_a5,coverage$height85, method = "pearson")
+spear_cor_85_a5 <- cor(coverage$rh85_a5,coverage$height85, method = "spearman")
+pear_cor_85_test_a5 <- cor.test(coverage$rh85_a5,coverage$height85, method = "pearson")
+spear_cor_85_test_a5 <- cor.test(coverage$rh85_a5,coverage$height85, method = "spearman")
+bias85_a5 <-round(bias(coverage$rh85_a5,coverage$height85), digits = 4)
+
+RMSE80_a5 <-round(hydroGOF::rmse(coverage$rh80_a5,coverage$height80), digits = 4)
+r2_80_a5 <- round(rsq(coverage$rh80_a5,coverage$height80), digits = 4)
+pear_cor_80_a5 <- cor(coverage$rh80_a5,coverage$height80, method = "pearson")
+spear_cor_80_a5 <- cor(coverage$rh80_a5,coverage$height80, method = "spearman")
+pear_cor_80_test_a5 <- cor.test(coverage$rh80_a5,coverage$height80, method = "pearson")
+spear_cor_80_test_a5 <- cor.test(coverage$rh80_a5,coverage$height80, method = "spearman")
+bias80_a5 <-round(bias(coverage$rh80_a5,coverage$height80), digits = 4)
+
+RMSE75_a5 <-round(hydroGOF::rmse(coverage$rh75_a5,coverage$height75), digits = 4)
+r2_75_a5 <- round(rsq(coverage$rh75_a5,coverage$height75), digits = 4)
+pear_cor_75_a5 <- cor(coverage$rh75_a5,coverage$height75, method = "pearson")
+spear_cor_75_a5 <- cor(coverage$rh75_a5,coverage$height75, method = "spearman")
+pear_cor_75_test_a5 <- cor.test(coverage$rh75_a5,coverage$height75, method = "pearson")
+spear_cor_75_test_a5 <- cor.test(coverage$rh75_a5,coverage$height75, method = "spearman")
+bias75_a5 <-round(bias(coverage$rh75_a5,coverage$height75), digits = 4)
+
+RMSE70_a5 <-round(hydroGOF::rmse(coverage$rh70_a5,coverage$height70), digits = 4)
+r2_70_a5 <- round(rsq(coverage$rh70_a5,coverage$height70), digits = 4)
+pear_cor_70_a5 <- cor(coverage$rh70_a5,coverage$height70, method = "pearson")
+spear_cor_70_a5 <- cor(coverage$rh70_a5,coverage$height70, method = "spearman")
+pear_cor_70_test_a5 <- cor.test(coverage$rh70_a5,coverage$height70, method = "pearson")
+spear_cor_70_test_a5 <- cor.test(coverage$rh70_a5,coverage$height70, method = "spearman")
+bias70_a5 <-round(bias(coverage$rh70_a5,coverage$height70), digits = 4)
+
+RMSE65_a5 <-round(hydroGOF::rmse(coverage$rh65_a5,coverage$height65), digits = 4)
+r2_65_a5 <- round(rsq(coverage$rh65_a5,coverage$height65), digits = 4)
+pear_cor_65_a5<- cor(coverage$rh65_a5,coverage$height65, method = "pearson")
+spear_cor_65_a5 <- cor(coverage$rh65_a5,coverage$height65, method = "spearman")
+pear_cor_65_test_a5 <- cor.test(coverage$rh65_a5,coverage$height65, method = "pearson")
+spear_cor_65_test_a5 <- cor.test(coverage$rh65_a5,coverage$height65, method = "spearman")
+bias65_a5 <-round(bias(coverage$rh65_a5,coverage$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a5), col = "purple")
+p2 <-coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a5), col = "purple")
+p3 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a5), col = "purple")
+p4 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a5), col = "purple")
+p5 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a5), col = "purple")
+p6 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a5), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 6------------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a6 <- round(hydroGOF::rmse(coverage$rh100_a6,coverage$height100), digits = 4)
+r2_100_a6 <- round(rsq(coverage$rh100_a6,coverage$height100), digits = 4)
+pear_cor_100_a6 <- cor(coverage$rh100_a6,coverage$height100, method = "pearson")
+spear_cor_100_a6 <- cor(coverage$rh100_a6,coverage$height100, method = "spearman")
+pear_cor_100_test_a6 <- cor.test(coverage$rh100_a6,coverage$height100, method = "pearson")
+spear_cor_100_test_a6 <- cor.test(coverage$rh100_a6,coverage$height100, method = "spearman")
+bias100_a6 <- round(bias(coverage$rh100_a6,coverage$height100), digits = 4)
+
+RMSE99_a6 <-round(hydroGOF::rmse(coverage$rh99_a6,coverage$height99), digits = 4)
+r2_99_a6 <- round(rsq(coverage$rh99_a6,coverage$height99), digits = 4)
+pear_cor_99_a6 <- cor(coverage$rh99_a6,coverage$height99, method = "pearson")
+spear_cor_99_a6 <- cor(coverage$rh99_a6,coverage$height99, method = "spearman")
+pear_cor_99_test_a6 <- cor.test(coverage$rh99_a6,coverage$height99, method = "pearson")
+spear_cor_99_test_a6 <- cor.test(coverage$rh99_a6,coverage$height99, method = "spearman")
+bias99_a6 <-round(bias(coverage$rh99_a6,coverage$height99), digits = 4)
+
+RMSE98_a6 <-round(hydroGOF::rmse(coverage$rh98_a6,coverage$height98), digits = 4)
+r2_98_a6 <- round(rsq(coverage$rh98_a6,coverage$height98), digits = 4)
+pear_cor_98_a6 <- cor(coverage$rh98_a6,coverage$height98, method = "pearson")
+spear_cor_98_a6 <- cor(coverage$rh98_a6,coverage$height98, method = "spearman")
+pear_cor_98_test_a6 <- cor.test(coverage$rh98_a6,coverage$height98, method = "pearson")
+spear_cor_98_test_a6 <- cor.test(coverage$rh98_a6,coverage$height98, method = "spearman")
+bias98_a6 <-round(bias(coverage$rh98_a6,coverage$height98), digits = 4)
+
+RMSE95_a6 <-round(hydroGOF::rmse(coverage$rh95_a6,coverage$height95), digits = 4)
+r2_95_a6 <- round(rsq(coverage$rh95_a6,coverage$height95), digits = 4)
+pear_cor_95_a6 <- cor(coverage$rh95_a6,coverage$height95, method = "pearson")
+spear_cor_95_a6 <- cor(coverage$rh95_a6,coverage$height95, method = "spearman")
+pear_cor_95_test_a6 <- cor.test(coverage$rh95_a6,coverage$height95, method = "pearson")
+spear_cor_95_test_a6 <- cor.test(coverage$rh95_a6,coverage$height95, method = "spearman")
+bias95_a6 <-round(bias(coverage$rh95_a6,coverage$height95), digits = 4)
+
+RMSE90_a6 <-round(hydroGOF::rmse(coverage$rh90_a6,coverage$height90), digits = 4)
+r2_90_a6 <- round(rsq(coverage$rh90_a6,coverage$height90), digits = 4)
+pear_cor_90_a6 <- cor(coverage$rh90_a6,coverage$height90, method = "pearson")
+spear_cor_90_a6 <- cor(coverage$rh90_a6,coverage$height90, method = "spearman")
+pear_cor_90_test_a6 <- cor.test(coverage$rh90_a6,coverage$height90, method = "pearson")
+spear_cor_90_test_a6 <- cor.test(coverage$rh90_a6,coverage$height90, method = "spearman")
+bias90_a6 <-round(bias(coverage$rh90_a6,coverage$height90), digits = 4)
+
+RMSE85_a6 <-round(hydroGOF::rmse(coverage$rh85_a6,coverage$height85), digits = 4)
+r2_85_a6 <- round(rsq(coverage$rh85_a6,coverage$height85), digits = 4)
+pear_cor_85_a6 <- cor(coverage$rh85_a6,coverage$height85, method = "pearson")
+spear_cor_85_a6 <- cor(coverage$rh85_a6,coverage$height85, method = "spearman")
+pear_cor_85_test_a6 <- cor.test(coverage$rh85_a6,coverage$height85, method = "pearson")
+spear_cor_85_test_a6 <- cor.test(coverage$rh85_a6,coverage$height85, method = "spearman")
+bias85_a6 <-round(bias(coverage$rh85_a6,coverage$height85), digits = 4)
+
+RMSE80_a6 <-round(hydroGOF::rmse(coverage$rh80_a6,coverage$height80), digits = 4)
+r2_80_a6 <- round(rsq(coverage$rh80_a6,coverage$height80), digits = 4)
+pear_cor_80_a6 <- cor(coverage$rh80_a6,coverage$height80, method = "pearson")
+spear_cor_80_a6 <- cor(coverage$rh80_a6,coverage$height80, method = "spearman")
+pear_cor_80_test_a6 <- cor.test(coverage$rh80_a6,coverage$height80, method = "pearson")
+spear_cor_80_test_a6 <- cor.test(coverage$rh80_a6,coverage$height80, method = "spearman")
+bias80_a6 <-round(bias(coverage$rh80_a6,coverage$height80), digits = 4)
+
+RMSE75_a6 <-round(hydroGOF::rmse(coverage$rh75_a6,coverage$height75), digits = 4)
+r2_75_a6 <- round(rsq(coverage$rh75_a6,coverage$height75), digits = 4)
+pear_cor_75_a6 <- cor(coverage$rh75_a6,coverage$height75, method = "pearson")
+spear_cor_75_a6 <- cor(coverage$rh75_a6,coverage$height75, method = "spearman")
+pear_cor_75_test_a6 <- cor.test(coverage$rh75_a6,coverage$height75, method = "pearson")
+spear_cor_75_test_a6 <- cor.test(coverage$rh75_a6,coverage$height75, method = "spearman")
+bias75_a6 <-round(bias(coverage$rh75_a6,coverage$height75), digits = 4)
+
+RMSE70_a6 <-round(hydroGOF::rmse(coverage$rh70_a6,coverage$height70), digits = 4)
+r2_70_a6 <- round(rsq(coverage$rh70_a6,coverage$height70), digits = 4)
+pear_cor_70_a6 <- cor(coverage$rh70_a6,coverage$height70, method = "pearson")
+spear_cor_70_a6 <- cor(coverage$rh70_a6,coverage$height70, method = "spearman")
+pear_cor_70_test_a6 <- cor.test(coverage$rh70_a6,coverage$height70, method = "pearson")
+spear_cor_70_test_a6 <- cor.test(coverage$rh70_a6,coverage$height70, method = "spearman")
+bias70_a6 <-round(bias(coverage$rh70_a6,coverage$height70), digits = 4)
+
+RMSE65_a6 <-round(hydroGOF::rmse(coverage$rh65_a6,coverage$height65), digits = 4)
+r2_65_a6 <- round(rsq(coverage$rh65_a6,coverage$height65), digits = 4)
+pear_cor_65_a6<- cor(coverage$rh65_a6,coverage$height65, method = "pearson")
+spear_cor_65_a6 <- cor(coverage$rh65_a6,coverage$height65, method = "spearman")
+pear_cor_65_test_a6 <- cor.test(coverage$rh65_a6,coverage$height65, method = "pearson")
+spear_cor_65_test_a6 <- cor.test(coverage$rh65_a6,coverage$height65, method = "spearman")
+bias65_a6 <-round(bias(coverage$rh65_a6,coverage$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a6), col = "purple")
+p2 <-coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a6), col = "purple")
+p3 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a6), col = "purple")
+p4 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a6), col = "purple")
+p5 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a6), col = "purple")
+p6 <- coverage %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a6), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##--------------Results Dataframe--------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+algs <- c("_default","_a2","_a3","_a4","_a5","_a6")
+percentiles <- c(100, 99, 98, 95, 90, 85, 80, 75, 70, 65)
+stats <- c("RMSE", "r2_", "pear_cor_", "spear_cor_", "bias")
+
+for (i in 1:length(algs)){
+  #percentiles down, stats across
+  df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+  colnames(df) <- stats
+  for (j in 1:length(percentiles)){
+    temp <- paste0(percentiles[j], algs[i])
+    for (k in 1:length(stats)){
+      var <- lapply(paste0(stats[k], temp),get)
+      df[j,k] <- var
+      
+    }
+  }
+df$percentile <- percentiles
+df$algorithm <- rep(algs[i],length(nrow(df)))
+algname <-paste0(algs[i], i)
+assign(paste0("stats", algname), df)
+}
+```
+
+
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##-----------Elevation Comparisons--------------
+#----------------------------------------------#
+#----------------------------------------------#
 
 ```{r}
 # Calculate R squared and RMSE 
@@ -492,15 +1140,6 @@ pear_cor_80_test <- cor.test(plotdat$rh80_a2,plotdat$height80, method = "pearson
 spear_cor_80_test <- cor.test(plotdat$rh80_a2,plotdat$height80, method = "spearman")
 bias80 <-round(bias(plotdat$rh80_a2,plotdat$height80), digits = 4)
 
-RMSE80
-RMSE75
-r2_80
-r2_75
-r2_70
-r2_65
-bias80
-bias75
-
 RMSE75 <-round(hydroGOF::rmse(plotdat$rh75_a2,plotdat$height75), digits = 4)
 r2_75 <- round(rsq(plotdat$rh75_a2,plotdat$height75), digits = 4)
 pear_cor_75 <- cor(plotdat$rh75_a2,plotdat$height75, method = "pearson")
@@ -525,10 +1164,6 @@ pear_cor_65_test <- cor.test(plotdat$rh65_a2,plotdat$height65, method = "pearson
 spear_cor_65_test <- cor.test(plotdat$rh65_a2,plotdat$height65, method = "spearman")
 bias65 <-round(bias(plotdat$rh65_a2,plotdat$height65), digits = 4)
 
-pear_cor_85
-spear_cor_85
-pear_cor_85_test 
-spear_cor_85_test
 ```
 
 ```{r,}
