@@ -14,7 +14,6 @@ library(plyr)
 # dat == analyses with alive and dead trees
 # dat1 == analyses with only alive trees
 
-
 # Read in Lambir Dataframe
 dat <- read_csv("~/Desktop/Research_2022/Data/Southeast_Asia/Lambir/lambir_2022.csv")
 
