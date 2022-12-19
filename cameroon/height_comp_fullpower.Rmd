@@ -1,0 +1,2720 @@
+---
+title: "fullpower Cameroon Height Comparisons"
+output:
+  pdf_document: default
+  word_document: default
+  html_notebook: default
+---
+
+#### Default, Algorithm 3, and Algorithm 2 Comparisons Between GEDI and CHM data
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(dplyr)
+library(rgdal)
+library(tidyverse)
+library(skimr)
+library(stringr)
+library(readxl)
+library(raster)
+library(Metrics)
+library(hydroGOF)
+library(SimDesign)
+library(rgeos)
+library(ggspatial)
+library(ggpubr)
+library(ggthemes)
+
+plotdat <- read.csv( "~/Desktop/Research_2022/Data/GEDI/cam_field_gedi_lidar_all.csv")
+table(plotdat$Beam)
+
+fullpower <- subset(plotdat, Beam == "BEAM0101" | Beam == "BEAM0110" | Beam == "BEAM1000" |
+                      Beam == "BEAM1011")
+# r squared calculation
+rsq <-  function(x, y) summary(lm(y~x))$r.squared
+```
+
+```{r,}
+p1 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100), alpha = .5,col = "#CC6666")+ geom_rangeframe()+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  labs(title = "100th Percentile", x = "Drone Lidar Height", y = "GEDI Height")+theme_fivethirtyeight()+
+  theme(axis.title = element_text(), plot.title = element_text(size=10))
+#p2 <- fullpower %>%
+#  ggplot() + 
+#  geom_point(mapping = aes(height99,rh99), alpha = .5,col = "#CC6666")+ geom_rangeframe()+
+#  geom_abline(intercept = 0, slope = 1)+
+#  xlim(0, 55)+ylim(0, 55)+
+#  labs(title = "99th Percentile", x = "Drone Lidar Height", y = "GEDI Height")+theme_fivethirtyeight()+
+#  theme(axis.title = element_text(), plot.title = element_text(size=10))
+p2 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98), alpha = .5,col = "#CC6666")+ geom_rangeframe()+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  labs(title = "98th Percentile", x = "Drone Lidar Height", y = "GEDI Height")+theme_fivethirtyeight()+
+  theme(axis.title = element_text(), plot.title = element_text(size=10))
+p3 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95), alpha = .5,col = "#CC6666")+ geom_rangeframe()+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  labs(title = "95th Percentile", x = "Drone Lidar Height", y = "GEDI Height")+theme_fivethirtyeight()+
+  theme(axis.title = element_text(), plot.title = element_text(size=10))
+p4 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90), alpha = .5,col = "#CC6666")+ geom_rangeframe()+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  labs(title = "90th Percentile", x = "Drone Lidar Height", y = "GEDI Height")+theme_fivethirtyeight()+
+  theme(axis.title = element_text(), plot.title = element_text(size=10))
+p5 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85), alpha = .5,col = "#CC6666")+ geom_rangeframe()+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  labs(title = "85th Percentile", x = "Drone Lidar Height", y = "GEDI Height")+theme_fivethirtyeight()+
+  theme(axis.title = element_text(), plot.title = element_text(size=10))
+p6 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height80,rh80), alpha = .5,col = "#CC6666")+ geom_rangeframe()+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  labs(title = "80th Percentile", x = "Drone Lidar Height", y = "GEDI Height")+theme_fivethirtyeight()+
+  theme(axis.title = element_text(), plot.title = element_text(size=10))
+p8 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height75,rh75), alpha = .5,col = "#CC6666")+ geom_rangeframe()+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  labs(title = "75th Percentile", x = "Drone Lidar Height", y = "GEDI Height")+theme_fivethirtyeight()+
+  theme(axis.title = element_text(), plot.title = element_text(size=10))
+p9 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height70,rh70), alpha = .5,col = "#CC6666")+ geom_rangeframe()+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  labs(title = "70th Percentile", x = "Drone Lidar Height", y = "GEDI Height")+theme_fivethirtyeight()+
+  theme(axis.title = element_text(), plot.title = element_text(size=10))
+
+ggarrange(p1,p2,p3,p4,p5,p6, nrow = 2, ncol = 3)
+
+```
+
+```{r,}
+p1 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("100th Percentile")+theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p2 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("99th Percentile")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p3 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("98th Percentile")+theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p4 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("95th Percentile")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p5 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("90th Percentile")+theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p6 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("85th Percentile")+theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+
+
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##------------- Default Algorithm--------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_default <- round(hydroGOF::rmse(fullpower$rh100,fullpower$height100), digits = 4)
+r2_100_default <- round(rsq(fullpower$rh100,fullpower$height100), digits = 4)
+pear_cor_100_default <- cor(fullpower$rh100,fullpower$height100, method = "pearson")
+spear_cor_100_default <- cor(fullpower$rh100,fullpower$height100, method = "spearman")
+pear_cor_100_test_default <- cor.test(fullpower$rh100,fullpower$height100, method = "pearson")
+spear_cor_100_test_default <- cor.test(fullpower$rh100,fullpower$height100, method = "spearman")
+bias100_default <- round(bias(fullpower$rh100,fullpower$height100), digits = 4)
+
+RMSE99_default <-round(hydroGOF::rmse(fullpower$rh99,fullpower$height99), digits = 4)
+r2_99_default <- round(rsq(fullpower$rh99,fullpower$height99), digits = 4)
+pear_cor_99_default <- cor(fullpower$rh99,fullpower$height99, method = "pearson")
+spear_cor_99_default <- cor(fullpower$rh99,fullpower$height99, method = "spearman")
+pear_cor_99_test_default <- cor.test(fullpower$rh99,fullpower$height99, method = "pearson")
+spear_cor_99_test_default <- cor.test(fullpower$rh99,fullpower$height99, method = "spearman")
+bias99_default <-round(bias(fullpower$rh99,fullpower$height99), digits = 4)
+
+RMSE98_default <-round(hydroGOF::rmse(fullpower$rh98,fullpower$height98), digits = 4)
+r2_98_default <- round(rsq(fullpower$rh98,fullpower$height98), digits = 4)
+pear_cor_98_default <- cor(fullpower$rh98,fullpower$height98, method = "pearson")
+spear_cor_98_default <- cor(fullpower$rh98,fullpower$height98, method = "spearman")
+pear_cor_98_test_default <- cor.test(fullpower$rh98,fullpower$height98, method = "pearson")
+spear_cor_98_test_default <- cor.test(fullpower$rh98,fullpower$height98, method = "spearman")
+bias98_default <-round(bias(fullpower$rh98,fullpower$height98), digits = 4)
+
+RMSE95_default <-round(hydroGOF::rmse(fullpower$rh95,fullpower$height95), digits = 4)
+r2_95_default <- round(rsq(fullpower$rh95,fullpower$height95), digits = 4)
+pear_cor_95_default <- cor(fullpower$rh95,fullpower$height95, method = "pearson")
+spear_cor_95_default <- cor(fullpower$rh95,fullpower$height95, method = "spearman")
+pear_cor_95_test_default <- cor.test(fullpower$rh95,fullpower$height95, method = "pearson")
+spear_cor_95_test_default <- cor.test(fullpower$rh95,fullpower$height95, method = "spearman")
+bias95_default <-round(bias(fullpower$rh95,fullpower$height95), digits = 4)
+
+RMSE90_default <-round(hydroGOF::rmse(fullpower$rh90,fullpower$height90), digits = 4)
+r2_90_default <- round(rsq(fullpower$rh90,fullpower$height90), digits = 4)
+pear_cor_90_default <- cor(fullpower$rh90,fullpower$height90, method = "pearson")
+spear_cor_90_default <- cor(fullpower$rh90,fullpower$height90, method = "spearman")
+pear_cor_90_test_default <- cor.test(fullpower$rh90,fullpower$height90, method = "pearson")
+spear_cor_90_test_default <- cor.test(fullpower$rh90,fullpower$height90, method = "spearman")
+bias90_default <-round(bias(fullpower$rh90,fullpower$height90), digits = 4)
+
+RMSE85_default <-round(hydroGOF::rmse(fullpower$rh85,fullpower$height85), digits = 4)
+r2_85_default <- round(rsq(fullpower$rh85,fullpower$height85), digits = 4)
+pear_cor_85_default <- cor(fullpower$rh85,fullpower$height85, method = "pearson")
+spear_cor_85_default <- cor(fullpower$rh85,fullpower$height85, method = "spearman")
+pear_cor_85_test_default <- cor.test(fullpower$rh85,fullpower$height85, method = "pearson")
+spear_cor_85_test_default <- cor.test(fullpower$rh85,fullpower$height85, method = "spearman")
+bias85_default <-round(bias(fullpower$rh85,fullpower$height85), digits = 4)
+
+RMSE80_default <-round(hydroGOF::rmse(fullpower$rh80,fullpower$height80), digits = 4)
+r2_80_default <- round(rsq(fullpower$rh80,fullpower$height80), digits = 4)
+pear_cor_80_default <- cor(fullpower$rh80,fullpower$height80, method = "pearson")
+spear_cor_80_default <- cor(fullpower$rh80,fullpower$height80, method = "spearman")
+pear_cor_80_test_default <- cor.test(fullpower$rh80,fullpower$height80, method = "pearson")
+spear_cor_80_test_default <- cor.test(fullpower$rh80,fullpower$height80, method = "spearman")
+bias80_default <-round(bias(fullpower$rh80,fullpower$height80), digits = 4)
+
+RMSE75_default <-round(hydroGOF::rmse(fullpower$rh75,fullpower$height75), digits = 4)
+r2_75_default <- round(rsq(fullpower$rh75,fullpower$height75), digits = 4)
+pear_cor_75_default <- cor(fullpower$rh75,fullpower$height75, method = "pearson")
+spear_cor_75_default <- cor(fullpower$rh75,fullpower$height75, method = "spearman")
+pear_cor_75_test_default <- cor.test(fullpower$rh75,fullpower$height75, method = "pearson")
+spear_cor_75_test_default <- cor.test(fullpower$rh75,fullpower$height75, method = "spearman")
+bias75_default <-round(bias(fullpower$rh75,fullpower$height75), digits = 4)
+
+RMSE70_default <-round(hydroGOF::rmse(fullpower$rh70,fullpower$height70), digits = 4)
+r2_70_default <- round(rsq(fullpower$rh70,fullpower$height70), digits = 4)
+pear_cor_70_default <- cor(fullpower$rh70,fullpower$height70, method = "pearson")
+spear_cor_70_default <- cor(fullpower$rh70,fullpower$height70, method = "spearman")
+pear_cor_70_test_default <- cor.test(fullpower$rh70,fullpower$height70, method = "pearson")
+spear_cor_70_test_default <- cor.test(fullpower$rh70,fullpower$height70, method = "spearman")
+bias70_default <-round(bias(fullpower$rh70,fullpower$height70), digits = 4)
+
+RMSE65_default <-round(hydroGOF::rmse(fullpower$rh65,fullpower$height65), digits = 4)
+r2_65_default <- round(rsq(fullpower$rh65,fullpower$height65), digits = 4)
+pear_cor_65_default <- cor(fullpower$rh65,fullpower$height65, method = "pearson")
+spear_cor_65_default <- cor(fullpower$rh65,fullpower$height65, method = "spearman")
+pear_cor_65_test_default <- cor.test(fullpower$rh65,fullpower$height65, method = "pearson")
+spear_cor_65_test_default <- cor.test(fullpower$rh65,fullpower$height65, method = "spearman")
+bias65_default <-round(bias(fullpower$rh65,fullpower$height65), digits = 4)
+
+# 90 is best with r2 of 0.6606
+```
+
+```{r,}
+par(mfrow=c(2,1))
+p1 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("100th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE100), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_100), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias100), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p2 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("99th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE99), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_99), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias99), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p3 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("98th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE98), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_98), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias98), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p4 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("95th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE95), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_95), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias95), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p5 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("90th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE90), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_90), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias90), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p6 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("85th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE85), col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_85), col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias85), col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p7 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height80,rh80), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("80th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE80), alpha = .5,col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_80), alpha = .5,col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias80), alpha = .5,col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p8 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height75,rh75), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("75th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE75), alpha = .5,col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_75), alpha = .5,col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias75), alpha = .5,col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+p9 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height70,rh70), alpha = .5,col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  xlim(0, 55)+ylim(0, 55)+
+  ylab("GEDI")+xlab("Drone Lidar")+ggtitle("70th Percentile")+
+  geom_text(aes(x = 7, y = 50, label = RMSE70), alpha = .5,col = "red")+
+  geom_text(aes(x = 7, y = 40, label = r2_70), alpha = .5,col = "darkgreen")+
+  geom_text(aes(x = 7, y = 30, label = bias70), alpha = .5,col = "purple")+ theme(plot.title = element_text(size=10, 
+                                                                                                            family="serif"), 
+                                                                                  axis.title.x=element_text(size=10, 
+                                                                                                           family="serif"),
+                                                                                  axis.title.y=element_text(size=10, 
+                                                                                                           family="serif"))
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=3)
+```
+
+
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 2------------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a2 <- round(hydroGOF::rmse(fullpower$rh100_a2,fullpower$height100), digits = 4)
+r2_100_a2 <- round(rsq(fullpower$rh100_a2,fullpower$height100), digits = 4)
+pear_cor_100_a2 <- cor(fullpower$rh100_a2,fullpower$height100, method = "pearson")
+spear_cor_100_a2 <- cor(fullpower$rh100_a2,fullpower$height100, method = "spearman")
+pear_cor_100_test_a2 <- cor.test(fullpower$rh100_a2,fullpower$height100, method = "pearson")
+spear_cor_100_test_a2 <- cor.test(fullpower$rh100_a2,fullpower$height100, method = "spearman")
+bias100_a2 <- round(bias(fullpower$rh100_a2,fullpower$height100), digits = 4)
+
+RMSE99_a2 <-round(hydroGOF::rmse(fullpower$rh99_a2,fullpower$height99), digits = 4)
+r2_99_a2 <- round(rsq(fullpower$rh99_a2,fullpower$height99), digits = 4)
+pear_cor_99_a2 <- cor(fullpower$rh99_a2,fullpower$height99, method = "pearson")
+spear_cor_99_a2 <- cor(fullpower$rh99_a2,fullpower$height99, method = "spearman")
+pear_cor_99_test_a2 <- cor.test(fullpower$rh99_a2,fullpower$height99, method = "pearson")
+spear_cor_99_test_a2 <- cor.test(fullpower$rh99_a2,fullpower$height99, method = "spearman")
+bias99_a2 <-round(bias(fullpower$rh99_a2,fullpower$height99), digits = 4)
+
+RMSE98_a2 <-round(hydroGOF::rmse(fullpower$rh98_a2,fullpower$height98), digits = 4)
+r2_98_a2 <- round(rsq(fullpower$rh98_a2,fullpower$height98), digits = 4)
+pear_cor_98_a2 <- cor(fullpower$rh98_a2,fullpower$height98, method = "pearson")
+spear_cor_98_a2 <- cor(fullpower$rh98_a2,fullpower$height98, method = "spearman")
+pear_cor_98_test_a2 <- cor.test(fullpower$rh98_a2,fullpower$height98, method = "pearson")
+spear_cor_98_test_a2 <- cor.test(fullpower$rh98_a2,fullpower$height98, method = "spearman")
+bias98_a2 <-round(bias(fullpower$rh98_a2,fullpower$height98), digits = 4)
+
+RMSE95_a2 <-round(hydroGOF::rmse(fullpower$rh95_a2,fullpower$height95), digits = 4)
+r2_95_a2 <- round(rsq(fullpower$rh95_a2,fullpower$height95), digits = 4)
+pear_cor_95_a2 <- cor(fullpower$rh95_a2,fullpower$height95, method = "pearson")
+spear_cor_95_a2 <- cor(fullpower$rh95_a2,fullpower$height95, method = "spearman")
+pear_cor_95_test_a2 <- cor.test(fullpower$rh95_a2,fullpower$height95, method = "pearson")
+spear_cor_95_test_a2 <- cor.test(fullpower$rh95_a2,fullpower$height95, method = "spearman")
+bias95_a2 <-round(bias(fullpower$rh95_a2,fullpower$height95), digits = 4)
+
+RMSE90_a2 <-round(hydroGOF::rmse(fullpower$rh90_a2,fullpower$height90), digits = 4)
+r2_90_a2 <- round(rsq(fullpower$rh90_a2,fullpower$height90), digits = 4)
+pear_cor_90_a2 <- cor(fullpower$rh90_a2,fullpower$height90, method = "pearson")
+spear_cor_90_a2 <- cor(fullpower$rh90_a2,fullpower$height90, method = "spearman")
+pear_cor_90_test_a2 <- cor.test(fullpower$rh90_a2,fullpower$height90, method = "pearson")
+spear_cor_90_test_a2 <- cor.test(fullpower$rh90_a2,fullpower$height90, method = "spearman")
+bias90_a2 <-round(bias(fullpower$rh90_a2,fullpower$height90), digits = 4)
+
+RMSE85_a2 <-round(hydroGOF::rmse(fullpower$rh85_a2,fullpower$height85), digits = 4)
+r2_85_a2 <- round(rsq(fullpower$rh85_a2,fullpower$height85), digits = 4)
+pear_cor_85_a2 <- cor(fullpower$rh85_a2,fullpower$height85, method = "pearson")
+spear_cor_85_a2 <- cor(fullpower$rh85_a2,fullpower$height85, method = "spearman")
+pear_cor_85_test_a2 <- cor.test(fullpower$rh85_a2,fullpower$height85, method = "pearson")
+spear_cor_85_test_a2 <- cor.test(fullpower$rh85_a2,fullpower$height85, method = "spearman")
+bias85_a2 <-round(bias(fullpower$rh85_a2,fullpower$height85), digits = 4)
+
+RMSE80_a2 <-round(hydroGOF::rmse(fullpower$rh80_a2,fullpower$height80), digits = 4)
+r2_80_a2 <- round(rsq(fullpower$rh80_a2,fullpower$height80), digits = 4)
+pear_cor_80_a2 <- cor(fullpower$rh80_a2,fullpower$height80, method = "pearson")
+spear_cor_80_a2 <- cor(fullpower$rh80_a2,fullpower$height80, method = "spearman")
+pear_cor_80_test_a2 <- cor.test(fullpower$rh80_a2,fullpower$height80, method = "pearson")
+spear_cor_80_test_a2 <- cor.test(fullpower$rh80_a2,fullpower$height80, method = "spearman")
+bias80_a2 <-round(bias(fullpower$rh80_a2,fullpower$height80), digits = 4)
+
+RMSE75_a2 <-round(hydroGOF::rmse(fullpower$rh75_a2,fullpower$height75), digits = 4)
+r2_75_a2 <- round(rsq(fullpower$rh75_a2,fullpower$height75), digits = 4)
+pear_cor_75_a2 <- cor(fullpower$rh75_a2,fullpower$height75, method = "pearson")
+spear_cor_75_a2 <- cor(fullpower$rh75_a2,fullpower$height75, method = "spearman")
+pear_cor_75_test_a2 <- cor.test(fullpower$rh75_a2,fullpower$height75, method = "pearson")
+spear_cor_75_test_a2 <- cor.test(fullpower$rh75_a2,fullpower$height75, method = "spearman")
+bias75_a2 <-round(bias(fullpower$rh75_a2,fullpower$height75), digits = 4)
+
+RMSE70_a2 <-round(hydroGOF::rmse(fullpower$rh70_a2,fullpower$height70), digits = 4)
+r2_70_a2 <- round(rsq(fullpower$rh70_a2,fullpower$height70), digits = 4)
+pear_cor_70_a2 <- cor(fullpower$rh70_a2,fullpower$height70, method = "pearson")
+spear_cor_70_a2 <- cor(fullpower$rh70_a2,fullpower$height70, method = "spearman")
+pear_cor_70_test_a2 <- cor.test(fullpower$rh70_a2,fullpower$height70, method = "pearson")
+spear_cor_70_test_a2 <- cor.test(fullpower$rh70_a2,fullpower$height70, method = "spearman")
+bias70_a2 <-round(bias(fullpower$rh70_a2,fullpower$height70), digits = 4)
+
+RMSE65_a2 <-round(hydroGOF::rmse(fullpower$rh65_a2,fullpower$height65), digits = 4)
+r2_65_a2 <- round(rsq(fullpower$rh65_a2,fullpower$height65), digits = 4)
+pear_cor_65_a2<- cor(fullpower$rh65_a2,fullpower$height65, method = "pearson")
+spear_cor_65_a2 <- cor(fullpower$rh65_a2,fullpower$height65, method = "spearman")
+pear_cor_65_test_a2 <- cor.test(fullpower$rh65_a2,fullpower$height65, method = "pearson")
+spear_cor_65_test_a2 <- cor.test(fullpower$rh65_a2,fullpower$height65, method = "spearman")
+bias65_a2 <-round(bias(fullpower$rh65_a2,fullpower$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a2), col = "purple")
+p2 <-fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a2), col = "purple")
+p3 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a2), col = "purple")
+p4 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a2), col = "purple")
+p5 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a2), col = "purple")
+p6 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a2), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85_a2), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a2), col = "purple")
+```
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 3------------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a3 <- round(hydroGOF::rmse(fullpower$rh100_a3,fullpower$height100), digits = 4)
+r2_100_a3 <- round(rsq(fullpower$rh100_a3,fullpower$height100), digits = 4)
+pear_cor_100_a3 <- cor(fullpower$rh100_a3,fullpower$height100, method = "pearson")
+spear_cor_100_a3 <- cor(fullpower$rh100_a3,fullpower$height100, method = "spearman")
+pear_cor_100_test_a3 <- cor.test(fullpower$rh100_a3,fullpower$height100, method = "pearson")
+spear_cor_100_test_a3 <- cor.test(fullpower$rh100_a3,fullpower$height100, method = "spearman")
+bias100_a3 <- round(bias(fullpower$rh100_a3,fullpower$height100), digits = 4)
+
+RMSE99_a3 <-round(hydroGOF::rmse(fullpower$rh99_a3,fullpower$height99), digits = 4)
+r2_99_a3 <- round(rsq(fullpower$rh99_a3,fullpower$height99), digits = 4)
+pear_cor_99_a3 <- cor(fullpower$rh99_a3,fullpower$height99, method = "pearson")
+spear_cor_99_a3 <- cor(fullpower$rh99_a3,fullpower$height99, method = "spearman")
+pear_cor_99_test_a3 <- cor.test(fullpower$rh99_a3,fullpower$height99, method = "pearson")
+spear_cor_99_test_a3 <- cor.test(fullpower$rh99_a3,fullpower$height99, method = "spearman")
+bias99_a3 <-round(bias(fullpower$rh99_a3,fullpower$height99), digits = 4)
+
+RMSE98_a3 <-round(hydroGOF::rmse(fullpower$rh98_a3,fullpower$height98), digits = 4)
+r2_98_a3 <- round(rsq(fullpower$rh98_a3,fullpower$height98), digits = 4)
+pear_cor_98_a3 <- cor(fullpower$rh98_a3,fullpower$height98, method = "pearson")
+spear_cor_98_a3 <- cor(fullpower$rh98_a3,fullpower$height98, method = "spearman")
+pear_cor_98_test_a3 <- cor.test(fullpower$rh98_a3,fullpower$height98, method = "pearson")
+spear_cor_98_test_a3 <- cor.test(fullpower$rh98_a3,fullpower$height98, method = "spearman")
+bias98_a3 <-round(bias(fullpower$rh98_a3,fullpower$height98), digits = 4)
+
+RMSE95_a3 <-round(hydroGOF::rmse(fullpower$rh95_a3,fullpower$height95), digits = 4)
+r2_95_a3 <- round(rsq(fullpower$rh95_a3,fullpower$height95), digits = 4)
+pear_cor_95_a3 <- cor(fullpower$rh95_a3,fullpower$height95, method = "pearson")
+spear_cor_95_a3 <- cor(fullpower$rh95_a3,fullpower$height95, method = "spearman")
+pear_cor_95_test_a3 <- cor.test(fullpower$rh95_a3,fullpower$height95, method = "pearson")
+spear_cor_95_test_a3 <- cor.test(fullpower$rh95_a3,fullpower$height95, method = "spearman")
+bias95_a3 <-round(bias(fullpower$rh95_a3,fullpower$height95), digits = 4)
+
+RMSE90_a3 <-round(hydroGOF::rmse(fullpower$rh90_a3,fullpower$height90), digits = 4)
+r2_90_a3 <- round(rsq(fullpower$rh90_a3,fullpower$height90), digits = 4)
+pear_cor_90_a3 <- cor(fullpower$rh90_a3,fullpower$height90, method = "pearson")
+spear_cor_90_a3 <- cor(fullpower$rh90_a3,fullpower$height90, method = "spearman")
+pear_cor_90_test_a3 <- cor.test(fullpower$rh90_a3,fullpower$height90, method = "pearson")
+spear_cor_90_test_a3 <- cor.test(fullpower$rh90_a3,fullpower$height90, method = "spearman")
+bias90_a3 <-round(bias(fullpower$rh90_a3,fullpower$height90), digits = 4)
+
+RMSE85_a3 <-round(hydroGOF::rmse(fullpower$rh85_a3,fullpower$height85), digits = 4)
+r2_85_a3 <- round(rsq(fullpower$rh85_a3,fullpower$height85), digits = 4)
+pear_cor_85_a3 <- cor(fullpower$rh85_a3,fullpower$height85, method = "pearson")
+spear_cor_85_a3 <- cor(fullpower$rh85_a3,fullpower$height85, method = "spearman")
+pear_cor_85_test_a3 <- cor.test(fullpower$rh85_a3,fullpower$height85, method = "pearson")
+spear_cor_85_test_a3 <- cor.test(fullpower$rh85_a3,fullpower$height85, method = "spearman")
+bias85_a3 <-round(bias(fullpower$rh85_a3,fullpower$height85), digits = 4)
+
+RMSE80_a3 <-round(hydroGOF::rmse(fullpower$rh80_a3,fullpower$height80), digits = 4)
+r2_80_a3 <- round(rsq(fullpower$rh80_a3,fullpower$height80), digits = 4)
+pear_cor_80_a3 <- cor(fullpower$rh80_a3,fullpower$height80, method = "pearson")
+spear_cor_80_a3 <- cor(fullpower$rh80_a3,fullpower$height80, method = "spearman")
+pear_cor_80_test_a3 <- cor.test(fullpower$rh80_a3,fullpower$height80, method = "pearson")
+spear_cor_80_test_a3 <- cor.test(fullpower$rh80_a3,fullpower$height80, method = "spearman")
+bias80_a3 <-round(bias(fullpower$rh80_a3,fullpower$height80), digits = 4)
+
+RMSE75_a3 <-round(hydroGOF::rmse(fullpower$rh75_a3,fullpower$height75), digits = 4)
+r2_75_a3 <- round(rsq(fullpower$rh75_a3,fullpower$height75), digits = 4)
+pear_cor_75_a3 <- cor(fullpower$rh75_a3,fullpower$height75, method = "pearson")
+spear_cor_75_a3 <- cor(fullpower$rh75_a3,fullpower$height75, method = "spearman")
+pear_cor_75_test_a3 <- cor.test(fullpower$rh75_a3,fullpower$height75, method = "pearson")
+spear_cor_75_test_a3 <- cor.test(fullpower$rh75_a3,fullpower$height75, method = "spearman")
+bias75_a3 <-round(bias(fullpower$rh75_a3,fullpower$height75), digits = 4)
+
+RMSE70_a3 <-round(hydroGOF::rmse(fullpower$rh70_a3,fullpower$height70), digits = 4)
+r2_70_a3 <- round(rsq(fullpower$rh70_a3,fullpower$height70), digits = 4)
+pear_cor_70_a3 <- cor(fullpower$rh70_a3,fullpower$height70, method = "pearson")
+spear_cor_70_a3 <- cor(fullpower$rh70_a3,fullpower$height70, method = "spearman")
+pear_cor_70_test_a3 <- cor.test(fullpower$rh70_a3,fullpower$height70, method = "pearson")
+spear_cor_70_test_a3 <- cor.test(fullpower$rh70_a3,fullpower$height70, method = "spearman")
+bias70_a3 <-round(bias(fullpower$rh70_a3,fullpower$height70), digits = 4)
+
+RMSE65_a3 <-round(hydroGOF::rmse(fullpower$rh65_a3,fullpower$height65), digits = 4)
+r2_65_a3 <- round(rsq(fullpower$rh65_a3,fullpower$height65), digits = 4)
+pear_cor_65_a3<- cor(fullpower$rh65_a3,fullpower$height65, method = "pearson")
+spear_cor_65_a3 <- cor(fullpower$rh65_a3,fullpower$height65, method = "spearman")
+pear_cor_65_test_a3 <- cor.test(fullpower$rh65_a3,fullpower$height65, method = "pearson")
+spear_cor_65_test_a3 <- cor.test(fullpower$rh65_a3,fullpower$height65, method = "spearman")
+bias65_a3 <-round(bias(fullpower$rh65_a3,fullpower$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a3), col = "purple")
+p2 <-fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a3), col = "purple")
+p3 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a3), col = "purple")
+p4 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a3), col = "purple")
+p5 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a3), col = "purple")
+p6 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a3), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85_a3), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a3), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+```
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 4------------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a4 <- round(hydroGOF::rmse(fullpower$rh100_a4,fullpower$height100), digits = 4)
+r2_100_a4 <- round(rsq(fullpower$rh100_a4,fullpower$height100), digits = 4)
+pear_cor_100_a4 <- cor(fullpower$rh100_a4,fullpower$height100, method = "pearson")
+spear_cor_100_a4 <- cor(fullpower$rh100_a4,fullpower$height100, method = "spearman")
+pear_cor_100_test_a4 <- cor.test(fullpower$rh100_a4,fullpower$height100, method = "pearson")
+spear_cor_100_test_a4 <- cor.test(fullpower$rh100_a4,fullpower$height100, method = "spearman")
+bias100_a4 <- round(bias(fullpower$rh100_a4,fullpower$height100), digits = 4)
+
+RMSE99_a4 <-round(hydroGOF::rmse(fullpower$rh99_a4,fullpower$height99), digits = 4)
+r2_99_a4 <- round(rsq(fullpower$rh99_a4,fullpower$height99), digits = 4)
+pear_cor_99_a4 <- cor(fullpower$rh99_a4,fullpower$height99, method = "pearson")
+spear_cor_99_a4 <- cor(fullpower$rh99_a4,fullpower$height99, method = "spearman")
+pear_cor_99_test_a4 <- cor.test(fullpower$rh99_a4,fullpower$height99, method = "pearson")
+spear_cor_99_test_a4 <- cor.test(fullpower$rh99_a4,fullpower$height99, method = "spearman")
+bias99_a4 <-round(bias(fullpower$rh99_a4,fullpower$height99), digits = 4)
+
+RMSE98_a4 <-round(hydroGOF::rmse(fullpower$rh98_a4,fullpower$height98), digits = 4)
+r2_98_a4 <- round(rsq(fullpower$rh98_a4,fullpower$height98), digits = 4)
+pear_cor_98_a4 <- cor(fullpower$rh98_a4,fullpower$height98, method = "pearson")
+spear_cor_98_a4 <- cor(fullpower$rh98_a4,fullpower$height98, method = "spearman")
+pear_cor_98_test_a4 <- cor.test(fullpower$rh98_a4,fullpower$height98, method = "pearson")
+spear_cor_98_test_a4 <- cor.test(fullpower$rh98_a4,fullpower$height98, method = "spearman")
+bias98_a4 <-round(bias(fullpower$rh98_a4,fullpower$height98), digits = 4)
+
+RMSE95_a4 <-round(hydroGOF::rmse(fullpower$rh95_a4,fullpower$height95), digits = 4)
+r2_95_a4 <- round(rsq(fullpower$rh95_a4,fullpower$height95), digits = 4)
+pear_cor_95_a4 <- cor(fullpower$rh95_a4,fullpower$height95, method = "pearson")
+spear_cor_95_a4 <- cor(fullpower$rh95_a4,fullpower$height95, method = "spearman")
+pear_cor_95_test_a4 <- cor.test(fullpower$rh95_a4,fullpower$height95, method = "pearson")
+spear_cor_95_test_a4 <- cor.test(fullpower$rh95_a4,fullpower$height95, method = "spearman")
+bias95_a4 <-round(bias(fullpower$rh95_a4,fullpower$height95), digits = 4)
+
+RMSE90_a4 <-round(hydroGOF::rmse(fullpower$rh90_a4,fullpower$height90), digits = 4)
+r2_90_a4 <- round(rsq(fullpower$rh90_a4,fullpower$height90), digits = 4)
+pear_cor_90_a4 <- cor(fullpower$rh90_a4,fullpower$height90, method = "pearson")
+spear_cor_90_a4 <- cor(fullpower$rh90_a4,fullpower$height90, method = "spearman")
+pear_cor_90_test_a4 <- cor.test(fullpower$rh90_a4,fullpower$height90, method = "pearson")
+spear_cor_90_test_a4 <- cor.test(fullpower$rh90_a4,fullpower$height90, method = "spearman")
+bias90_a4 <-round(bias(fullpower$rh90_a4,fullpower$height90), digits = 4)
+
+RMSE85_a4 <-round(hydroGOF::rmse(fullpower$rh85_a4,fullpower$height85), digits = 4)
+r2_85_a4 <- round(rsq(fullpower$rh85_a4,fullpower$height85), digits = 4)
+pear_cor_85_a4 <- cor(fullpower$rh85_a4,fullpower$height85, method = "pearson")
+spear_cor_85_a4 <- cor(fullpower$rh85_a4,fullpower$height85, method = "spearman")
+pear_cor_85_test_a4 <- cor.test(fullpower$rh85_a4,fullpower$height85, method = "pearson")
+spear_cor_85_test_a4 <- cor.test(fullpower$rh85_a4,fullpower$height85, method = "spearman")
+bias85_a4 <-round(bias(fullpower$rh85_a4,fullpower$height85), digits = 4)
+
+RMSE80_a4 <-round(hydroGOF::rmse(fullpower$rh80_a4,fullpower$height80), digits = 4)
+r2_80_a4 <- round(rsq(fullpower$rh80_a4,fullpower$height80), digits = 4)
+pear_cor_80_a4 <- cor(fullpower$rh80_a4,fullpower$height80, method = "pearson")
+spear_cor_80_a4 <- cor(fullpower$rh80_a4,fullpower$height80, method = "spearman")
+pear_cor_80_test_a4 <- cor.test(fullpower$rh80_a4,fullpower$height80, method = "pearson")
+spear_cor_80_test_a4 <- cor.test(fullpower$rh80_a4,fullpower$height80, method = "spearman")
+bias80_a4 <-round(bias(fullpower$rh80_a4,fullpower$height80), digits = 4)
+
+RMSE75_a4 <-round(hydroGOF::rmse(fullpower$rh75_a4,fullpower$height75), digits = 4)
+r2_75_a4 <- round(rsq(fullpower$rh75_a4,fullpower$height75), digits = 4)
+pear_cor_75_a4 <- cor(fullpower$rh75_a4,fullpower$height75, method = "pearson")
+spear_cor_75_a4 <- cor(fullpower$rh75_a4,fullpower$height75, method = "spearman")
+pear_cor_75_test_a4 <- cor.test(fullpower$rh75_a4,fullpower$height75, method = "pearson")
+spear_cor_75_test_a4 <- cor.test(fullpower$rh75_a4,fullpower$height75, method = "spearman")
+bias75_a4 <-round(bias(fullpower$rh75_a4,fullpower$height75), digits = 4)
+
+RMSE70_a4 <-round(hydroGOF::rmse(fullpower$rh70_a4,fullpower$height70), digits = 4)
+r2_70_a4 <- round(rsq(fullpower$rh70_a4,fullpower$height70), digits = 4)
+pear_cor_70_a4 <- cor(fullpower$rh70_a4,fullpower$height70, method = "pearson")
+spear_cor_70_a4 <- cor(fullpower$rh70_a4,fullpower$height70, method = "spearman")
+pear_cor_70_test_a4 <- cor.test(fullpower$rh70_a4,fullpower$height70, method = "pearson")
+spear_cor_70_test_a4 <- cor.test(fullpower$rh70_a4,fullpower$height70, method = "spearman")
+bias70_a4 <-round(bias(fullpower$rh70_a4,fullpower$height70), digits = 4)
+
+RMSE65_a4 <-round(hydroGOF::rmse(fullpower$rh65_a4,fullpower$height65), digits = 4)
+r2_65_a4 <- round(rsq(fullpower$rh65_a4,fullpower$height65), digits = 4)
+pear_cor_65_a4<- cor(fullpower$rh65_a4,fullpower$height65, method = "pearson")
+spear_cor_65_a4 <- cor(fullpower$rh65_a4,fullpower$height65, method = "spearman")
+pear_cor_65_test_a4 <- cor.test(fullpower$rh65_a4,fullpower$height65, method = "pearson")
+spear_cor_65_test_a4 <- cor.test(fullpower$rh65_a4,fullpower$height65, method = "spearman")
+bias65_a4 <-round(bias(fullpower$rh65_a4,fullpower$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a4), col = "purple")
+p2 <-fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a4), col = "purple")
+p3 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a4), col = "purple")
+p4 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a4), col = "purple")
+p5 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a4), col = "purple")
+p6 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a4), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85_a4), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a4), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+```
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 5------------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a5 <- round(hydroGOF::rmse(fullpower$rh100_a5,fullpower$height100), digits = 4)
+r2_100_a5 <- round(rsq(fullpower$rh100_a5,fullpower$height100), digits = 4)
+pear_cor_100_a5 <- cor(fullpower$rh100_a5,fullpower$height100, method = "pearson")
+spear_cor_100_a5 <- cor(fullpower$rh100_a5,fullpower$height100, method = "spearman")
+pear_cor_100_test_a5 <- cor.test(fullpower$rh100_a5,fullpower$height100, method = "pearson")
+spear_cor_100_test_a5 <- cor.test(fullpower$rh100_a5,fullpower$height100, method = "spearman")
+bias100_a5 <- round(bias(fullpower$rh100_a5,fullpower$height100), digits = 4)
+
+RMSE99_a5 <-round(hydroGOF::rmse(fullpower$rh99_a5,fullpower$height99), digits = 4)
+r2_99_a5 <- round(rsq(fullpower$rh99_a5,fullpower$height99), digits = 4)
+pear_cor_99_a5 <- cor(fullpower$rh99_a5,fullpower$height99, method = "pearson")
+spear_cor_99_a5 <- cor(fullpower$rh99_a5,fullpower$height99, method = "spearman")
+pear_cor_99_test_a5 <- cor.test(fullpower$rh99_a5,fullpower$height99, method = "pearson")
+spear_cor_99_test_a5 <- cor.test(fullpower$rh99_a5,fullpower$height99, method = "spearman")
+bias99_a5 <-round(bias(fullpower$rh99_a5,fullpower$height99), digits = 4)
+
+RMSE98_a5 <-round(hydroGOF::rmse(fullpower$rh98_a5,fullpower$height98), digits = 4)
+r2_98_a5 <- round(rsq(fullpower$rh98_a5,fullpower$height98), digits = 4)
+pear_cor_98_a5 <- cor(fullpower$rh98_a5,fullpower$height98, method = "pearson")
+spear_cor_98_a5 <- cor(fullpower$rh98_a5,fullpower$height98, method = "spearman")
+pear_cor_98_test_a5 <- cor.test(fullpower$rh98_a5,fullpower$height98, method = "pearson")
+spear_cor_98_test_a5 <- cor.test(fullpower$rh98_a5,fullpower$height98, method = "spearman")
+bias98_a5 <-round(bias(fullpower$rh98_a5,fullpower$height98), digits = 4)
+
+RMSE95_a5 <-round(hydroGOF::rmse(fullpower$rh95_a5,fullpower$height95), digits = 4)
+r2_95_a5 <- round(rsq(fullpower$rh95_a5,fullpower$height95), digits = 4)
+pear_cor_95_a5 <- cor(fullpower$rh95_a5,fullpower$height95, method = "pearson")
+spear_cor_95_a5 <- cor(fullpower$rh95_a5,fullpower$height95, method = "spearman")
+pear_cor_95_test_a5 <- cor.test(fullpower$rh95_a5,fullpower$height95, method = "pearson")
+spear_cor_95_test_a5 <- cor.test(fullpower$rh95_a5,fullpower$height95, method = "spearman")
+bias95_a5 <-round(bias(fullpower$rh95_a5,fullpower$height95), digits = 4)
+
+RMSE90_a5 <-round(hydroGOF::rmse(fullpower$rh90_a5,fullpower$height90), digits = 4)
+r2_90_a5 <- round(rsq(fullpower$rh90_a5,fullpower$height90), digits = 4)
+pear_cor_90_a5 <- cor(fullpower$rh90_a5,fullpower$height90, method = "pearson")
+spear_cor_90_a5 <- cor(fullpower$rh90_a5,fullpower$height90, method = "spearman")
+pear_cor_90_test_a5 <- cor.test(fullpower$rh90_a5,fullpower$height90, method = "pearson")
+spear_cor_90_test_a5 <- cor.test(fullpower$rh90_a5,fullpower$height90, method = "spearman")
+bias90_a5 <-round(bias(fullpower$rh90_a5,fullpower$height90), digits = 4)
+
+RMSE85_a5 <-round(hydroGOF::rmse(fullpower$rh85_a5,fullpower$height85), digits = 4)
+r2_85_a5 <- round(rsq(fullpower$rh85_a5,fullpower$height85), digits = 4)
+pear_cor_85_a5 <- cor(fullpower$rh85_a5,fullpower$height85, method = "pearson")
+spear_cor_85_a5 <- cor(fullpower$rh85_a5,fullpower$height85, method = "spearman")
+pear_cor_85_test_a5 <- cor.test(fullpower$rh85_a5,fullpower$height85, method = "pearson")
+spear_cor_85_test_a5 <- cor.test(fullpower$rh85_a5,fullpower$height85, method = "spearman")
+bias85_a5 <-round(bias(fullpower$rh85_a5,fullpower$height85), digits = 4)
+
+RMSE80_a5 <-round(hydroGOF::rmse(fullpower$rh80_a5,fullpower$height80), digits = 4)
+r2_80_a5 <- round(rsq(fullpower$rh80_a5,fullpower$height80), digits = 4)
+pear_cor_80_a5 <- cor(fullpower$rh80_a5,fullpower$height80, method = "pearson")
+spear_cor_80_a5 <- cor(fullpower$rh80_a5,fullpower$height80, method = "spearman")
+pear_cor_80_test_a5 <- cor.test(fullpower$rh80_a5,fullpower$height80, method = "pearson")
+spear_cor_80_test_a5 <- cor.test(fullpower$rh80_a5,fullpower$height80, method = "spearman")
+bias80_a5 <-round(bias(fullpower$rh80_a5,fullpower$height80), digits = 4)
+
+RMSE75_a5 <-round(hydroGOF::rmse(fullpower$rh75_a5,fullpower$height75), digits = 4)
+r2_75_a5 <- round(rsq(fullpower$rh75_a5,fullpower$height75), digits = 4)
+pear_cor_75_a5 <- cor(fullpower$rh75_a5,fullpower$height75, method = "pearson")
+spear_cor_75_a5 <- cor(fullpower$rh75_a5,fullpower$height75, method = "spearman")
+pear_cor_75_test_a5 <- cor.test(fullpower$rh75_a5,fullpower$height75, method = "pearson")
+spear_cor_75_test_a5 <- cor.test(fullpower$rh75_a5,fullpower$height75, method = "spearman")
+bias75_a5 <-round(bias(fullpower$rh75_a5,fullpower$height75), digits = 4)
+
+RMSE70_a5 <-round(hydroGOF::rmse(fullpower$rh70_a5,fullpower$height70), digits = 4)
+r2_70_a5 <- round(rsq(fullpower$rh70_a5,fullpower$height70), digits = 4)
+pear_cor_70_a5 <- cor(fullpower$rh70_a5,fullpower$height70, method = "pearson")
+spear_cor_70_a5 <- cor(fullpower$rh70_a5,fullpower$height70, method = "spearman")
+pear_cor_70_test_a5 <- cor.test(fullpower$rh70_a5,fullpower$height70, method = "pearson")
+spear_cor_70_test_a5 <- cor.test(fullpower$rh70_a5,fullpower$height70, method = "spearman")
+bias70_a5 <-round(bias(fullpower$rh70_a5,fullpower$height70), digits = 4)
+
+RMSE65_a5 <-round(hydroGOF::rmse(fullpower$rh65_a5,fullpower$height65), digits = 4)
+r2_65_a5 <- round(rsq(fullpower$rh65_a5,fullpower$height65), digits = 4)
+pear_cor_65_a5<- cor(fullpower$rh65_a5,fullpower$height65, method = "pearson")
+spear_cor_65_a5 <- cor(fullpower$rh65_a5,fullpower$height65, method = "spearman")
+pear_cor_65_test_a5 <- cor.test(fullpower$rh65_a5,fullpower$height65, method = "pearson")
+spear_cor_65_test_a5 <- cor.test(fullpower$rh65_a5,fullpower$height65, method = "spearman")
+bias65_a5 <-round(bias(fullpower$rh65_a5,fullpower$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a5), col = "purple")
+p2 <-fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a5), col = "purple")
+p3 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a5), col = "purple")
+p4 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a5), col = "purple")
+p5 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a5), col = "purple")
+p6 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a5), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85_a5), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a5), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 6------------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a6 <- round(hydroGOF::rmse(fullpower$rh100_a6,fullpower$height100), digits = 4)
+r2_100_a6 <- round(rsq(fullpower$rh100_a6,fullpower$height100), digits = 4)
+pear_cor_100_a6 <- cor(fullpower$rh100_a6,fullpower$height100, method = "pearson")
+spear_cor_100_a6 <- cor(fullpower$rh100_a6,fullpower$height100, method = "spearman")
+pear_cor_100_test_a6 <- cor.test(fullpower$rh100_a6,fullpower$height100, method = "pearson")
+spear_cor_100_test_a6 <- cor.test(fullpower$rh100_a6,fullpower$height100, method = "spearman")
+bias100_a6 <- round(bias(fullpower$rh100_a6,fullpower$height100), digits = 4)
+
+RMSE99_a6 <-round(hydroGOF::rmse(fullpower$rh99_a6,fullpower$height99), digits = 4)
+r2_99_a6 <- round(rsq(fullpower$rh99_a6,fullpower$height99), digits = 4)
+pear_cor_99_a6 <- cor(fullpower$rh99_a6,fullpower$height99, method = "pearson")
+spear_cor_99_a6 <- cor(fullpower$rh99_a6,fullpower$height99, method = "spearman")
+pear_cor_99_test_a6 <- cor.test(fullpower$rh99_a6,fullpower$height99, method = "pearson")
+spear_cor_99_test_a6 <- cor.test(fullpower$rh99_a6,fullpower$height99, method = "spearman")
+bias99_a6 <-round(bias(fullpower$rh99_a6,fullpower$height99), digits = 4)
+
+RMSE98_a6 <-round(hydroGOF::rmse(fullpower$rh98_a6,fullpower$height98), digits = 4)
+r2_98_a6 <- round(rsq(fullpower$rh98_a6,fullpower$height98), digits = 4)
+pear_cor_98_a6 <- cor(fullpower$rh98_a6,fullpower$height98, method = "pearson")
+spear_cor_98_a6 <- cor(fullpower$rh98_a6,fullpower$height98, method = "spearman")
+pear_cor_98_test_a6 <- cor.test(fullpower$rh98_a6,fullpower$height98, method = "pearson")
+spear_cor_98_test_a6 <- cor.test(fullpower$rh98_a6,fullpower$height98, method = "spearman")
+bias98_a6 <-round(bias(fullpower$rh98_a6,fullpower$height98), digits = 4)
+
+RMSE95_a6 <-round(hydroGOF::rmse(fullpower$rh95_a6,fullpower$height95), digits = 4)
+r2_95_a6 <- round(rsq(fullpower$rh95_a6,fullpower$height95), digits = 4)
+pear_cor_95_a6 <- cor(fullpower$rh95_a6,fullpower$height95, method = "pearson")
+spear_cor_95_a6 <- cor(fullpower$rh95_a6,fullpower$height95, method = "spearman")
+pear_cor_95_test_a6 <- cor.test(fullpower$rh95_a6,fullpower$height95, method = "pearson")
+spear_cor_95_test_a6 <- cor.test(fullpower$rh95_a6,fullpower$height95, method = "spearman")
+bias95_a6 <-round(bias(fullpower$rh95_a6,fullpower$height95), digits = 4)
+
+RMSE90_a6 <-round(hydroGOF::rmse(fullpower$rh90_a6,fullpower$height90), digits = 4)
+r2_90_a6 <- round(rsq(fullpower$rh90_a6,fullpower$height90), digits = 4)
+pear_cor_90_a6 <- cor(fullpower$rh90_a6,fullpower$height90, method = "pearson")
+spear_cor_90_a6 <- cor(fullpower$rh90_a6,fullpower$height90, method = "spearman")
+pear_cor_90_test_a6 <- cor.test(fullpower$rh90_a6,fullpower$height90, method = "pearson")
+spear_cor_90_test_a6 <- cor.test(fullpower$rh90_a6,fullpower$height90, method = "spearman")
+bias90_a6 <-round(bias(fullpower$rh90_a6,fullpower$height90), digits = 4)
+
+RMSE85_a6 <-round(hydroGOF::rmse(fullpower$rh85_a6,fullpower$height85), digits = 4)
+r2_85_a6 <- round(rsq(fullpower$rh85_a6,fullpower$height85), digits = 4)
+pear_cor_85_a6 <- cor(fullpower$rh85_a6,fullpower$height85, method = "pearson")
+spear_cor_85_a6 <- cor(fullpower$rh85_a6,fullpower$height85, method = "spearman")
+pear_cor_85_test_a6 <- cor.test(fullpower$rh85_a6,fullpower$height85, method = "pearson")
+spear_cor_85_test_a6 <- cor.test(fullpower$rh85_a6,fullpower$height85, method = "spearman")
+bias85_a6 <-round(bias(fullpower$rh85_a6,fullpower$height85), digits = 4)
+
+RMSE80_a6 <-round(hydroGOF::rmse(fullpower$rh80_a6,fullpower$height80), digits = 4)
+r2_80_a6 <- round(rsq(fullpower$rh80_a6,fullpower$height80), digits = 4)
+pear_cor_80_a6 <- cor(fullpower$rh80_a6,fullpower$height80, method = "pearson")
+spear_cor_80_a6 <- cor(fullpower$rh80_a6,fullpower$height80, method = "spearman")
+pear_cor_80_test_a6 <- cor.test(fullpower$rh80_a6,fullpower$height80, method = "pearson")
+spear_cor_80_test_a6 <- cor.test(fullpower$rh80_a6,fullpower$height80, method = "spearman")
+bias80_a6 <-round(bias(fullpower$rh80_a6,fullpower$height80), digits = 4)
+
+RMSE75_a6 <-round(hydroGOF::rmse(fullpower$rh75_a6,fullpower$height75), digits = 4)
+r2_75_a6 <- round(rsq(fullpower$rh75_a6,fullpower$height75), digits = 4)
+pear_cor_75_a6 <- cor(fullpower$rh75_a6,fullpower$height75, method = "pearson")
+spear_cor_75_a6 <- cor(fullpower$rh75_a6,fullpower$height75, method = "spearman")
+pear_cor_75_test_a6 <- cor.test(fullpower$rh75_a6,fullpower$height75, method = "pearson")
+spear_cor_75_test_a6 <- cor.test(fullpower$rh75_a6,fullpower$height75, method = "spearman")
+bias75_a6 <-round(bias(fullpower$rh75_a6,fullpower$height75), digits = 4)
+
+RMSE70_a6 <-round(hydroGOF::rmse(fullpower$rh70_a6,fullpower$height70), digits = 4)
+r2_70_a6 <- round(rsq(fullpower$rh70_a6,fullpower$height70), digits = 4)
+pear_cor_70_a6 <- cor(fullpower$rh70_a6,fullpower$height70, method = "pearson")
+spear_cor_70_a6 <- cor(fullpower$rh70_a6,fullpower$height70, method = "spearman")
+pear_cor_70_test_a6 <- cor.test(fullpower$rh70_a6,fullpower$height70, method = "pearson")
+spear_cor_70_test_a6 <- cor.test(fullpower$rh70_a6,fullpower$height70, method = "spearman")
+bias70_a6 <-round(bias(fullpower$rh70_a6,fullpower$height70), digits = 4)
+
+RMSE65_a6 <-round(hydroGOF::rmse(fullpower$rh65_a6,fullpower$height65), digits = 4)
+r2_65_a6 <- round(rsq(fullpower$rh65_a6,fullpower$height65), digits = 4)
+pear_cor_65_a6<- cor(fullpower$rh65_a6,fullpower$height65, method = "pearson")
+spear_cor_65_a6 <- cor(fullpower$rh65_a6,fullpower$height65, method = "spearman")
+pear_cor_65_test_a6 <- cor.test(fullpower$rh65_a6,fullpower$height65, method = "pearson")
+spear_cor_65_test_a6 <- cor.test(fullpower$rh65_a6,fullpower$height65, method = "spearman")
+bias65_a6 <-round(bias(fullpower$rh65_a6,fullpower$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a6), col = "purple")
+p2 <-fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a6), col = "purple")
+p3 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a6), col = "purple")
+p4 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a6), col = "purple")
+p5 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a6), col = "purple")
+p6 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a6), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85_a6), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a6), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##--------------Results Dataframe--------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+algs <- c("_default","_a2","_a3","_a4","_a4","_a5","_a6")
+percentiles <- c(100, 99, 98, 95, 90, 85, 80, 75, 70, 65)
+stats <- c("RMSE", "r2_", "pear_cor_", "spear_cor_", "bias")
+
+for (i in 1:length(algs)){
+  #percentiles down, stats across
+  df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+  colnames(df) <- stats
+  for (j in 1:length(percentiles)){
+    temp <- paste0(percentiles[j], algs[i])
+    for (k in 1:length(stats)){
+      var <- lapply(paste0(stats[k], temp),get)
+      df[j,k] <- var
+      
+    }
+  }
+df$percentile <- percentiles
+df$algorithm <- rep(algs[i],length(nrow(df)))
+algname <-paste0(algs[i], i)
+assign(paste0("stats", algname), df)
+}
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##----------Elevation Comparisons--------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+#----------------------------------------------#
+#--------------No Adjustment----------------
+#----------------------------------------------#
+```{r}
+# omit nas for bias calculations
+fullpower_elev <- na.omit(fullpower)
+# Calculate R squared and RMSE 
+RMSE_elev_full_none <- round(hydroGOF::rmse(fullpower_elev$lidar_elev,fullpower_elev$Elevation), digits = 4)
+r2_elev_full_none <- round(rsq(fullpower_elev$lidar_elev,fullpower_elev$Elevation), digits = 4)
+pear_cor_95_elev_full_none <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation, method = "pearson")
+spear_cor_95_elev_full_none <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation, method = "spearman")
+pear_cor_95_test_elev_full_none <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation, method = "pearson")
+spear_cor_95_test_elev_full_none <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation, method = "spearman")
+bias_elev_full_none <- round(bias(fullpower_elev$lidar_elev,fullpower_elev$Elevation), digits = 4)
+```
+
+```{r,}
+fullpower_elev %>%
+  ggplot() + 
+  geom_point(mapping = aes(lidar_elev,Elevation), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  ylab("GEDI Elevation")+
+  xlab("Drone Lidar Elevation")+
+  geom_text(aes(x = 670, y = 730, label = RMSE_elev_full_none), col = "red")+
+  geom_text(aes(x = 670, y = 720, label = r2_elev_full_none), col = "green")
+```
+
+#----------------------------------------------#
+#--------------Default Algorithm----------------
+#----------------------------------------------#
+```{r}
+# Calculate R squared and RMSE 
+RMSE_elev_full_default <- round(hydroGOF::rmse(fullpower_elev$lidar_elev,fullpower_elev$Elevation_default), digits = 4)
+r2_elev_full_default <- round(rsq(fullpower_elev$lidar_elev,fullpower_elev$Elevation_default), digits = 4)
+pear_cor_95_elev_full_default <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_default, method = "pearson")
+spear_cor_95_elev_full_default <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_default, method = "spearman")
+pear_cor_95_test_elev_full_default <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_default, method = "pearson")
+spear_cor_95_test_elev_full_default <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_default, method = "spearman")
+bias_elev_full_default <- round(bias(fullpower_elev$lidar_elev,fullpower_elev$Elevation_default), digits = 4)
+```
+
+```{r,}
+fullpower_elev %>%
+  ggplot() + 
+  geom_point(mapping = aes(lidar_elev,Elevation_default), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  ylab("Elevation with Default Algorithm RH0 Adjustment")+
+  xlab("Drone Lidar Elevation")+
+  geom_text(aes(x = 670, y = 730, label = RMSE_elev_full_default), col = "red")+
+  geom_text(aes(x = 670, y = 720, label = r2_elev_full_default), col = "green")
+```
+
+
+#----------------------------------------------#
+#-----------------Algorithm 2----------------
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE_elev_a2 <- round(hydroGOF::rmse(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a2), digits = 4)
+r2_elev_a2 <- round(rsq(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a2), digits = 4)
+pear_cor_95_elev_a2 <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a2, method = "pearson")
+spear_cor_95_elev_a2 <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a2, method = "spearman")
+pear_cor_95_test_elev_a2 <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a2, method = "pearson")
+spear_cor_95_test_elev_a2 <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a2, method = "spearman")
+bias_elev_a2 <- round(bias(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a2), digits = 4)
+```
+
+```{r,}
+fullpower_elev %>%
+  ggplot() + 
+  geom_point(mapping = aes(lidar_elev,Elevation_a2), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 670, y = 730, label = RMSE_elev), col = "red")+
+  geom_label(aes(x = 670, y = 720, label = r2_elev), col = "green")+
+  geom_label(aes(x = 670, y = 710, label = bias_elev), col = "purple")
+```
+
+
+#----------------------------------------------#
+#-----------------Algorithm 3----------------
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE_elev_a3 <- round(hydroGOF::rmse(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a3), digits = 4)
+r2_elev_a3 <- round(rsq(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a3), digits = 4)
+pear_cor_95_elev_a3 <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a3, method = "pearson")
+spear_cor_95_elev_a3 <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a3, method = "spearman")
+pear_cor_95_test_elev_a3 <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a3, method = "pearson")
+spear_cor_95_test_elev_a3 <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a3, method = "spearman")
+bias_elev_a3 <- round(bias(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a3), digits = 4)
+```
+
+```{r,}
+fullpower_elev %>%
+  ggplot() + 
+  geom_point(mapping = aes(lidar_elev,Elevation_a3), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 670, y = 730, label = RMSE_elev), col = "red")+
+  geom_label(aes(x = 670, y = 720, label = r2_elev), col = "green")+
+  geom_label(aes(x = 670, y = 710, label = bias_elev), col = "purple")
+```
+
+#----------------------------------------------#
+#-----------------Algorithm 4----------------
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE_elev_a4 <- round(hydroGOF::rmse(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a4), digits = 4)
+r2_elev_a4 <- round(rsq(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a4), digits = 4)
+pear_cor_95_elev_a4 <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a4, method = "pearson")
+spear_cor_95_elev_a4 <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a4, method = "spearman")
+pear_cor_95_test_elev_a4 <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a4, method = "pearson")
+spear_cor_95_test_elev_a4 <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a4, method = "spearman")
+bias_elev_a4 <- round(bias(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a4), digits = 4)
+```
+
+```{r,}
+fullpower_elev %>%
+  ggplot() + 
+  geom_point(mapping = aes(lidar_elev,Elevation_a4), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 670, y = 730, label = RMSE_elev), col = "red")+
+  geom_label(aes(x = 670, y = 720, label = r2_elev), col = "green")+
+  geom_label(aes(x = 670, y = 710, label = bias_elev), col = "purple")
+```
+
+
+#----------------------------------------------#
+#-----------------Algorithm 5----------------
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE_elev_a5 <- round(hydroGOF::rmse(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a5), digits = 4)
+r2_elev_a5 <- round(rsq(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a5), digits = 4)
+pear_cor_95_elev_a5 <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a5, method = "pearson")
+spear_cor_95_elev_a5 <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a5, method = "spearman")
+pear_cor_95_test_elev_a5 <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a5, method = "pearson")
+spear_cor_95_test_elev_a5 <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a5, method = "spearman")
+bias_elev_a5 <- round(bias(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a5), digits = 4)
+```
+
+```{r,}
+fullpower_elev %>%
+  ggplot() + 
+  geom_point(mapping = aes(lidar_elev,Elevation_a5), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 670, y = 730, label = RMSE_elev), col = "red")+
+  geom_label(aes(x = 670, y = 720, label = r2_elev), col = "green")+
+  geom_label(aes(x = 670, y = 710, label = bias_elev), col = "purple")
+```
+
+#----------------------------------------------#
+#-----------------Algorithm 6----------------
+#----------------------------------------------#
+
+```{r}
+# Calculate R squared and RMSE 
+RMSE_elev_a6 <- round(hydroGOF::rmse(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a6), digits = 4)
+r2_elev_a6 <- round(rsq(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a6), digits = 4)
+pear_cor_95_elev_a6 <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a6, method = "pearson")
+spear_cor_95_elev_a6 <- cor(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a6, method = "spearman")
+pear_cor_95_test_elev_a6 <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a6, method = "pearson")
+spear_cor_95_test_elev_a6 <- cor.test(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a6, method = "spearman")
+bias_elev_a6 <- round(bias(fullpower_elev$lidar_elev,fullpower_elev$Elevation_a6), digits = 4)
+```
+
+```{r,}
+fullpower_elev %>%
+  ggplot() + 
+  geom_point(mapping = aes(lidar_elev,Elevation_a6), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 670, y = 730, label = RMSE_elev), col = "red")+
+  geom_label(aes(x = 670, y = 720, label = r2_elev), col = "green")+
+  geom_label(aes(x = 670, y = 710, label = bias_elev), col = "purple")
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##--------------Elevation Results---------------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r,}
+# make a dataframe with all stats results
+algs <- c("_full_none", "_full_default","_a2","_a3","_a4","_a4","_a5","_a6")
+stats <- c("RMSE_elev", "r2_elev", "pear_cor_95_elev", "spear_cor_95_elev", "bias_elev")
+
+#algs down, stats across
+elev_df <- data.frame(matrix(ncol = length(stats), nrow = length(algs)))
+colnames(elev_df) <- stats
+
+for (i in 1:length(algs)){
+  for (k in 1:length(stats)){
+      var <- lapply(paste0(stats[k], algs[i]),get)
+      elev_df[i,k] <- var
+    }
+  }
+elev_df$algorithm <- algs
+```
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##--------Copernicus Elev Comparison------------
+#------------------all shots-------------------#
+#----------------------------------------------#
+
+```{r}
+# remove nas 
+plotdat_elev <- na.omit(plotdat)
+# Calculate R squared and RMSE 
+RMSE_elev_cop <- round(hydroGOF::rmse(plotdat_elev$lidar_elev,plotdat_elev$coper_elev), digits = 4)
+r2_elev_cop <- round(rsq(plotdat_elev$lidar_elev,plotdat_elev$coper_elev), digits = 4)
+pear_cor_95_elev_cop <- cor(plotdat_elev$lidar_elev,plotdat_elev$coper_elev, method = "pearson")
+spear_cor_95_elev_cop <- cor(plotdat_elev$lidar_elev,plotdat_elev$coper_elev, method = "spearman")
+pear_cor_95_test_elev_cop <- cor.test(plotdat_elev$lidar_elev,plotdat_elev$coper_elev, method = "pearson")
+spear_cor_95_test_elev_cop <- cor.test(plotdat_elev$lidar_elev,plotdat_elev$coper_elev, method = "spearman")
+bias_elev_cop <- round(bias(plotdat_elev$lidar_elev,plotdat_elev$coper_elev), digits = 4)
+```
+
+```{r}
+plotdat_elev %>%
+  ggplot() + 
+  geom_point(mapping = aes(lidar_elev,coper_elev), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 670, y = 730, label = RMSE_elev_cop), col = "red")+
+  geom_label(aes(x = 670, y = 720, label = r2_elev_cop), col = "green")+
+  geom_label(aes(x = 670, y = 710, label = bias_elev_cop), col = "purple")
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##---------Copernicus Height Adjustment---------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust <- fullpower$Elevation-fullpower$coper_elev
+fullpower$rh100_adj <- fullpower$rh100 + fullpower$elev_adjust
+fullpower$rh99_adj <- fullpower$rh99 + fullpower$elev_adjust
+fullpower$rh98_adj <- fullpower$rh98 + fullpower$elev_adjust
+fullpower$rh95_adj <- fullpower$rh95 + fullpower$elev_adjust
+fullpower$rh90_adj <- fullpower$rh90 + fullpower$elev_adjust
+fullpower$rh85_adj <- fullpower$rh85 + fullpower$elev_adjust
+fullpower$rh80_adj <- fullpower$rh80 + fullpower$elev_adjust
+fullpower$rh75_adj <- fullpower$rh75 + fullpower$elev_adjust
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adj,fullpower$height100), digits = 4)
+r2_100 <- round(rsq(fullpower$rh100_adj,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adj,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adj,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adj,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adj,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adj,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adj,fullpower$height99), digits = 4)
+r2_99 <- round(rsq(fullpower$rh99_adj,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adj,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adj,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adj,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adj,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adj,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adj,fullpower$height98), digits = 4)
+r2_98 <- round(rsq(fullpower$rh98_adj,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adj,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adj,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adj,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adj,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adj,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adj,fullpower$height95), digits = 4)
+r2_95 <- round(rsq(fullpower$rh95_adj,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adj,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adj,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adj,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adj,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adj,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adj,fullpower$height90), digits = 4)
+r2_90 <- round(rsq(fullpower$rh90_adj,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adj,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adj,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adj,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adj,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adj,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adj,fullpower$height85), digits = 4)
+r2_85 <- round(rsq(fullpower$rh85_adj,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adj,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adj,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adj,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adj,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adj,fullpower$height85), digits = 4)
+
+RMSE80 <-round(hydroGOF::rmse(fullpower$rh80_adj,fullpower$height80), digits = 4)
+r2_80 <- round(rsq(fullpower$rh80_adj,fullpower$height80), digits = 4)
+pear_cor_80 <- cor(fullpower$rh80_adj,fullpower$height80, method = "pearson")
+spear_cor_80 <- cor(fullpower$rh80_adj,fullpower$height80, method = "spearman")
+pear_cor_80_test <- cor.test(fullpower$rh80_adj,fullpower$height80, method = "pearson")
+spear_cor_80_test <- cor.test(fullpower$rh80_adj,fullpower$height80, method = "spearman")
+bias80 <-round(bias(fullpower$rh80_adj,fullpower$height80), digits = 4)
+
+
+RMSE75 <-round(hydroGOF::rmse(fullpower$rh75_adj,fullpower$height75), digits = 4)
+r2_75 <- round(rsq(fullpower$rh75_adj,fullpower$height75), digits = 4)
+pear_cor_75 <- cor(fullpower$rh75_adj,fullpower$height75, method = "pearson")
+spear_cor_75 <- cor(fullpower$rh75_adj,fullpower$height75, method = "spearman")
+pear_cor_75_test <- cor.test(fullpower$rh75_adj,fullpower$height75, method = "pearson")
+spear_cor_75_test <- cor.test(fullpower$rh75_adj,fullpower$height75, method = "spearman")
+bias75 <-round(bias(fullpower$rh75_adj,fullpower$height75), digits = 4)
+```
+
+```{r}
+p1 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100), col = "purple")
+p2 <-fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99), col = "purple")
+p3 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98), col = "purple")
+p4 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95), col = "purple")
+p5 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90), col = "purple")
+p6 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+```
+
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##-----------Cop Results Dataframe--------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85, 80, 75)
+stats <- c("RMSE", "r2_", "pear_cor_", "spear_cor_", "bias")
+
+cop_stats_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(cop_stats_df) <- stats
+
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    cop_stats_df[j,k] <- var
+  }
+}
+cop_stats_df$percentile <- percentiles
+```
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##----------Point to Point Adjustment-----------
+#----------------------------------------------#
+#----------------------------------------------#
+
+#----------------------------------------------#
+#--------------------Default-------------------
+#----------------------------------------------#
+
+```{r}
+fullpower <- na.omit(fullpower)
+# Height adjustment shot by shot
+fullpower$elev_adjust <- fullpower$Elevation-fullpower$lidar_elev
+
+fullpower$rh100_adj <- fullpower$rh100 + fullpower$elev_adjust
+fullpower$rh99_adj <- fullpower$rh99 + fullpower$elev_adjust
+fullpower$rh98_adj <- fullpower$rh98 + fullpower$elev_adjust
+fullpower$rh95_adj <- fullpower$rh95 + fullpower$elev_adjust
+fullpower$rh90_adj <- fullpower$rh90 + fullpower$elev_adjust
+fullpower$rh85_adj <- fullpower$rh85 + fullpower$elev_adjust
+fullpower$rh80_adj <- fullpower$rh80 + fullpower$elev_adjust
+fullpower$rh75_adj <- fullpower$rh75 + fullpower$elev_adjust
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adj,fullpower$height100), digits = 4)
+r2_100 <- round(rsq(fullpower$rh100_adj,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adj,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adj,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adj,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adj,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adj,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adj,fullpower$height99), digits = 4)
+r2_99 <- round(rsq(fullpower$rh99_adj,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adj,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adj,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adj,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adj,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adj,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adj,fullpower$height98), digits = 4)
+r2_98 <- round(rsq(fullpower$rh98_adj,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adj,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adj,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adj,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adj,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adj,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adj,fullpower$height95), digits = 4)
+r2_95 <- round(rsq(fullpower$rh95_adj,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adj,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adj,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adj,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adj,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adj,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adj,fullpower$height90), digits = 4)
+r2_90 <- round(rsq(fullpower$rh90_adj,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adj,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adj,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adj,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adj,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adj,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adj,fullpower$height85), digits = 4)
+r2_85 <- round(rsq(fullpower$rh85_adj,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adj,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adj,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adj,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adj,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adj,fullpower$height85), digits = 4)
+
+RMSE80 <-round(hydroGOF::rmse(fullpower$rh80_adj,fullpower$height80), digits = 4)
+r2_80 <- round(rsq(fullpower$rh80_adj,fullpower$height80), digits = 4)
+pear_cor_80 <- cor(fullpower$rh80_adj,fullpower$height80, method = "pearson")
+spear_cor_80 <- cor(fullpower$rh80_adj,fullpower$height80, method = "spearman")
+pear_cor_80_test <- cor.test(fullpower$rh80_adj,fullpower$height80, method = "pearson")
+spear_cor_80_test <- cor.test(fullpower$rh80_adj,fullpower$height80, method = "spearman")
+bias80 <-round(bias(fullpower$rh80_adj,fullpower$height80), digits = 4)
+
+RMSE75 <-round(hydroGOF::rmse(fullpower$rh75_adj,fullpower$height75), digits = 4)
+r2_75 <- round(rsq(fullpower$rh75_adj,fullpower$height75), digits = 4)
+pear_cor_75 <- cor(fullpower$rh75_adj,fullpower$height75, method = "pearson")
+spear_cor_75 <- cor(fullpower$rh75_adj,fullpower$height75, method = "spearman")
+pear_cor_75_test <- cor.test(fullpower$rh75_adj,fullpower$height75, method = "pearson")
+spear_cor_75_test <- cor.test(fullpower$rh75_adj,fullpower$height75, method = "spearman")
+bias75 <-round(bias(fullpower$rh75_adj,fullpower$height75), digits = 4)
+```
+
+```{r}
+p1 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_100), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100), col = "purple")
+p2 <-fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_99), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99), col = "purple")
+p3 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_98), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98), col = "purple")
+p4 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_95), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95), col = "purple")
+p5 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_90), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90), col = "purple")
+p6 <- fullpower %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_adj), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r2_85), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, p5, p6, cols=2)
+```
+
+
+#----------------------------------------------#
+#-----------------Algorithm 2----------------
+#----------------------------------------------#
+
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust_a2 <- fullpower$Elevation_a2-fullpower$lidar_elev
+summary(fullpower$elev_adjust_a2)
+
+fullpower$rh100_adj_a2  <- fullpower$rh100  + fullpower$elev_adjust_a2
+summary(fullpower$rh100_adj_a2 )
+fullpower$rh99_adj_a2  <- fullpower$rh99  + fullpower$elev_adjust_a2
+summary(fullpower$rh99_adj_a2 )
+fullpower$rh98_adj_a2  <- fullpower$rh98  + fullpower$elev_adjust_a2
+summary(fullpower$rh98_adj_a2 )
+fullpower$rh95_adj_a2  <- fullpower$rh95  + fullpower$elev_adjust_a2
+summary(fullpower$rh95_adj_a2 )
+fullpower$rh90_adj_a2  <- fullpower$rh90  + fullpower$elev_adjust_a2
+summary(fullpower$rh90_adj_a2 )
+fullpower$rh85_adj_a2  <- fullpower$rh85  + fullpower$elev_adjust_a2
+summary(fullpower$rh85_adj_a2 )
+```
+
+```{r}
+RMSE100_a2 <- round(hydroGOF::rmse(fullpower$rh100_adj_a2,fullpower$height100), digits = 4)
+r2_100_a2 <- round(rsq(fullpower$rh100_adj_a2,fullpower$height100), digits = 4)
+pear_cor_100_a2 <- cor(fullpower$rh100_adj_a2,fullpower$height100, method = "pearson")
+spear_cor_100_a2 <- cor(fullpower$rh100_adj_a2,fullpower$height100, method = "spearman")
+pear_cor_100_test_a2 <- cor.test(fullpower$rh100_adj_a2,fullpower$height100, method = "pearson")
+spear_cor_100_test_a2 <- cor.test(fullpower$rh100_adj_a2,fullpower$height100, method = "spearman")
+bias100_a2 <- round(bias(fullpower$rh100_adj_a2,fullpower$height100), digits = 4)
+
+RMSE99_a2 <-round(hydroGOF::rmse(fullpower$rh99_adj_a2,fullpower$height99), digits = 4)
+r2_99_a2 <- round(rsq(fullpower$rh99_adj_a2,fullpower$height99), digits = 4)
+pear_cor_99_a2 <- cor(fullpower$rh99_adj_a2,fullpower$height99, method = "pearson")
+spear_cor_99_a2 <- cor(fullpower$rh99_adj_a2,fullpower$height99, method = "spearman")
+pear_cor_99_test_a2 <- cor.test(fullpower$rh99_adj_a2,fullpower$height99, method = "pearson")
+spear_cor_99_test_a2 <- cor.test(fullpower$rh99_adj_a2,fullpower$height99, method = "spearman")
+bias99_a2 <-round(bias(fullpower$rh99_adj_a2,fullpower$height99), digits = 4)
+
+RMSE98_a2 <-round(hydroGOF::rmse(fullpower$rh98_adj_a2,fullpower$height98), digits = 4)
+r2_98_a2 <- round(rsq(fullpower$rh98_adj_a2,fullpower$height98), digits = 4)
+pear_cor_98_a2 <- cor(fullpower$rh98_adj_a2,fullpower$height98, method = "pearson")
+spear_cor_98_a2 <- cor(fullpower$rh98_adj_a2,fullpower$height98, method = "spearman")
+pear_cor_98_test_a2 <- cor.test(fullpower$rh98_adj_a2,fullpower$height98, method = "pearson")
+spear_cor_98_test_a2 <- cor.test(fullpower$rh98_adj_a2,fullpower$height98, method = "spearman")
+bias98_a2 <-round(bias(fullpower$rh98_adj_a2,fullpower$height98), digits = 4)
+
+RMSE95_a2 <-round(hydroGOF::rmse(fullpower$rh95_adj_a2,fullpower$height95), digits = 4)
+r2_95_a2 <- round(rsq(fullpower$rh95_adj_a2,fullpower$height95), digits = 4)
+pear_cor_95_a2 <- cor(fullpower$rh95_adj_a2,fullpower$height95, method = "pearson")
+spear_cor_95_a2 <- cor(fullpower$rh95_adj_a2,fullpower$height95, method = "spearman")
+pear_cor_95_test_a2 <- cor.test(fullpower$rh95_adj_a2,fullpower$height95, method = "pearson")
+spear_cor_95_test_a2 <- cor.test(fullpower$rh95_adj_a2,fullpower$height95, method = "spearman")
+bias95_a2 <-round(bias(fullpower$rh95_adj_a2,fullpower$height95), digits = 4)
+
+RMSE90_a2 <-round(hydroGOF::rmse(fullpower$rh90_adj_a2,fullpower$height90), digits = 4)
+r2_90_a2 <- round(rsq(fullpower$rh90_adj_a2,fullpower$height90), digits = 4)
+pear_cor_90_a2 <- cor(fullpower$rh90_adj_a2,fullpower$height90, method = "pearson")
+spear_cor_90_a2 <- cor(fullpower$rh90_adj_a2,fullpower$height90, method = "spearman")
+pear_cor_90_test_a2 <- cor.test(fullpower$rh90_adj_a2,fullpower$height90, method = "pearson")
+spear_cor_90_test_a2 <- cor.test(fullpower$rh90_adj_a2,fullpower$height90, method = "spearman")
+bias90_a2 <-round(bias(fullpower$rh90_adj_a2,fullpower$height90), digits = 4)
+
+RMSE85_a2 <-round(hydroGOF::rmse(fullpower$rh85_adj_a2,fullpower$height85), digits = 4)
+r2_85_a2 <- round(rsq(fullpower$rh85_adj_a2,fullpower$height85), digits = 4)
+pear_cor_85_a2 <- cor(fullpower$rh85_adj_a2,fullpower$height85, method = "pearson")
+spear_cor_85_a2 <- cor(fullpower$rh85_adj_a2,fullpower$height85, method = "spearman")
+pear_cor_85_test_a2 <- cor.test(fullpower$rh85_adj_a2,fullpower$height85, method = "pearson")
+spear_cor_85_test_a2 <- cor.test(fullpower$rh85_adj_a2,fullpower$height85, method = "spearman")
+bias85_a2 <-round(bias(fullpower$rh85_adj_a2,fullpower$height85), digits = 4)
+```
+
+#----------------------------------------------#
+#-----------------Algorithm 3----------------
+#----------------------------------------------#
+
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust_a3 <- fullpower$Elevation_a3-fullpower$lidar_elev
+summary(fullpower$elev_adjust_a3)
+
+fullpower$rh100_adj_a3  <- fullpower$rh100  + fullpower$elev_adjust_a3
+summary(fullpower$rh100_adj_a3 )
+fullpower$rh99_adj_a3  <- fullpower$rh99  + fullpower$elev_adjust_a3
+summary(fullpower$rh99_adj_a3 )
+fullpower$rh98_adj_a3  <- fullpower$rh98  + fullpower$elev_adjust_a3
+summary(fullpower$rh98_adj_a3 )
+fullpower$rh95_adj_a3  <- fullpower$rh95  + fullpower$elev_adjust_a3
+summary(fullpower$rh95_adj_a3 )
+fullpower$rh90_adj_a3  <- fullpower$rh90  + fullpower$elev_adjust_a3
+summary(fullpower$rh90_adj_a3 )
+fullpower$rh85_adj_a3  <- fullpower$rh85  + fullpower$elev_adjust_a3
+summary(fullpower$rh85_adj_a3 )
+```
+
+```{r}
+RMSE100_a3 <- round(hydroGOF::rmse(fullpower$rh100_adj_a3,fullpower$height100), digits = 4)
+r2_100_a3 <- round(rsq(fullpower$rh100_adj_a3,fullpower$height100), digits = 4)
+pear_cor_100_a3 <- cor(fullpower$rh100_adj_a3,fullpower$height100, method = "pearson")
+spear_cor_100_a3 <- cor(fullpower$rh100_adj_a3,fullpower$height100, method = "spearman")
+pear_cor_100_test_a3 <- cor.test(fullpower$rh100_adj_a3,fullpower$height100, method = "pearson")
+spear_cor_100_test_a3 <- cor.test(fullpower$rh100_adj_a3,fullpower$height100, method = "spearman")
+bias100_a3 <- round(bias(fullpower$rh100_adj_a3,fullpower$height100), digits = 4)
+
+RMSE99_a3 <-round(hydroGOF::rmse(fullpower$rh99_adj_a3,fullpower$height99), digits = 4)
+r2_99_a3 <- round(rsq(fullpower$rh99_adj_a3,fullpower$height99), digits = 4)
+pear_cor_99_a3 <- cor(fullpower$rh99_adj_a3,fullpower$height99, method = "pearson")
+spear_cor_99_a3 <- cor(fullpower$rh99_adj_a3,fullpower$height99, method = "spearman")
+pear_cor_99_test_a3 <- cor.test(fullpower$rh99_adj_a3,fullpower$height99, method = "pearson")
+spear_cor_99_test_a3 <- cor.test(fullpower$rh99_adj_a3,fullpower$height99, method = "spearman")
+bias99_a3 <-round(bias(fullpower$rh99_adj_a3,fullpower$height99), digits = 4)
+
+RMSE98_a3 <-round(hydroGOF::rmse(fullpower$rh98_adj_a3,fullpower$height98), digits = 4)
+r2_98_a3 <- round(rsq(fullpower$rh98_adj_a3,fullpower$height98), digits = 4)
+pear_cor_98_a3 <- cor(fullpower$rh98_adj_a3,fullpower$height98, method = "pearson")
+spear_cor_98_a3 <- cor(fullpower$rh98_adj_a3,fullpower$height98, method = "spearman")
+pear_cor_98_test_a3 <- cor.test(fullpower$rh98_adj_a3,fullpower$height98, method = "pearson")
+spear_cor_98_test_a3 <- cor.test(fullpower$rh98_adj_a3,fullpower$height98, method = "spearman")
+bias98_a3 <-round(bias(fullpower$rh98_adj_a3,fullpower$height98), digits = 4)
+
+RMSE95_a3 <-round(hydroGOF::rmse(fullpower$rh95_adj_a3,fullpower$height95), digits = 4)
+r2_95_a3 <- round(rsq(fullpower$rh95_adj_a3,fullpower$height95), digits = 4)
+pear_cor_95_a3 <- cor(fullpower$rh95_adj_a3,fullpower$height95, method = "pearson")
+spear_cor_95_a3 <- cor(fullpower$rh95_adj_a3,fullpower$height95, method = "spearman")
+pear_cor_95_test_a3 <- cor.test(fullpower$rh95_adj_a3,fullpower$height95, method = "pearson")
+spear_cor_95_test_a3 <- cor.test(fullpower$rh95_adj_a3,fullpower$height95, method = "spearman")
+bias95_a3 <-round(bias(fullpower$rh95_adj_a3,fullpower$height95), digits = 4)
+
+RMSE90_a3 <-round(hydroGOF::rmse(fullpower$rh90_adj_a3,fullpower$height90), digits = 4)
+r2_90_a3 <- round(rsq(fullpower$rh90_adj_a3,fullpower$height90), digits = 4)
+pear_cor_90_a3 <- cor(fullpower$rh90_adj_a3,fullpower$height90, method = "pearson")
+spear_cor_90_a3 <- cor(fullpower$rh90_adj_a3,fullpower$height90, method = "spearman")
+pear_cor_90_test_a3 <- cor.test(fullpower$rh90_adj_a3,fullpower$height90, method = "pearson")
+spear_cor_90_test_a3 <- cor.test(fullpower$rh90_adj_a3,fullpower$height90, method = "spearman")
+bias90_a3 <-round(bias(fullpower$rh90_adj_a3,fullpower$height90), digits = 4)
+
+RMSE85_a3 <-round(hydroGOF::rmse(fullpower$rh85_adj_a3,fullpower$height85), digits = 4)
+r2_85_a3 <- round(rsq(fullpower$rh85_adj_a3,fullpower$height85), digits = 4)
+pear_cor_85_a3 <- cor(fullpower$rh85_adj_a3,fullpower$height85, method = "pearson")
+spear_cor_85_a3 <- cor(fullpower$rh85_adj_a3,fullpower$height85, method = "spearman")
+pear_cor_85_test_a3 <- cor.test(fullpower$rh85_adj_a3,fullpower$height85, method = "pearson")
+spear_cor_85_test_a3 <- cor.test(fullpower$rh85_adj_a3,fullpower$height85, method = "spearman")
+bias85_a3 <-round(bias(fullpower$rh85_adj_a3,fullpower$height85), digits = 4)
+```
+
+#----------------------------------------------#
+#-----------------Algorithm 4----------------
+#----------------------------------------------#
+
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust_a4 <- fullpower$Elevation_a4-fullpower$lidar_elev
+summary(fullpower$elev_adjust_a4)
+
+fullpower$rh100_adj_a4  <- fullpower$rh100  + fullpower$elev_adjust_a4
+summary(fullpower$rh100_adj_a4 )
+fullpower$rh99_adj_a4  <- fullpower$rh99  + fullpower$elev_adjust_a4
+summary(fullpower$rh99_adj_a4 )
+fullpower$rh98_adj_a4  <- fullpower$rh98  + fullpower$elev_adjust_a4
+summary(fullpower$rh98_adj_a4 )
+fullpower$rh95_adj_a4  <- fullpower$rh95  + fullpower$elev_adjust_a4
+summary(fullpower$rh95_adj_a4 )
+fullpower$rh90_adj_a4  <- fullpower$rh90  + fullpower$elev_adjust_a4
+summary(fullpower$rh90_adj_a4 )
+fullpower$rh85_adj_a4  <- fullpower$rh85  + fullpower$elev_adjust_a4
+summary(fullpower$rh85_adj_a4 )
+```
+
+```{r}
+RMSE100_a4 <- round(hydroGOF::rmse(fullpower$rh100_adj_a4,fullpower$height100), digits = 4)
+r2_100_a4 <- round(rsq(fullpower$rh100_adj_a4,fullpower$height100), digits = 4)
+pear_cor_100_a4 <- cor(fullpower$rh100_adj_a4,fullpower$height100, method = "pearson")
+spear_cor_100_a4 <- cor(fullpower$rh100_adj_a4,fullpower$height100, method = "spearman")
+pear_cor_100_test_a4 <- cor.test(fullpower$rh100_adj_a4,fullpower$height100, method = "pearson")
+spear_cor_100_test_a4 <- cor.test(fullpower$rh100_adj_a4,fullpower$height100, method = "spearman")
+bias100_a4 <- round(bias(fullpower$rh100_adj_a4,fullpower$height100), digits = 4)
+
+RMSE99_a4 <-round(hydroGOF::rmse(fullpower$rh99_adj_a4,fullpower$height99), digits = 4)
+r2_99_a4 <- round(rsq(fullpower$rh99_adj_a4,fullpower$height99), digits = 4)
+pear_cor_99_a4 <- cor(fullpower$rh99_adj_a4,fullpower$height99, method = "pearson")
+spear_cor_99_a4 <- cor(fullpower$rh99_adj_a4,fullpower$height99, method = "spearman")
+pear_cor_99_test_a4 <- cor.test(fullpower$rh99_adj_a4,fullpower$height99, method = "pearson")
+spear_cor_99_test_a4 <- cor.test(fullpower$rh99_adj_a4,fullpower$height99, method = "spearman")
+bias99_a4 <-round(bias(fullpower$rh99_adj_a4,fullpower$height99), digits = 4)
+
+RMSE98_a4 <-round(hydroGOF::rmse(fullpower$rh98_adj_a4,fullpower$height98), digits = 4)
+r2_98_a4 <- round(rsq(fullpower$rh98_adj_a4,fullpower$height98), digits = 4)
+pear_cor_98_a4 <- cor(fullpower$rh98_adj_a4,fullpower$height98, method = "pearson")
+spear_cor_98_a4 <- cor(fullpower$rh98_adj_a4,fullpower$height98, method = "spearman")
+pear_cor_98_test_a4 <- cor.test(fullpower$rh98_adj_a4,fullpower$height98, method = "pearson")
+spear_cor_98_test_a4 <- cor.test(fullpower$rh98_adj_a4,fullpower$height98, method = "spearman")
+bias98_a4 <-round(bias(fullpower$rh98_adj_a4,fullpower$height98), digits = 4)
+
+RMSE95_a4 <-round(hydroGOF::rmse(fullpower$rh95_adj_a4,fullpower$height95), digits = 4)
+r2_95_a4 <- round(rsq(fullpower$rh95_adj_a4,fullpower$height95), digits = 4)
+pear_cor_95_a4 <- cor(fullpower$rh95_adj_a4,fullpower$height95, method = "pearson")
+spear_cor_95_a4 <- cor(fullpower$rh95_adj_a4,fullpower$height95, method = "spearman")
+pear_cor_95_test_a4 <- cor.test(fullpower$rh95_adj_a4,fullpower$height95, method = "pearson")
+spear_cor_95_test_a4 <- cor.test(fullpower$rh95_adj_a4,fullpower$height95, method = "spearman")
+bias95_a4 <-round(bias(fullpower$rh95_adj_a4,fullpower$height95), digits = 4)
+
+RMSE90_a4 <-round(hydroGOF::rmse(fullpower$rh90_adj_a4,fullpower$height90), digits = 4)
+r2_90_a4 <- round(rsq(fullpower$rh90_adj_a4,fullpower$height90), digits = 4)
+pear_cor_90_a4 <- cor(fullpower$rh90_adj_a4,fullpower$height90, method = "pearson")
+spear_cor_90_a4 <- cor(fullpower$rh90_adj_a4,fullpower$height90, method = "spearman")
+pear_cor_90_test_a4 <- cor.test(fullpower$rh90_adj_a4,fullpower$height90, method = "pearson")
+spear_cor_90_test_a4 <- cor.test(fullpower$rh90_adj_a4,fullpower$height90, method = "spearman")
+bias90_a4 <-round(bias(fullpower$rh90_adj_a4,fullpower$height90), digits = 4)
+
+RMSE85_a4 <-round(hydroGOF::rmse(fullpower$rh85_adj_a4,fullpower$height85), digits = 4)
+r2_85_a4 <- round(rsq(fullpower$rh85_adj_a4,fullpower$height85), digits = 4)
+pear_cor_85_a4 <- cor(fullpower$rh85_adj_a4,fullpower$height85, method = "pearson")
+spear_cor_85_a4 <- cor(fullpower$rh85_adj_a4,fullpower$height85, method = "spearman")
+pear_cor_85_test_a4 <- cor.test(fullpower$rh85_adj_a4,fullpower$height85, method = "pearson")
+spear_cor_85_test_a4 <- cor.test(fullpower$rh85_adj_a4,fullpower$height85, method = "spearman")
+bias85_a4 <-round(bias(fullpower$rh85_adj_a4,fullpower$height85), digits = 4)
+```
+
+#----------------------------------------------#
+#-----------------Algorithm 5----------------
+#----------------------------------------------#
+
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust_a5 <- fullpower$Elevation_a5-fullpower$lidar_elev
+summary(fullpower$elev_adjust_a5)
+
+fullpower$rh100_adj_a5  <- fullpower$rh100  + fullpower$elev_adjust_a5
+summary(fullpower$rh100_adj_a5 )
+fullpower$rh99_adj_a5  <- fullpower$rh99  + fullpower$elev_adjust_a5
+summary(fullpower$rh99_adj_a5 )
+fullpower$rh98_adj_a5  <- fullpower$rh98  + fullpower$elev_adjust_a5
+summary(fullpower$rh98_adj_a5 )
+fullpower$rh95_adj_a5  <- fullpower$rh95  + fullpower$elev_adjust_a5
+summary(fullpower$rh95_adj_a5 )
+fullpower$rh90_adj_a5  <- fullpower$rh90  + fullpower$elev_adjust_a5
+summary(fullpower$rh90_adj_a5 )
+fullpower$rh85_adj_a5  <- fullpower$rh85  + fullpower$elev_adjust_a5
+summary(fullpower$rh85_adj_a5 )
+```
+
+```{r}
+RMSE100_a5 <- round(hydroGOF::rmse(fullpower$rh100_adj_a5,fullpower$height100), digits = 4)
+r2_100_a5 <- round(rsq(fullpower$rh100_adj_a5,fullpower$height100), digits = 4)
+pear_cor_100_a5 <- cor(fullpower$rh100_adj_a5,fullpower$height100, method = "pearson")
+spear_cor_100_a5 <- cor(fullpower$rh100_adj_a5,fullpower$height100, method = "spearman")
+pear_cor_100_test_a5 <- cor.test(fullpower$rh100_adj_a5,fullpower$height100, method = "pearson")
+spear_cor_100_test_a5 <- cor.test(fullpower$rh100_adj_a5,fullpower$height100, method = "spearman")
+bias100_a5 <- round(bias(fullpower$rh100_adj_a5,fullpower$height100), digits = 4)
+
+RMSE99_a5 <-round(hydroGOF::rmse(fullpower$rh99_adj_a5,fullpower$height99), digits = 4)
+r2_99_a5 <- round(rsq(fullpower$rh99_adj_a5,fullpower$height99), digits = 4)
+pear_cor_99_a5 <- cor(fullpower$rh99_adj_a5,fullpower$height99, method = "pearson")
+spear_cor_99_a5 <- cor(fullpower$rh99_adj_a5,fullpower$height99, method = "spearman")
+pear_cor_99_test_a5 <- cor.test(fullpower$rh99_adj_a5,fullpower$height99, method = "pearson")
+spear_cor_99_test_a5 <- cor.test(fullpower$rh99_adj_a5,fullpower$height99, method = "spearman")
+bias99_a5 <-round(bias(fullpower$rh99_adj_a5,fullpower$height99), digits = 4)
+
+RMSE98_a5 <-round(hydroGOF::rmse(fullpower$rh98_adj_a5,fullpower$height98), digits = 4)
+r2_98_a5 <- round(rsq(fullpower$rh98_adj_a5,fullpower$height98), digits = 4)
+pear_cor_98_a5 <- cor(fullpower$rh98_adj_a5,fullpower$height98, method = "pearson")
+spear_cor_98_a5 <- cor(fullpower$rh98_adj_a5,fullpower$height98, method = "spearman")
+pear_cor_98_test_a5 <- cor.test(fullpower$rh98_adj_a5,fullpower$height98, method = "pearson")
+spear_cor_98_test_a5 <- cor.test(fullpower$rh98_adj_a5,fullpower$height98, method = "spearman")
+bias98_a5 <-round(bias(fullpower$rh98_adj_a5,fullpower$height98), digits = 4)
+
+RMSE95_a5 <-round(hydroGOF::rmse(fullpower$rh95_adj_a5,fullpower$height95), digits = 4)
+r2_95_a5 <- round(rsq(fullpower$rh95_adj_a5,fullpower$height95), digits = 4)
+pear_cor_95_a5 <- cor(fullpower$rh95_adj_a5,fullpower$height95, method = "pearson")
+spear_cor_95_a5 <- cor(fullpower$rh95_adj_a5,fullpower$height95, method = "spearman")
+pear_cor_95_test_a5 <- cor.test(fullpower$rh95_adj_a5,fullpower$height95, method = "pearson")
+spear_cor_95_test_a5 <- cor.test(fullpower$rh95_adj_a5,fullpower$height95, method = "spearman")
+bias95_a5 <-round(bias(fullpower$rh95_adj_a5,fullpower$height95), digits = 4)
+
+RMSE90_a5 <-round(hydroGOF::rmse(fullpower$rh90_adj_a5,fullpower$height90), digits = 4)
+r2_90_a5 <- round(rsq(fullpower$rh90_adj_a5,fullpower$height90), digits = 4)
+pear_cor_90_a5 <- cor(fullpower$rh90_adj_a5,fullpower$height90, method = "pearson")
+spear_cor_90_a5 <- cor(fullpower$rh90_adj_a5,fullpower$height90, method = "spearman")
+pear_cor_90_test_a5 <- cor.test(fullpower$rh90_adj_a5,fullpower$height90, method = "pearson")
+spear_cor_90_test_a5 <- cor.test(fullpower$rh90_adj_a5,fullpower$height90, method = "spearman")
+bias90_a5 <-round(bias(fullpower$rh90_adj_a5,fullpower$height90), digits = 4)
+
+RMSE85_a5 <-round(hydroGOF::rmse(fullpower$rh85_adj_a5,fullpower$height85), digits = 4)
+r2_85_a5 <- round(rsq(fullpower$rh85_adj_a5,fullpower$height85), digits = 4)
+pear_cor_85_a5 <- cor(fullpower$rh85_adj_a5,fullpower$height85, method = "pearson")
+spear_cor_85_a5 <- cor(fullpower$rh85_adj_a5,fullpower$height85, method = "spearman")
+pear_cor_85_test_a5 <- cor.test(fullpower$rh85_adj_a5,fullpower$height85, method = "pearson")
+spear_cor_85_test_a5 <- cor.test(fullpower$rh85_adj_a5,fullpower$height85, method = "spearman")
+bias85_a5 <-round(bias(fullpower$rh85_adj_a5,fullpower$height85), digits = 4)
+```
+
+#----------------------------------------------#
+#-----------------Algorithm 6----------------
+#----------------------------------------------#
+
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust_a6 <- fullpower$Elevation_a6-fullpower$lidar_elev
+summary(fullpower$elev_adjust_a6)
+
+fullpower$rh100_adj_a6  <- fullpower$rh100  + fullpower$elev_adjust_a6
+summary(fullpower$rh100_adj_a6 )
+fullpower$rh99_adj_a6  <- fullpower$rh99  + fullpower$elev_adjust_a6
+summary(fullpower$rh99_adj_a6 )
+fullpower$rh98_adj_a6  <- fullpower$rh98  + fullpower$elev_adjust_a6
+summary(fullpower$rh98_adj_a6 )
+fullpower$rh95_adj_a6  <- fullpower$rh95  + fullpower$elev_adjust_a6
+summary(fullpower$rh95_adj_a6 )
+fullpower$rh90_adj_a6  <- fullpower$rh90  + fullpower$elev_adjust_a6
+summary(fullpower$rh90_adj_a6 )
+fullpower$rh85_adj_a6  <- fullpower$rh85  + fullpower$elev_adjust_a6
+summary(fullpower$rh85_adj_a6 )
+```
+
+```{r}
+RMSE100_a6 <- round(hydroGOF::rmse(fullpower$rh100_adj_a6,fullpower$height100), digits = 4)
+r2_100_a6 <- round(rsq(fullpower$rh100_adj_a6,fullpower$height100), digits = 4)
+pear_cor_100_a6 <- cor(fullpower$rh100_adj_a6,fullpower$height100, method = "pearson")
+spear_cor_100_a6 <- cor(fullpower$rh100_adj_a6,fullpower$height100, method = "spearman")
+pear_cor_100_test_a6 <- cor.test(fullpower$rh100_adj_a6,fullpower$height100, method = "pearson")
+spear_cor_100_test_a6 <- cor.test(fullpower$rh100_adj_a6,fullpower$height100, method = "spearman")
+bias100_a6 <- round(bias(fullpower$rh100_adj_a6,fullpower$height100), digits = 4)
+
+RMSE99_a6 <-round(hydroGOF::rmse(fullpower$rh99_adj_a6,fullpower$height99), digits = 4)
+r2_99_a6 <- round(rsq(fullpower$rh99_adj_a6,fullpower$height99), digits = 4)
+pear_cor_99_a6 <- cor(fullpower$rh99_adj_a6,fullpower$height99, method = "pearson")
+spear_cor_99_a6 <- cor(fullpower$rh99_adj_a6,fullpower$height99, method = "spearman")
+pear_cor_99_test_a6 <- cor.test(fullpower$rh99_adj_a6,fullpower$height99, method = "pearson")
+spear_cor_99_test_a6 <- cor.test(fullpower$rh99_adj_a6,fullpower$height99, method = "spearman")
+bias99_a6 <-round(bias(fullpower$rh99_adj_a6,fullpower$height99), digits = 4)
+
+RMSE98_a6 <-round(hydroGOF::rmse(fullpower$rh98_adj_a6,fullpower$height98), digits = 4)
+r2_98_a6 <- round(rsq(fullpower$rh98_adj_a6,fullpower$height98), digits = 4)
+pear_cor_98_a6 <- cor(fullpower$rh98_adj_a6,fullpower$height98, method = "pearson")
+spear_cor_98_a6 <- cor(fullpower$rh98_adj_a6,fullpower$height98, method = "spearman")
+pear_cor_98_test_a6 <- cor.test(fullpower$rh98_adj_a6,fullpower$height98, method = "pearson")
+spear_cor_98_test_a6 <- cor.test(fullpower$rh98_adj_a6,fullpower$height98, method = "spearman")
+bias98_a6 <-round(bias(fullpower$rh98_adj_a6,fullpower$height98), digits = 4)
+
+RMSE95_a6 <-round(hydroGOF::rmse(fullpower$rh95_adj_a6,fullpower$height95), digits = 4)
+r2_95_a6 <- round(rsq(fullpower$rh95_adj_a6,fullpower$height95), digits = 4)
+pear_cor_95_a6 <- cor(fullpower$rh95_adj_a6,fullpower$height95, method = "pearson")
+spear_cor_95_a6 <- cor(fullpower$rh95_adj_a6,fullpower$height95, method = "spearman")
+pear_cor_95_test_a6 <- cor.test(fullpower$rh95_adj_a6,fullpower$height95, method = "pearson")
+spear_cor_95_test_a6 <- cor.test(fullpower$rh95_adj_a6,fullpower$height95, method = "spearman")
+bias95_a6 <-round(bias(fullpower$rh95_adj_a6,fullpower$height95), digits = 4)
+
+RMSE90_a6 <-round(hydroGOF::rmse(fullpower$rh90_adj_a6,fullpower$height90), digits = 4)
+r2_90_a6 <- round(rsq(fullpower$rh90_adj_a6,fullpower$height90), digits = 4)
+pear_cor_90_a6 <- cor(fullpower$rh90_adj_a6,fullpower$height90, method = "pearson")
+spear_cor_90_a6 <- cor(fullpower$rh90_adj_a6,fullpower$height90, method = "spearman")
+pear_cor_90_test_a6 <- cor.test(fullpower$rh90_adj_a6,fullpower$height90, method = "pearson")
+spear_cor_90_test_a6 <- cor.test(fullpower$rh90_adj_a6,fullpower$height90, method = "spearman")
+bias90_a6 <-round(bias(fullpower$rh90_adj_a6,fullpower$height90), digits = 4)
+
+RMSE85_a6 <-round(hydroGOF::rmse(fullpower$rh85_adj_a6,fullpower$height85), digits = 4)
+r2_85_a6 <- round(rsq(fullpower$rh85_adj_a6,fullpower$height85), digits = 4)
+pear_cor_85_a6 <- cor(fullpower$rh85_adj_a6,fullpower$height85, method = "pearson")
+spear_cor_85_a6 <- cor(fullpower$rh85_adj_a6,fullpower$height85, method = "spearman")
+pear_cor_85_test_a6 <- cor.test(fullpower$rh85_adj_a6,fullpower$height85, method = "pearson")
+spear_cor_85_test_a6 <- cor.test(fullpower$rh85_adj_a6,fullpower$height85, method = "spearman")
+bias85_a6 <-round(bias(fullpower$rh85_adj_a6,fullpower$height85), digits = 4)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##----------Point Results Dataframe-------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+algs <- c("","_a2","_a3","_a4","_a4","_a5","_a6")
+percentiles <- c(100, 99, 98, 95, 90, 85)
+stats <- c("RMSE", "r2_", "pear_cor_", "spear_cor_", "bias")
+
+for (i in 1:length(algs)){
+  #percentiles down, stats across
+  df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+  colnames(df) <- stats
+  for (j in 1:length(percentiles)){
+    temp <- paste0(percentiles[j], algs[i])
+    for (k in 1:length(stats)){
+      var <- lapply(paste0(stats[k], temp),get)
+      df[j,k] <- var
+      
+    }
+  }
+df$percentile <- percentiles
+df$algorithm <- rep(algs[i],length(nrow(df)))
+algname <-paste0(algs[i], i)
+assign(paste0("stats_adj", algname), df)
+}
+```
+
+
+#----------------------------------------------#
+#----------------------------------------------#
+##-------Linear Regression Adjustment-----------
+#----------------------------------------------#
+#----------------------------------------------#
+
+```{r}
+lm(fullpower$Elevation~fullpower$lidar_elev)
+# linear regression equation: y = 0.9866 x+11.9967
+# gedi = y, drone = x
+
+fullpower$elevation_linreg <-0.9866*fullpower$Elevation+11.9967
+
+fullpower$elev_adjust_linreg <- fullpower$Elevation-fullpower$elevation_linreg
+summary(fullpower$elev_adjust_linreg)
+
+fullpower$rh100_adjlinreg <- fullpower$rh100 + fullpower$elev_adjust_linreg
+summary(fullpower$rh100_adjlinreg)
+fullpower$rh99_adjlinreg <- fullpower$rh99 + fullpower$elev_adjust_linreg
+summary(fullpower$rh99_adjlinreg)
+fullpower$rh98_adjlinreg <- fullpower$rh98 + fullpower$elev_adjust_linreg
+summary(fullpower$rh98_adjlinreg)
+fullpower$rh95_adjlinreg <- fullpower$rh95 + fullpower$elev_adjust_linreg
+summary(fullpower$rh95_adjlinreg)
+fullpower$rh90_adjlinreg <- fullpower$rh90 + fullpower$elev_adjust_linreg
+summary(fullpower$rh90_adjlinreg)
+fullpower$rh85_adjlinreg <- fullpower$rh85 + fullpower$elev_adjust_linreg
+summary(fullpower$rh85_adjlinreg)
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+r2_100 <- round(rsq(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+r2_99 <- round(rsq(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+r2_98 <- round(rsq(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+r2_95 <- round(rsq(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+r2_90 <- round(rsq(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+r2_85 <- round(rsq(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##----------LinReg Results Dataframe------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85)
+stats <- c("RMSE", "r2_", "pear_cor_", "spear_cor_", "bias")
+
+linreg_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(linreg_df) <- stats
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    linreg_df[j,k] <- var
+  }
+}
+linreg_df$percentile <- percentiles
+```
+
+
+
+
+
+### Comparisons between CHM and Ground Data
+```{r, echo=FALSE}
+grounddat_field_gedi <- read.csv("~/Desktop/Research_2022/Data/GEDI/cameroon_gedi_field.csv")
+grounddat_field_gedi <- na.omit(grounddat_field_gedi)
+grounddat_lidar <- read.csv("~/Desktop/Research_2022/Data/GEDI/cameroon_field_lidar.csv")
+
+str(grounddat_field_gedi$field_height100)
+```
+
+
+
+```{r}
+# Calculate R squared and RMSE
+RMSE100 <- round(hydroGOF::rmse(grounddat_lidar$field_height100 ,grounddat_lidar$height100), digits = 4)
+r2_100 <- round(rsq(grounddat_lidar$field_height100 ,grounddat_lidar$height100), digits = 4)
+pear_cor_100 <- cor(grounddat_lidar$field_height100 ,grounddat_lidar$height100, method = "pearson")
+spear_cor_100 <- cor(grounddat_lidar$field_height100 ,grounddat_lidar$height100, method = "spearman")
+pear_cor_100_test <- cor.test(grounddat_lidar$field_height100 ,grounddat_lidar$height100, method = "pearson")
+spear_cor_100_test <- cor.test(grounddat_lidar$field_height100 ,grounddat_lidar$height100, method = "spearman")
+bias100 <- round(bias(grounddat_lidar$field_height100 ,grounddat_lidar$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(grounddat_lidar$field_height99 ,grounddat_lidar$height99), digits = 4)
+r2_99 <- round(rsq(grounddat_lidar$field_height99 ,grounddat_lidar$height99), digits = 4)
+pear_cor_99 <- cor(grounddat_lidar$field_height99 ,grounddat_lidar$height99, method = "pearson")
+spear_cor_99 <- cor(grounddat_lidar$field_height99 ,grounddat_lidar$height99, method = "spearman")
+pear_cor_99_test <- cor.test(grounddat_lidar$field_height99 ,grounddat_lidar$height99, method = "pearson")
+spear_cor_99_test <- cor.test(grounddat_lidar$field_height99 ,grounddat_lidar$height99, method = "spearman")
+bias99 <-round(bias(grounddat_lidar$field_height99 ,grounddat_lidar$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(grounddat_lidar$field_height98 ,grounddat_lidar$height98), digits = 4)
+r2_98 <- round(rsq(grounddat_lidar$field_height98 ,grounddat_lidar$height98), digits = 4)
+pear_cor_98 <- cor(grounddat_lidar$field_height98 ,grounddat_lidar$height98, method = "pearson")
+spear_cor_98 <- cor(grounddat_lidar$field_height98 ,grounddat_lidar$height98, method = "spearman")
+pear_cor_98_test <- cor.test(grounddat_lidar$field_height98 ,grounddat_lidar$height98, method = "pearson")
+spear_cor_98_test <- cor.test(grounddat_lidar$field_height98 ,grounddat_lidar$height98, method = "spearman")
+bias98 <-round(bias(grounddat_lidar$field_height98 ,grounddat_lidar$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(grounddat_lidar$field_height95 ,grounddat_lidar$height95), digits = 4)
+r2_95 <- round(rsq(grounddat_lidar$field_height95 ,grounddat_lidar$height95), digits = 4)
+pear_cor_95 <- cor(grounddat_lidar$field_height95 ,grounddat_lidar$height95, method = "pearson")
+spear_cor_95 <- cor(grounddat_lidar$field_height95 ,grounddat_lidar$height95, method = "spearman")
+pear_cor_95_test <- cor.test(grounddat_lidar$field_height95 ,grounddat_lidar$height95, method = "pearson")
+spear_cor_95_test <- cor.test(grounddat_lidar$field_height95 ,grounddat_lidar$height95, method = "spearman")
+bias95 <-round(bias(grounddat_lidar$field_height95 ,grounddat_lidar$height95), digits = 4)
+```
+
+```{r,}
+p1 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,field_height100), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE100), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_100), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias100), col = "purple")
+p2 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,field_height99), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE99), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_99), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias99), col = "purple")
+p3 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,field_height98), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE98), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_98), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias98), col = "purple")
+p4 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,field_height95), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE95), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_95), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias95), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, cols=2)
+```
+
+### Comparison between Ground and Gedi
+## Default
+```{r,}
+grounddat_field_gedi %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh100,field_height), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)
+grounddat_field_gedi %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh98,field_height), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)
+```
+
+```{r}
+# Calculate R squared and RMSE
+RMSE100 <- round(hydroGOF::rmse(grounddat_field_gedi$rh100 ,grounddat_field_gedi$field_height100), digits = 4)
+r2_100 <- round(rsq(grounddat_field_gedi$rh100 ,grounddat_field_gedi$field_height100), digits = 4)
+pear_cor_100 <- cor(grounddat_field_gedi$rh100 ,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100 <- cor(grounddat_field_gedi$rh100 ,grounddat_field_gedi$field_height100, method = "spearman")
+pear_cor_100_test <- cor.test(grounddat_field_gedi$rh100 ,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100_test <- cor.test(grounddat_field_gedi$rh100 ,grounddat_field_gedi$field_height100, method = "spearman")
+bias100 <- round(bias(grounddat_field_gedi$rh100 ,grounddat_field_gedi$field_height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(grounddat_field_gedi$rh99 ,grounddat_field_gedi$field_height99), digits = 4)
+r2_99 <- round(rsq(grounddat_field_gedi$rh99 ,grounddat_field_gedi$field_height99), digits = 4)
+pear_cor_99 <- cor(grounddat_field_gedi$rh99 ,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99 <- cor(grounddat_field_gedi$rh99 ,grounddat_field_gedi$field_height99, method = "spearman")
+pear_cor_99_test <- cor.test(grounddat_field_gedi$rh99 ,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99_test <- cor.test(grounddat_field_gedi$rh99 ,grounddat_field_gedi$field_height99, method = "spearman")
+bias99 <-round(bias(grounddat_field_gedi$rh99 ,grounddat_field_gedi$field_height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(grounddat_field_gedi$rh98 ,grounddat_field_gedi$field_height98), digits = 4)
+r2_98 <- round(rsq(grounddat_field_gedi$rh98 ,grounddat_field_gedi$field_height98), digits = 4)
+pear_cor_98 <- cor(grounddat_field_gedi$rh98 ,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98 <- cor(grounddat_field_gedi$rh98 ,grounddat_field_gedi$field_height98, method = "spearman")
+pear_cor_98_test <- cor.test(grounddat_field_gedi$rh98 ,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98_test <- cor.test(grounddat_field_gedi$rh98 ,grounddat_field_gedi$field_height98, method = "spearman")
+bias98 <-round(bias(grounddat_field_gedi$rh98 ,grounddat_field_gedi$field_height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height95), digits = 4)
+r2_95 <- round(rsq(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height95), digits = 4)
+pear_cor_95 <- cor(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95 <- cor(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height95, method = "spearman")
+pear_cor_95_test <- cor.test(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95_test <- cor.test(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height95, method = "spearman")
+bias95 <-round(bias(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height95), digits = 4)
+```
+
+```{r,}
+p1 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh100,field_height100), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE100), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_100), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias100), col = "purple")
+p2 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh99,field_height99), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE99), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_99), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias99), col = "purple")
+p3 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh98,field_height98), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE98), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_98), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias98), col = "purple")
+p4 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh95,field_height95), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE95), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_95), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias95), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, cols=2)
+```
+
+## Alg 2
+```{r}
+# Calculate R squared and RMSE
+RMSE100 <- round(hydroGOF::rmse(grounddat_field_gedi$rh100_a2,grounddat_field_gedi$field_height100), digits = 4)
+r2_100 <- round(rsq(grounddat_field_gedi$rh100_a2,grounddat_field_gedi$field_height100), digits = 4)
+pear_cor_100 <- cor(grounddat_field_gedi$rh100_a2,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100 <- cor(grounddat_field_gedi$rh100_a2,grounddat_field_gedi$field_height100, method = "spearman")
+pear_cor_100_test <- cor.test(grounddat_field_gedi$rh100_a2,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100_test <- cor.test(grounddat_field_gedi$rh100_a2,grounddat_field_gedi$field_height100, method = "spearman")
+bias100 <- round(bias(grounddat_field_gedi$rh100_a2,grounddat_field_gedi$field_height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(grounddat_field_gedi$rh99_a2,grounddat_field_gedi$field_height99), digits = 4)
+r2_99 <- round(rsq(grounddat_field_gedi$rh99_a2,grounddat_field_gedi$field_height99), digits = 4)
+pear_cor_99 <- cor(grounddat_field_gedi$rh99_a2,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99 <- cor(grounddat_field_gedi$rh99_a2,grounddat_field_gedi$field_height99, method = "spearman")
+pear_cor_99_test <- cor.test(grounddat_field_gedi$rh99_a2,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99_test <- cor.test(grounddat_field_gedi$rh99_a2,grounddat_field_gedi$field_height99, method = "spearman")
+bias99 <-round(bias(grounddat_field_gedi$rh99_a2,grounddat_field_gedi$field_height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(grounddat_field_gedi$rh98_a2,grounddat_field_gedi$field_height98), digits = 4)
+r2_98 <- round(rsq(grounddat_field_gedi$rh98_a2,grounddat_field_gedi$field_height98), digits = 4)
+pear_cor_98 <- cor(grounddat_field_gedi$rh98_a2,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98 <- cor(grounddat_field_gedi$rh98_a2,grounddat_field_gedi$field_height98, method = "spearman")
+pear_cor_98_test <- cor.test(grounddat_field_gedi$rh98_a2,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98_test <- cor.test(grounddat_field_gedi$rh98_a2,grounddat_field_gedi$field_height98, method = "spearman")
+bias98 <-round(bias(grounddat_field_gedi$rh98_a2,grounddat_field_gedi$field_height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(grounddat_field_gedi$rh95_a2,grounddat_field_gedi$field_height95), digits = 4)
+r2_95 <- round(rsq(grounddat_field_gedi$rh95_a2,grounddat_field_gedi$field_height95), digits = 4)
+pear_cor_95 <- cor(grounddat_field_gedi$rh95_a2,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95 <- cor(grounddat_field_gedi$rh95_a2,grounddat_field_gedi$field_height95, method = "spearman")
+pear_cor_95_test <- cor.test(grounddat_field_gedi$rh95_a2,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95_test <- cor.test(grounddat_field_gedi$rh95_a2,grounddat_field_gedi$field_height95, method = "spearman")
+bias95 <-round(bias(grounddat_field_gedi$rh95_a2,grounddat_field_gedi$field_height95), digits = 4)
+```
+
+```{r,}
+p1 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh100_a2,field_height100), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE100), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_100), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias100), col = "purple")
+p2 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh99_a2,field_height99), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE99), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_99), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias99), col = "purple")
+p3 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh98_a2,field_height98), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE98), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_98), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias98), col = "purple")
+p4 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh95_a2,field_height95), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE95), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_95), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias95), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, cols=2)
+```
+
+## Alg 3
+```{r}
+# Calculate R squared and RMSE
+RMSE100 <- round(hydroGOF::rmse(grounddat_field_gedi$rh100_a3,grounddat_field_gedi$field_height100), digits = 4)
+r2_100 <- round(rsq(grounddat_field_gedi$rh100_a3,grounddat_field_gedi$field_height100), digits = 4)
+pear_cor_100 <- cor(grounddat_field_gedi$rh100_a3,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100 <- cor(grounddat_field_gedi$rh100_a3,grounddat_field_gedi$field_height100, method = "spearman")
+pear_cor_100_test <- cor.test(grounddat_field_gedi$rh100_a3,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100_test <- cor.test(grounddat_field_gedi$rh100_a3,grounddat_field_gedi$field_height100, method = "spearman")
+bias100 <- round(bias(grounddat_field_gedi$rh100_a3,grounddat_field_gedi$field_height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(grounddat_field_gedi$rh99_a3,grounddat_field_gedi$field_height99), digits = 4)
+r2_99 <- round(rsq(grounddat_field_gedi$rh99_a3,grounddat_field_gedi$field_height99), digits = 4)
+pear_cor_99 <- cor(grounddat_field_gedi$rh99_a3,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99 <- cor(grounddat_field_gedi$rh99_a3,grounddat_field_gedi$field_height99, method = "spearman")
+pear_cor_99_test <- cor.test(grounddat_field_gedi$rh99_a3,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99_test <- cor.test(grounddat_field_gedi$rh99_a3,grounddat_field_gedi$field_height99, method = "spearman")
+bias99 <-round(bias(grounddat_field_gedi$rh99_a3,grounddat_field_gedi$field_height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(grounddat_field_gedi$rh98_a3,grounddat_field_gedi$field_height98), digits = 4)
+r2_98 <- round(rsq(grounddat_field_gedi$rh98_a3,grounddat_field_gedi$field_height98), digits = 4)
+pear_cor_98 <- cor(grounddat_field_gedi$rh98_a3,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98 <- cor(grounddat_field_gedi$rh98_a3,grounddat_field_gedi$field_height98, method = "spearman")
+pear_cor_98_test <- cor.test(grounddat_field_gedi$rh98_a3,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98_test <- cor.test(grounddat_field_gedi$rh98_a3,grounddat_field_gedi$field_height98, method = "spearman")
+bias98 <-round(bias(grounddat_field_gedi$rh98_a3,grounddat_field_gedi$field_height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(grounddat_field_gedi$rh95_a3,grounddat_field_gedi$field_height95), digits = 4)
+r2_95 <- round(rsq(grounddat_field_gedi$rh95_a3,grounddat_field_gedi$field_height95), digits = 4)
+pear_cor_95 <- cor(grounddat_field_gedi$rh95_a3,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95 <- cor(grounddat_field_gedi$rh95_a3,grounddat_field_gedi$field_height95, method = "spearman")
+pear_cor_95_test <- cor.test(grounddat_field_gedi$rh95_a3,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95_test <- cor.test(grounddat_field_gedi$rh95_a3,grounddat_field_gedi$field_height95, method = "spearman")
+bias95 <-round(bias(grounddat_field_gedi$rh95_a3,grounddat_field_gedi$field_height95), digits = 4)
+```
+
+```{r,}
+p1 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh100_a3,field_height100), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE100), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_100), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias100), col = "purple")
+p2 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh99_a3,field_height99), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE99), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_99), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias99), col = "purple")
+p3 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh98_a3,field_height98), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE98), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_98), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias98), col = "purple")
+p4 <- grounddat_lidar %>%
+  ggplot() + 
+  geom_point(mapping = aes(rh95_a3,field_height95), col = "blue")+
+  xlim(20,70) + ylim(20,70) +
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 30, y = 70, label = RMSE95), col = "red")+
+  geom_label(aes(x = 30, y = 60, label = r2_95), col = "green")+
+  geom_label(aes(x = 30, y = 50, label = bias95), col = "purple")
+```
+
+```{r}
+multiplot(p1, p2, p3, p4, cols=2)
+```
+
+
+
+
+
+
+
+
+
+Fancy Plot
+
+```{r}
+# gedi
+dat <- read_csv("~/Desktop/Research_2022/Data/GEDI/cameroon_filtered_with_distances.csv")
+# Read in field data
+fielddat <- read.csv("~/Desktop/Research_2022/Data/GEDI/cameroon_field_lidar.csv")
+# reserve- for crs
+reserve <- readOGR('~/Desktop/Research/Cameroon/DjaFaunalReserve',"DjaFaunalReserveOSM")
+# Cameroon lidar
+cam_lidar <- raster("~/Desktop/Research/Cameroon/CHM_1m.tif")
+
+# make list of shots
+shot <- as.list(unique(fielddat$Shot_Number))
+dat <- dat[dat$Shot_Number%in% shot, ]
+shot <- as.list(unique(dat$Shot_Number))
+
+
+# convert GEDI data to spatial points dataframe
+cam_proj <- crs(reserve)
+coords<- dat[,c("Longitude","Latitude")]
+cam_spdf <- SpatialPointsDataFrame(coords=coords,
+                                   data=dat,
+                                   proj4string=cam_proj)
+cam_spdf <- spTransform(cam_spdf, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs"))
+cam_buff <- gBuffer(cam_spdf, width= 21, byid = TRUE)
+plot(cam_buff)
+
+hei <- as(cam_buff, "data.frame")
+chm <- raster::extract(cam_lidar, cam_buff, method = "simple", df=TRUE, cellnumbers=TRUE)
+summary(hei$lidar_height)
+```
+
+```{r}
+# make fancy plot
+i = 1
+par(mfrow = c(3,5), mai=c(0,0,0,0))
+for (val in shot){
+  temp <- subset(dat, dat$Shot_Number == val)
+  # convert GEDI data to spatial points dataframe
+  cam_proj <- crs(reserve)
+  coords<- temp[,c("Longitude","Latitude")]
+  temp_spdf <- SpatialPointsDataFrame(coords=coords,
+                                     data=temp,
+                                     proj4string=cam_proj)
+  temp_spdf <- spTransform(temp_spdf, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs "))
+  temp_buff <- gBuffer(temp_spdf, width= 42, byid = TRUE)
+  lidar_chm_crop <- cam_lidar %>% mask(temp_buff) %>%
+          crop(temp_buff)
+  plot(lidar_chm_crop, 
+     breaks = c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60), 
+     col = terrain.colors(12), legend = FALSE, ylab="",yaxt="n", xlab="",xaxt="n")
+  i = i+1}
+plot(lidar_chm_crop, legend.only = TRUE, cex = 2)
+```
+
+
+```{r}
+# Fancy plots
+dat <- subset(dat, dat$Shot_Number == "s29010100300314279")
+# convert GEDI data to spatial points dataframe
+cam_proj <- crs(reserve)
+coords<- dat[,c("Longitude","Latitude")]
+cam_spdf <- SpatialPointsDataFrame(coords=coords,
+                                   data=dat,
+                                   proj4string=cam_proj)
+cam_spdf <- spTransform(cam_spdf, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs "))
+cam_buff <- gBuffer(cam_spdf, width= 21, byid = TRUE)
+
+# cut raster data to buffer shp file
+# crop the lidar raster using the vector extent
+lidar_chm_crop <- cam_lidar %>% mask(cam_buff) %>%
+          crop(cam_buff)
+plot(lidar_chm_crop, main = "Cropped lidar chm")
+
+# make field data into shp file
+field <- subset(fielddat, fielddat$Shot_Number == "s29010100300314279")
+coords<- field[,c("Longitude","Latitude")]
+cam_proj <- crs(reserve)
+spdf_ground <- SpatialPointsDataFrame(coords=coords,
+                                   data=field,
+                                   proj4string=cam_proj)
+spdf_ground <- spTransform(spdf_ground, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs "))
+
+# subset really tall tree
+#tall <- subset(fielddat, fielddat$`Tree ID` == 68)
+#coords<- tall[,c("Longitude","Latitude")]
+#cam_proj <- crs(reserve)
+#tall_spdf <- SpatialPointsDataFrame(coords=coords,
+#                                   data=tall,
+#                                   proj4string=cam_proj)
+#tall_spdf <- spTransform(tall_spdf, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs "))
+
+# add shapefile on top of the existing raster
+plot(lidar_chm_crop)
+plot(spdf_ground, add = TRUE, col = spdf_ground$Height)
+plot(tall_spdf, add = TRUE, col = "white")
+summary(lidar_chm_crop)
+```
+
+```{r}
+# Fancy plots
+dat <- subset(dat, dat$Shot_Number == "s29010100300314279")
+# convert GEDI data to spatial points dataframe
+cam_proj <- crs(reserve)
+coords<- dat[,c("Longitude","Latitude")]
+cam_spdf <- SpatialPointsDataFrame(coords=coords,
+                                   data=dat,
+                                   proj4string=cam_proj)
+cam_spdf <- spTransform(cam_spdf, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs "))
+cam_buff <- gBuffer(cam_spdf, width= 21, byid = TRUE)
+
+# cut raster data to buffer shp file
+# crop the lidar raster using the vector extent
+lidar_chm_crop <- cam_lidar %>% mask(cam_buff) %>%
+          crop(cam_buff)
+plot(lidar_chm_crop, main = "Cropped lidar chm")
+```
+
+```{r}
+# Make a function that creates plot when given a shot number
+make_plot <- function(shot_num) {
+  dat <- subset(dat, dat$Shot_Number == shot_num)
+  # convert GEDI data to spatial points dataframe
+  cam_proj <- crs(reserve)
+  coords<- dat[,c("Longitude","Latitude")]
+  cam_spdf <- SpatialPointsDataFrame(coords=coords,
+                                     data=dat,
+                                     proj4string=cam_proj)
+  cam_spdf <- spTransform(cam_spdf, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs "))
+  cam_buff <- gBuffer(cam_spdf, width= 21, byid = TRUE)
+  lidar_chm_crop <- cam_lidar %>% mask(cam_buff) %>%
+            crop(cam_buff)
+  p1<-plot(lidar_chm_crop, 
+     breaks = c(10, 20, 30, 40, 50), 
+     col = terrain.colors(5), legend = FALSE)
+}
+
+plot(lidar_chm_crop, 
+     breaks = c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60), 
+     col = terrain.colors(12))
+```
+
+```{r}
+par(mfrow=c(3,1))
+make_plot("s29010100300314279")
+make_plot("s29010100300314279")
+plot(lidar_chm_crop, legend.only=TRUE)
+```
+
+
+
+```{r}
+dat <- subset(dat, dat$Shot_Number == "s29010100300314279")
+# convert GEDI data to spatial points dataframe
+cam_proj <- crs(reserve)
+coords<- dat[,c("Longitude","Latitude")]
+cam_spdf <- SpatialPointsDataFrame(coords=coords,
+                                   data=dat,
+                                   proj4string=cam_proj)
+cam_spdf <- spTransform(cam_spdf, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs "))
+cam_buff <- gBuffer(cam_spdf, width= 21, byid = TRUE)
+
+# cut raster data to buffer shp file
+# crop the lidar raster using the vector extent
+lidar_chm_crop <- cam_lidar %>% mask(cam_buff) %>%
+          crop(cam_buff)
+plot(lidar_chm_crop, main = "Cropped lidar chm")
+```
+
+
+```{r}
+dat <- subset(dat, dat$Shot_Number == "s29010000300321833")
+# convert GEDI data to spatial points dataframe
+cam_proj <- crs(reserve)
+coords<- dat[,c("Longitude","Latitude")]
+cam_spdf <- SpatialPointsDataFrame(coords=coords,
+                                   data=dat,
+                                   proj4string=cam_proj)
+cam_spdf <- spTransform(cam_spdf, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs "))
+cam_buff <- gBuffer(cam_spdf, width= 21, byid = TRUE)
+
+# cut raster data to buffer shp file
+# crop the lidar raster using the vector extent
+lidar_chm_crop <- cam_lidar %>% mask(cam_buff) %>%
+          crop(cam_buff)
+plot(lidar_chm_crop)
+p1 <- plot(lidar_chm_crop, xlim = c(257097, 257099),
+     ylim = c(353060, 353080), main = "Cropped lidar chm")
+
+# make field data into shp file
+field <- subset(fielddat, fielddat$Shot_Number == "s29010000300321833")
+coords<- field[,c("Longitude","Latitude")]
+cam_proj <- crs(reserve)
+spdf_ground <- SpatialPointsDataFrame(coords=coords,
+                                   data=field,
+                                   proj4string=cam_proj)
+spdf_ground <- spTransform(spdf_ground, CRS("+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs "))
+
+# add shapefile on top of the existing raster
+plot(lidar_chm_crop)
+plot(spdf_ground, add = TRUE, col = spdf_ground$Height)
+plot(tall_spdf, add = TRUE, col = "white")
+summary(lidar_chm_crop)
+```
+## Summary of Results
+\begin{tabular}{|c|c|c|}
+		\multicolumn{1}{r}{}
+		&  \multicolumn{1}{c}{Cancer}
+		& \multicolumn{1}{c}{No cancer}
+		& \multicolumn{1}{c}{Total} \\
+		\cline{2-4}
+		number & number & number \\
+		\cline{2-4}
+		number & number & number \\
+		\cline{2-4}
+		number & number & number \\
+		\cline{2-4}
+\end{tabular}
+
+
