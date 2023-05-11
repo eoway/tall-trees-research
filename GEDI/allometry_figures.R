@@ -4,34 +4,10 @@
 # run ED2_allometry.R to line ~475
 #---------------------------------------------------------------------#
 setwd("G:/My Drive") # Google Drive
-
-#---------------------------------------------------------------------#
-# load Danum data (plot dat & CSS file)
-#---------------------------------------------------------------------#
-census_dnm <- read.csv("Harvard/Analysis/ED2_Initialization/DNM_2019_census_20m.csv", header=T)
-#census_dnm <- read.csv("Harvard/Analysis/ED2_Initialization/DNM_2015_census_50m.csv", header=T)
-#Census_2_dnm50_clean_main_stem
-datDNM <- census_dnm
-
-#census_css_dnm <- read.table("Harvard/Analysis/ED2_Initialization/sites/Danum/DNM.lat4.956lon117.790.css", header=T)
 #datDNM <- census_css_dnm
 #---------------------------------------------------------------------#
 #---------------------------------------------------------------------#
 
-#---------------------------------------------------------------------#
-# Calculate size2bd
-#---------------------------------------------------------------------#
-#dat <- datDNM #2019 census - requires cleaning
-
-#temporarily remove top 0.0001% data based on DBH
-#keep <- datDNM$dbh >= quantile(datDNM$dbh, .005, na.rm=T) & datDNM$dbh <= quantile(datDNM$dbh, .999999, na.rm=T)
-#keep <- datDNM$dbh <= quantile(datDNM$dbh, .999995, na.rm=T)
-#dat <- datDNM[keep,]
-dat <- subset(datDNM, dbh < 300)
-
-plot_area <- 500000 # 50 ha = 500,000 m2
-
-dbh <- dat$dbh # dbh_samp | dnm_dbh | lam_dbh | etc
 hite <- dat$hite
 hmax = 70
 rho_low <- 0.4
