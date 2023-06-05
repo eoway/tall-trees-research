@@ -9,10 +9,6 @@ require(rgdal)
 require(raster)
 library(rgeos)
 
-
-#ignore
-gedi_dat <- read_csv("~/Desktop/SEAsia_test00100.csv")
-
 # Load data to obtain CRS from
 #irdplot <- readOGR('~/Desktop/Research/Cameroon/IRDplot',"Bouamir_IRDPlot")
 #plot(irdplot)
@@ -38,7 +34,11 @@ extent(camp)
 crs(camp)
 
 # Load GEDI data
-gedi_dat <- read_csv("~/Desktop/Research_2022/Data/cam_filtered_all_algs.csv")
+#gedi_dat <- read_csv("~/Desktop/Research_2022/Data/cam_filtered_all_algs.csv")
+
+gedi_dat <- read_csv("~/Desktop/Research_2022/Data/cam_real/Cameroon_2a_all_algs.csv")
+summary(gedi_dat$Sensitivity)
+colnames(gedi_dat)
 gedi_dat$Shot_Number
 #summary(gedi_dat)
 

@@ -14,7 +14,7 @@ library(fgeo)
 # ----------5m buffer, 600 tree sample-----------------
 #-------------------------------------------------#
 # Load data
-dan_surr_5_600 <- read_csv("~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_5m_600_trees_nci_debug.csv")
+dan_surr_5_600 <- read_csv("~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_5m_600_trees.csv")
 # Boxplots
 boxplot(dan_surr_5_600$n_trees ~ dan_surr_5_600$midtreetype, main = "", 
         xlab = "Tree Type", ylab = "Number of Trees", 
@@ -96,7 +96,7 @@ boxplot(dan_surr_5_600$n_family ~ dan_surr_5_600$midtreetype, main = "",
 t.test(n_family~midtreetype, data=dan_surr_5_600)
 
 boxplot(dan_surr_5_600$midNCI ~ dan_surr_5_600$midtreetype, main = "", 
-        xlab = "Tree Type", ylab = "Number of Families",
+        xlab = "Tree Type", ylab = "NCI",
         col = c("darkolivegreen2", "mediumpurple1"),
         names = c("Emergent", "Nonemergent"))
 

@@ -6,7 +6,7 @@ output:
   html_notebook: default
 ---
 
-#### Default, Algorithm 3, and Algorithm 2 Comparisons Between GEDI and CHM data
+#### Comparisons Between GEDI and CHM data
 
 ```{r, echo=FALSE}
 library(ggplot2)
@@ -25,8 +25,15 @@ library(ggspatial)
 library(ggpubr)
 library(ggthemes)
 
+
+# Load datasets, combine with a1 data
 plotdat <- read.csv( "~/Desktop/Research_2022/Data/GEDI/cam_field_gedi_lidar_all.csv")
-table(plotdat$Beam)
+a1 <- read.csv( "~/Desktop/Research_2022/Data/GEDI/cam_filtered_all_algs_a1_REAL.csv")
+
+total_ful <- merge(plotdat,a1,by="Shot_Number")
+
+ful_a1 <- subset(total_ful, Beam.x == "BEAM0101" | Beam.x == "BEAM0110" | Beam.x == "BEAM1000" |
+                      Beam.x == "BEAM1011")
 
 fullpower <- subset(plotdat, Beam == "BEAM0101" | Beam == "BEAM0110" | Beam == "BEAM1000" |
                       Beam == "BEAM1011")
@@ -99,7 +106,7 @@ p9 <- fullpower %>%
   labs(title = "70th Percentile", x = "Drone Lidar Height", y = "GEDI Height")+theme_fivethirtyeight()+
   theme(axis.title = element_text(), plot.title = element_text(size=10))
 
-ggarrange(p1,p2,p3,p4,p5,p6, nrow = 2, ncol = 3)
+ggarrange(p1,p2,p3,p4,p5,p6, nrow = 3, ncol = 2)
 
 ```
 
@@ -400,6 +407,139 @@ multiplot(p1, p2, p3, p4, p5, p6, cols=3)
 ```
 
 
+#----------------------------------------------#
+#----------------------------------------------#
+##---------------- Algorithm 1------------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r}
+# Calculate R squared and RMSE 
+RMSE100_a1 <- round(hydroGOF::rmse(ful_a1$rh100_a1,ful_a1$height100), digits = 4)
+r1_100_a1 <- round(rsq(ful_a1$rh100_a1,ful_a1$height100), digits = 4)
+pear_cor_100_a1 <- cor(ful_a1$rh100_a1,ful_a1$height100, method = "pearson")
+spear_cor_100_a1 <- cor(ful_a1$rh100_a1,ful_a1$height100, method = "spearman")
+pear_cor_100_test_a1 <- cor.test(ful_a1$rh100_a1,ful_a1$height100, method = "pearson")
+spear_cor_100_test_a1 <- cor.test(ful_a1$rh100_a1,ful_a1$height100, method = "spearman")
+bias100_a1 <- round(bias(ful_a1$rh100_a1,ful_a1$height100), digits = 4)
+
+RMSE99_a1 <-round(hydroGOF::rmse(ful_a1$rh99_a1,ful_a1$height99), digits = 4)
+r1_99_a1 <- round(rsq(ful_a1$rh99_a1,ful_a1$height99), digits = 4)
+pear_cor_99_a1 <- cor(ful_a1$rh99_a1,ful_a1$height99, method = "pearson")
+spear_cor_99_a1 <- cor(ful_a1$rh99_a1,ful_a1$height99, method = "spearman")
+pear_cor_99_test_a1 <- cor.test(ful_a1$rh99_a1,ful_a1$height99, method = "pearson")
+spear_cor_99_test_a1 <- cor.test(ful_a1$rh99_a1,ful_a1$height99, method = "spearman")
+bias99_a1 <-round(bias(ful_a1$rh99_a1,ful_a1$height99), digits = 4)
+
+RMSE98_a1 <-round(hydroGOF::rmse(ful_a1$rh98_a1,ful_a1$height98), digits = 4)
+r1_98_a1 <- round(rsq(ful_a1$rh98_a1,ful_a1$height98), digits = 4)
+pear_cor_98_a1 <- cor(ful_a1$rh98_a1,ful_a1$height98, method = "pearson")
+spear_cor_98_a1 <- cor(ful_a1$rh98_a1,ful_a1$height98, method = "spearman")
+pear_cor_98_test_a1 <- cor.test(ful_a1$rh98_a1,ful_a1$height98, method = "pearson")
+spear_cor_98_test_a1 <- cor.test(ful_a1$rh98_a1,ful_a1$height98, method = "spearman")
+bias98_a1 <-round(bias(ful_a1$rh98_a1,ful_a1$height98), digits = 4)
+
+RMSE95_a1 <-round(hydroGOF::rmse(ful_a1$rh95_a1,ful_a1$height95), digits = 4)
+r1_95_a1 <- round(rsq(ful_a1$rh95_a1,ful_a1$height95), digits = 4)
+pear_cor_95_a1 <- cor(ful_a1$rh95_a1,ful_a1$height95, method = "pearson")
+spear_cor_95_a1 <- cor(ful_a1$rh95_a1,ful_a1$height95, method = "spearman")
+pear_cor_95_test_a1 <- cor.test(ful_a1$rh95_a1,ful_a1$height95, method = "pearson")
+spear_cor_95_test_a1 <- cor.test(ful_a1$rh95_a1,ful_a1$height95, method = "spearman")
+bias95_a1 <-round(bias(ful_a1$rh95_a1,ful_a1$height95), digits = 4)
+
+RMSE90_a1 <-round(hydroGOF::rmse(ful_a1$rh90_a1,ful_a1$height90), digits = 4)
+r1_90_a1 <- round(rsq(ful_a1$rh90_a1,ful_a1$height90), digits = 4)
+pear_cor_90_a1 <- cor(ful_a1$rh90_a1,ful_a1$height90, method = "pearson")
+spear_cor_90_a1 <- cor(ful_a1$rh90_a1,ful_a1$height90, method = "spearman")
+pear_cor_90_test_a1 <- cor.test(ful_a1$rh90_a1,ful_a1$height90, method = "pearson")
+spear_cor_90_test_a1 <- cor.test(ful_a1$rh90_a1,ful_a1$height90, method = "spearman")
+bias90_a1 <-round(bias(ful_a1$rh90_a1,ful_a1$height90), digits = 4)
+
+RMSE85_a1 <-round(hydroGOF::rmse(ful_a1$rh85_a1,ful_a1$height85), digits = 4)
+r1_85_a1 <- round(rsq(ful_a1$rh85_a1,ful_a1$height85), digits = 4)
+pear_cor_85_a1 <- cor(ful_a1$rh85_a1,ful_a1$height85, method = "pearson")
+spear_cor_85_a1 <- cor(ful_a1$rh85_a1,ful_a1$height85, method = "spearman")
+pear_cor_85_test_a1 <- cor.test(ful_a1$rh85_a1,ful_a1$height85, method = "pearson")
+spear_cor_85_test_a1 <- cor.test(ful_a1$rh85_a1,ful_a1$height85, method = "spearman")
+bias85_a1 <-round(bias(ful_a1$rh85_a1,ful_a1$height85), digits = 4)
+
+RMSE80_a1 <-round(hydroGOF::rmse(ful_a1$rh80_a1,ful_a1$height80), digits = 4)
+r1_80_a1 <- round(rsq(ful_a1$rh80_a1,ful_a1$height80), digits = 4)
+pear_cor_80_a1 <- cor(ful_a1$rh80_a1,ful_a1$height80, method = "pearson")
+spear_cor_80_a1 <- cor(ful_a1$rh80_a1,ful_a1$height80, method = "spearman")
+pear_cor_80_test_a1 <- cor.test(ful_a1$rh80_a1,ful_a1$height80, method = "pearson")
+spear_cor_80_test_a1 <- cor.test(ful_a1$rh80_a1,ful_a1$height80, method = "spearman")
+bias80_a1 <-round(bias(ful_a1$rh80_a1,ful_a1$height80), digits = 4)
+
+RMSE75_a1 <-round(hydroGOF::rmse(ful_a1$rh75_a1,ful_a1$height75), digits = 4)
+r1_75_a1 <- round(rsq(ful_a1$rh75_a1,ful_a1$height75), digits = 4)
+pear_cor_75_a1 <- cor(ful_a1$rh75_a1,ful_a1$height75, method = "pearson")
+spear_cor_75_a1 <- cor(ful_a1$rh75_a1,ful_a1$height75, method = "spearman")
+pear_cor_75_test_a1 <- cor.test(ful_a1$rh75_a1,ful_a1$height75, method = "pearson")
+spear_cor_75_test_a1 <- cor.test(ful_a1$rh75_a1,ful_a1$height75, method = "spearman")
+bias75_a1 <-round(bias(ful_a1$rh75_a1,ful_a1$height75), digits = 4)
+
+RMSE70_a1 <-round(hydroGOF::rmse(ful_a1$rh70_a1,ful_a1$height70), digits = 4)
+r1_70_a1 <- round(rsq(ful_a1$rh70_a1,ful_a1$height70), digits = 4)
+pear_cor_70_a1 <- cor(ful_a1$rh70_a1,ful_a1$height70, method = "pearson")
+spear_cor_70_a1 <- cor(ful_a1$rh70_a1,ful_a1$height70, method = "spearman")
+pear_cor_70_test_a1 <- cor.test(ful_a1$rh70_a1,ful_a1$height70, method = "pearson")
+spear_cor_70_test_a1 <- cor.test(ful_a1$rh70_a1,ful_a1$height70, method = "spearman")
+bias70_a1 <-round(bias(ful_a1$rh70_a1,ful_a1$height70), digits = 4)
+
+RMSE65_a1 <-round(hydroGOF::rmse(ful_a1$rh65_a1,ful_a1$height65), digits = 4)
+r1_65_a1 <- round(rsq(ful_a1$rh65_a1,ful_a1$height65), digits = 4)
+pear_cor_65_a1<- cor(ful_a1$rh65_a1,ful_a1$height65, method = "pearson")
+spear_cor_65_a1 <- cor(ful_a1$rh65_a1,ful_a1$height65, method = "spearman")
+pear_cor_65_test_a1 <- cor.test(ful_a1$rh65_a1,ful_a1$height65, method = "pearson")
+spear_cor_65_test_a1 <- cor.test(ful_a1$rh65_a1,ful_a1$height65, method = "spearman")
+bias65_a1 <-round(bias(ful_a1$rh65_a1,ful_a1$height65), digits = 4)
+
+```
+
+```{r,}
+p1 <- ful_a1 %>%
+  ggplot() + 
+  geom_point(mapping = aes(height100,rh100_a1), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE100_a1), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r1_100_a1), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias100_a1), col = "purple")
+p1 <-ful_a1 %>%
+  ggplot() + 
+  geom_point(mapping = aes(height99,rh99_a1), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE99_a1), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r1_99_a1), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias99_a1), col = "purple")
+p3 <- ful_a1 %>%
+  ggplot() + 
+  geom_point(mapping = aes(height98,rh98_a1), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE98_a1), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r1_98_a1), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias98_a1), col = "purple")
+p4 <- ful_a1 %>%
+  ggplot() + 
+  geom_point(mapping = aes(height95,rh95_a1), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE95_a1), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r1_95_a1), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias95_a1), col = "purple")
+p5 <- ful_a1 %>%
+  ggplot() + 
+  geom_point(mapping = aes(height90,rh90_a1), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE90_a1), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r1_90_a1), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias90_a1), col = "purple")
+p6 <- ful_a1 %>%
+  ggplot() + 
+  geom_point(mapping = aes(height85,rh85_a1), col = "blue")+
+  geom_abline(intercept = 0, slope = 1)+
+  geom_label(aes(x = 15, y = 50, label = RMSE85_a1), col = "red")+
+  geom_label(aes(x = 15, y = 40, label = r1_85_a1), col = "green")+
+  geom_label(aes(x = 15, y = 30, label = bias85_a1), col = "purple")
+```
 
 
 #----------------------------------------------#
@@ -1125,6 +1265,30 @@ assign(paste0("stats", algname), df)
 }
 ```
 
+```{r,}
+# make a dataframe with all stats results
+algs <- c("_a1")
+percentiles <- c(100, 99, 98, 95, 90, 85, 80, 75, 70, 65)
+stats <- c("RMSE", "r1_", "pear_cor_", "spear_cor_", "bias")
+
+for (i in 1:length(algs)){
+  #percentiles down, stats across
+  df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+  colnames(df) <- stats
+  for (j in 1:length(percentiles)){
+    temp <- paste0(percentiles[j], algs[i])
+    for (k in 1:length(stats)){
+      var <- lapply(paste0(stats[k], temp),get)
+      df[j,k] <- var
+      
+    }
+  }
+df$percentile <- percentiles
+df$algorithm <- rep(algs[i],length(nrow(df)))
+algname <-paste0(algs[i], i)
+assign(paste0("stats", algname), df)
+}
+```
 #----------------------------------------------#
 #----------------------------------------------#
 ##----------Elevation Comparisons--------------
@@ -1523,8 +1687,584 @@ for (j in 1:length(percentiles)){
 }
 cop_stats_df$percentile <- percentiles
 ```
+# alg 1
+```{r}
+# Height adjustment shot by shot FINDME
+ful_a1$elev_adjust <- ful_a1$Elevation.x-ful_a1$coper_elev
+ful_a1$rh100_adj_a1 <- ful_a1$rh100_a1 + ful_a1$elev_adjust
+ful_a1$rh99_adj_a1 <- ful_a1$rh99_a1 + ful_a1$elev_adjust
+ful_a1$rh98_adj_a1 <- ful_a1$rh98_a1 + ful_a1$elev_adjust
+ful_a1$rh95_adj_a1 <- ful_a1$rh95_a1 + ful_a1$elev_adjust
+ful_a1$rh90_adj_a1 <- ful_a1$rh90_a1 + ful_a1$elev_adjust
+ful_a1$rh85_adj_a1 <- ful_a1$rh85_a1 + ful_a1$elev_adjust
+ful_a1$rh80_adj_a1 <- ful_a1$rh80_a1 + ful_a1$elev_adjust
+ful_a1$rh75_adj_a1 <- ful_a1$rh75_a1 + ful_a1$elev_adjust
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(ful_a1$rh100_adj_a1,ful_a1$height100), digits = 4)
+r1_100 <- round(rsq(ful_a1$rh100_adj_a1,ful_a1$height100), digits = 4)
+pear_cor_100 <- cor(ful_a1$rh100_adj_a1,ful_a1$height100, method = "pearson")
+spear_cor_100 <- cor(ful_a1$rh100_adj_a1,ful_a1$height100, method = "spearman")
+pear_cor_100_test <- cor.test(ful_a1$rh100_adj_a1,ful_a1$height100, method = "pearson")
+spear_cor_100_test <- cor.test(ful_a1$rh100_adj_a1,ful_a1$height100, method = "spearman")
+bias100 <- round(bias(ful_a1$rh100_adj_a1,ful_a1$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(ful_a1$rh99_adj_a1,ful_a1$height99), digits = 4)
+r1_99 <- round(rsq(ful_a1$rh99_adj_a1,ful_a1$height99), digits = 4)
+pear_cor_99 <- cor(ful_a1$rh99_adj_a1,ful_a1$height99, method = "pearson")
+spear_cor_99 <- cor(ful_a1$rh99_adj_a1,ful_a1$height99, method = "spearman")
+pear_cor_99_test <- cor.test(ful_a1$rh99_adj_a1,ful_a1$height99, method = "pearson")
+spear_cor_99_test <- cor.test(ful_a1$rh99_adj_a1,ful_a1$height99, method = "spearman")
+bias99 <-round(bias(ful_a1$rh99_adj_a1,ful_a1$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(ful_a1$rh98_adj_a1,ful_a1$height98), digits = 4)
+r1_98 <- round(rsq(ful_a1$rh98_adj_a1,ful_a1$height98), digits = 4)
+pear_cor_98 <- cor(ful_a1$rh98_adj_a1,ful_a1$height98, method = "pearson")
+spear_cor_98 <- cor(ful_a1$rh98_adj_a1,ful_a1$height98, method = "spearman")
+pear_cor_98_test <- cor.test(ful_a1$rh98_adj_a1,ful_a1$height98, method = "pearson")
+spear_cor_98_test <- cor.test(ful_a1$rh98_adj_a1,ful_a1$height98, method = "spearman")
+bias98 <-round(bias(ful_a1$rh98_adj_a1,ful_a1$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(ful_a1$rh95_adj_a1,ful_a1$height95), digits = 4)
+r1_95 <- round(rsq(ful_a1$rh95_adj_a1,ful_a1$height95), digits = 4)
+pear_cor_95 <- cor(ful_a1$rh95_adj_a1,ful_a1$height95, method = "pearson")
+spear_cor_95 <- cor(ful_a1$rh95_adj_a1,ful_a1$height95, method = "spearman")
+pear_cor_95_test <- cor.test(ful_a1$rh95_adj_a1,ful_a1$height95, method = "pearson")
+spear_cor_95_test <- cor.test(ful_a1$rh95_adj_a1,ful_a1$height95, method = "spearman")
+bias95 <-round(bias(ful_a1$rh95_adj_a1,ful_a1$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(ful_a1$rh90_adj_a1,ful_a1$height90), digits = 4)
+r1_90 <- round(rsq(ful_a1$rh90_adj_a1,ful_a1$height90), digits = 4)
+pear_cor_90 <- cor(ful_a1$rh90_adj_a1,ful_a1$height90, method = "pearson")
+spear_cor_90 <- cor(ful_a1$rh90_adj_a1,ful_a1$height90, method = "spearman")
+pear_cor_90_test <- cor.test(ful_a1$rh90_adj_a1,ful_a1$height90, method = "pearson")
+spear_cor_90_test <- cor.test(ful_a1$rh90_adj_a1,ful_a1$height90, method = "spearman")
+bias90 <-round(bias(ful_a1$rh90_adj_a1,ful_a1$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(ful_a1$rh85_adj_a1,ful_a1$height85), digits = 4)
+r1_85 <- round(rsq(ful_a1$rh85_adj_a1,ful_a1$height85), digits = 4)
+pear_cor_85 <- cor(ful_a1$rh85_adj_a1,ful_a1$height85, method = "pearson")
+spear_cor_85 <- cor(ful_a1$rh85_adj_a1,ful_a1$height85, method = "spearman")
+pear_cor_85_test <- cor.test(ful_a1$rh85_adj_a1,ful_a1$height85, method = "pearson")
+spear_cor_85_test <- cor.test(ful_a1$rh85_adj_a1,ful_a1$height85, method = "spearman")
+bias85 <-round(bias(ful_a1$rh85_adj_a1,ful_a1$height85), digits = 4)
+
+RMSE80 <-round(hydroGOF::rmse(ful_a1$rh80_adj_a1,ful_a1$height80), digits = 4)
+r1_80 <- round(rsq(ful_a1$rh80_adj_a1,ful_a1$height80), digits = 4)
+pear_cor_80 <- cor(ful_a1$rh80_adj_a1,ful_a1$height80, method = "pearson")
+spear_cor_80 <- cor(ful_a1$rh80_adj_a1,ful_a1$height80, method = "spearman")
+pear_cor_80_test <- cor.test(ful_a1$rh80_adj_a1,ful_a1$height80, method = "pearson")
+spear_cor_80_test <- cor.test(ful_a1$rh80_adj_a1,ful_a1$height80, method = "spearman")
+bias80 <-round(bias(ful_a1$rh80_adj_a1,ful_a1$height80), digits = 4)
 
 
+RMSE75 <-round(hydroGOF::rmse(ful_a1$rh75_adj_a1,ful_a1$height75), digits = 4)
+r1_75 <- round(rsq(ful_a1$rh75_adj_a1,ful_a1$height75), digits = 4)
+pear_cor_75 <- cor(ful_a1$rh75_adj_a1,ful_a1$height75, method = "pearson")
+spear_cor_75 <- cor(ful_a1$rh75_adj_a1,ful_a1$height75, method = "spearman")
+pear_cor_75_test <- cor.test(ful_a1$rh75_adj_a1,ful_a1$height75, method = "pearson")
+spear_cor_75_test <- cor.test(ful_a1$rh75_adj_a1,ful_a1$height75, method = "spearman")
+bias75 <-round(bias(ful_a1$rh75_adj_a1,ful_a1$height75), digits = 4)
+```
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85, 80, 75)
+stats <- c("RMSE", "r1_", "pear_cor_", "spear_cor_", "bias")
+
+cop_stats_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(cop_stats_df) <- stats
+
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    cop_stats_df[j,k] <- var
+  }
+}
+cop_stats_df$percentile <- percentiles
+```
+#alg 2
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust <- fullpower$Elevation-fullpower$coper_elev
+fullpower$rh100_adj_a2 <- fullpower$rh100_a2 + fullpower$elev_adjust
+fullpower$rh99_adj_a2 <- fullpower$rh99_a2 + fullpower$elev_adjust
+fullpower$rh98_adj_a2 <- fullpower$rh98_a2 + fullpower$elev_adjust
+fullpower$rh95_adj_a2 <- fullpower$rh95_a2 + fullpower$elev_adjust
+fullpower$rh90_adj_a2 <- fullpower$rh90_a2 + fullpower$elev_adjust
+fullpower$rh85_adj_a2 <- fullpower$rh85_a2 + fullpower$elev_adjust
+fullpower$rh80_adj_a2 <- fullpower$rh80_a2 + fullpower$elev_adjust
+fullpower$rh75_adj_a2 <- fullpower$rh75_a2 + fullpower$elev_adjust
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adj_a2,fullpower$height100), digits = 4)
+r2_100 <- round(rsq(fullpower$rh100_adj_a2,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adj_a2,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adj_a2,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adj_a2,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adj_a2,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adj_a2,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adj_a2,fullpower$height99), digits = 4)
+r2_99 <- round(rsq(fullpower$rh99_adj_a2,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adj_a2,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adj_a2,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adj_a2,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adj_a2,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adj_a2,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adj_a2,fullpower$height98), digits = 4)
+r2_98 <- round(rsq(fullpower$rh98_adj_a2,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adj_a2,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adj_a2,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adj_a2,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adj_a2,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adj_a2,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adj_a2,fullpower$height95), digits = 4)
+r2_95 <- round(rsq(fullpower$rh95_adj_a2,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adj_a2,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adj_a2,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adj_a2,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adj_a2,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adj_a2,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adj_a2,fullpower$height90), digits = 4)
+r2_90 <- round(rsq(fullpower$rh90_adj_a2,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adj_a2,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adj_a2,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adj_a2,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adj_a2,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adj_a2,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adj_a2,fullpower$height85), digits = 4)
+r2_85 <- round(rsq(fullpower$rh85_adj_a2,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adj_a2,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adj_a2,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adj_a2,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adj_a2,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adj_a2,fullpower$height85), digits = 4)
+
+RMSE80 <-round(hydroGOF::rmse(fullpower$rh80_adj_a2,fullpower$height80), digits = 4)
+r2_80 <- round(rsq(fullpower$rh80_adj_a2,fullpower$height80), digits = 4)
+pear_cor_80 <- cor(fullpower$rh80_adj_a2,fullpower$height80, method = "pearson")
+spear_cor_80 <- cor(fullpower$rh80_adj_a2,fullpower$height80, method = "spearman")
+pear_cor_80_test <- cor.test(fullpower$rh80_adj_a2,fullpower$height80, method = "pearson")
+spear_cor_80_test <- cor.test(fullpower$rh80_adj_a2,fullpower$height80, method = "spearman")
+bias80 <-round(bias(fullpower$rh80_adj_a2,fullpower$height80), digits = 4)
+
+
+RMSE75 <-round(hydroGOF::rmse(fullpower$rh75_adj_a2,fullpower$height75), digits = 4)
+r2_75 <- round(rsq(fullpower$rh75_adj_a2,fullpower$height75), digits = 4)
+pear_cor_75 <- cor(fullpower$rh75_adj_a2,fullpower$height75, method = "pearson")
+spear_cor_75 <- cor(fullpower$rh75_adj_a2,fullpower$height75, method = "spearman")
+pear_cor_75_test <- cor.test(fullpower$rh75_adj_a2,fullpower$height75, method = "pearson")
+spear_cor_75_test <- cor.test(fullpower$rh75_adj_a2,fullpower$height75, method = "spearman")
+bias75 <-round(bias(fullpower$rh75_adj_a2,fullpower$height75), digits = 4)
+```
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85, 80, 75)
+stats <- c("RMSE", "r2_", "pear_cor_", "spear_cor_", "bias")
+
+cop_stats_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(cop_stats_df) <- stats
+
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    cop_stats_df[j,k] <- var
+  }
+}
+cop_stats_df$percentile <- percentiles
+```
+
+# alg 3
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust <- fullpower$Elevation-fullpower$coper_elev
+fullpower$rh100_adj_a3 <- fullpower$rh100_a3 + fullpower$elev_adjust
+fullpower$rh99_adj_a3 <- fullpower$rh99_a3 + fullpower$elev_adjust
+fullpower$rh98_adj_a3 <- fullpower$rh98_a3 + fullpower$elev_adjust
+fullpower$rh95_adj_a3 <- fullpower$rh95_a3 + fullpower$elev_adjust
+fullpower$rh90_adj_a3 <- fullpower$rh90_a3 + fullpower$elev_adjust
+fullpower$rh85_adj_a3 <- fullpower$rh85_a3 + fullpower$elev_adjust
+fullpower$rh80_adj_a3 <- fullpower$rh80_a3 + fullpower$elev_adjust
+fullpower$rh75_adj_a3 <- fullpower$rh75_a3 + fullpower$elev_adjust
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adj_a3,fullpower$height100), digits = 4)
+r3_100 <- round(rsq(fullpower$rh100_adj_a3,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adj_a3,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adj_a3,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adj_a3,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adj_a3,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adj_a3,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adj_a3,fullpower$height99), digits = 4)
+r3_99 <- round(rsq(fullpower$rh99_adj_a3,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adj_a3,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adj_a3,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adj_a3,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adj_a3,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adj_a3,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adj_a3,fullpower$height98), digits = 4)
+r3_98 <- round(rsq(fullpower$rh98_adj_a3,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adj_a3,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adj_a3,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adj_a3,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adj_a3,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adj_a3,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adj_a3,fullpower$height95), digits = 4)
+r3_95 <- round(rsq(fullpower$rh95_adj_a3,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adj_a3,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adj_a3,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adj_a3,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adj_a3,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adj_a3,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adj_a3,fullpower$height90), digits = 4)
+r3_90 <- round(rsq(fullpower$rh90_adj_a3,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adj_a3,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adj_a3,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adj_a3,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adj_a3,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adj_a3,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adj_a3,fullpower$height85), digits = 4)
+r3_85 <- round(rsq(fullpower$rh85_adj_a3,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adj_a3,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adj_a3,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adj_a3,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adj_a3,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adj_a3,fullpower$height85), digits = 4)
+
+RMSE80 <-round(hydroGOF::rmse(fullpower$rh80_adj_a3,fullpower$height80), digits = 4)
+r3_80 <- round(rsq(fullpower$rh80_adj_a3,fullpower$height80), digits = 4)
+pear_cor_80 <- cor(fullpower$rh80_adj_a3,fullpower$height80, method = "pearson")
+spear_cor_80 <- cor(fullpower$rh80_adj_a3,fullpower$height80, method = "spearman")
+pear_cor_80_test <- cor.test(fullpower$rh80_adj_a3,fullpower$height80, method = "pearson")
+spear_cor_80_test <- cor.test(fullpower$rh80_adj_a3,fullpower$height80, method = "spearman")
+bias80 <-round(bias(fullpower$rh80_adj_a3,fullpower$height80), digits = 4)
+
+
+RMSE75 <-round(hydroGOF::rmse(fullpower$rh75_adj_a3,fullpower$height75), digits = 4)
+r3_75 <- round(rsq(fullpower$rh75_adj_a3,fullpower$height75), digits = 4)
+pear_cor_75 <- cor(fullpower$rh75_adj_a3,fullpower$height75, method = "pearson")
+spear_cor_75 <- cor(fullpower$rh75_adj_a3,fullpower$height75, method = "spearman")
+pear_cor_75_test <- cor.test(fullpower$rh75_adj_a3,fullpower$height75, method = "pearson")
+spear_cor_75_test <- cor.test(fullpower$rh75_adj_a3,fullpower$height75, method = "spearman")
+bias75 <-round(bias(fullpower$rh75_adj_a3,fullpower$height75), digits = 4)
+```
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85, 80, 75)
+stats <- c("RMSE", "r2_", "pear_cor_", "spear_cor_", "bias")
+
+cop_stats_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(cop_stats_df) <- stats
+
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    cop_stats_df[j,k] <- var
+  }
+}
+cop_stats_df$percentile <- percentiles
+```
+
+
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust <- fullpower$Elevation-fullpower$coper_elev
+fullpower$rh100_adj_a4 <- fullpower$rh100_a4 + fullpower$elev_adjust
+fullpower$rh99_adj_a4 <- fullpower$rh99_a4 + fullpower$elev_adjust
+fullpower$rh98_adj_a4 <- fullpower$rh98_a4 + fullpower$elev_adjust
+fullpower$rh95_adj_a4 <- fullpower$rh95_a4 + fullpower$elev_adjust
+fullpower$rh90_adj_a4 <- fullpower$rh90_a4 + fullpower$elev_adjust
+fullpower$rh85_adj_a4 <- fullpower$rh85_a4 + fullpower$elev_adjust
+fullpower$rh80_adj_a4 <- fullpower$rh80_a4 + fullpower$elev_adjust
+fullpower$rh75_adj_a4 <- fullpower$rh75_a4 + fullpower$elev_adjust
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adj_a4,fullpower$height100), digits = 4)
+r4_100 <- round(rsq(fullpower$rh100_adj_a4,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adj_a4,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adj_a4,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adj_a4,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adj_a4,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adj_a4,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adj_a4,fullpower$height99), digits = 4)
+r4_99 <- round(rsq(fullpower$rh99_adj_a4,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adj_a4,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adj_a4,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adj_a4,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adj_a4,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adj_a4,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adj_a4,fullpower$height98), digits = 4)
+r4_98 <- round(rsq(fullpower$rh98_adj_a4,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adj_a4,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adj_a4,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adj_a4,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adj_a4,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adj_a4,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adj_a4,fullpower$height95), digits = 4)
+r4_95 <- round(rsq(fullpower$rh95_adj_a4,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adj_a4,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adj_a4,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adj_a4,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adj_a4,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adj_a4,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adj_a4,fullpower$height90), digits = 4)
+r4_90 <- round(rsq(fullpower$rh90_adj_a4,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adj_a4,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adj_a4,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adj_a4,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adj_a4,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adj_a4,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adj_a4,fullpower$height85), digits = 4)
+r4_85 <- round(rsq(fullpower$rh85_adj_a4,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adj_a4,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adj_a4,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adj_a4,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adj_a4,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adj_a4,fullpower$height85), digits = 4)
+
+RMSE80 <-round(hydroGOF::rmse(fullpower$rh80_adj_a4,fullpower$height80), digits = 4)
+r4_80 <- round(rsq(fullpower$rh80_adj_a4,fullpower$height80), digits = 4)
+pear_cor_80 <- cor(fullpower$rh80_adj_a4,fullpower$height80, method = "pearson")
+spear_cor_80 <- cor(fullpower$rh80_adj_a4,fullpower$height80, method = "spearman")
+pear_cor_80_test <- cor.test(fullpower$rh80_adj_a4,fullpower$height80, method = "pearson")
+spear_cor_80_test <- cor.test(fullpower$rh80_adj_a4,fullpower$height80, method = "spearman")
+bias80 <-round(bias(fullpower$rh80_adj_a4,fullpower$height80), digits = 4)
+
+
+RMSE75 <-round(hydroGOF::rmse(fullpower$rh75_adj_a4,fullpower$height75), digits = 4)
+r4_75 <- round(rsq(fullpower$rh75_adj_a4,fullpower$height75), digits = 4)
+pear_cor_75 <- cor(fullpower$rh75_adj_a4,fullpower$height75, method = "pearson")
+spear_cor_75 <- cor(fullpower$rh75_adj_a4,fullpower$height75, method = "spearman")
+pear_cor_75_test <- cor.test(fullpower$rh75_adj_a4,fullpower$height75, method = "pearson")
+spear_cor_75_test <- cor.test(fullpower$rh75_adj_a4,fullpower$height75, method = "spearman")
+bias75 <-round(bias(fullpower$rh75_adj_a4,fullpower$height75), digits = 4)
+```
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85, 80, 75)
+stats <- c("RMSE", "r4_", "pear_cor_", "spear_cor_", "bias")
+
+cop_stats_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(cop_stats_df) <- stats
+
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    cop_stats_df[j,k] <- var
+  }
+}
+cop_stats_df$percentile <- percentiles
+```
+
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust <- fullpower$Elevation-fullpower$coper_elev
+fullpower$rh100_adj_a5 <- fullpower$rh100_a5 + fullpower$elev_adjust
+fullpower$rh99_adj_a5 <- fullpower$rh99_a5 + fullpower$elev_adjust
+fullpower$rh98_adj_a5 <- fullpower$rh98_a5 + fullpower$elev_adjust
+fullpower$rh95_adj_a5 <- fullpower$rh95_a5 + fullpower$elev_adjust
+fullpower$rh90_adj_a5 <- fullpower$rh90_a5 + fullpower$elev_adjust
+fullpower$rh85_adj_a5 <- fullpower$rh85_a5 + fullpower$elev_adjust
+fullpower$rh80_adj_a5 <- fullpower$rh80_a5 + fullpower$elev_adjust
+fullpower$rh75_adj_a5 <- fullpower$rh75_a5 + fullpower$elev_adjust
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adj_a5,fullpower$height100), digits = 4)
+r5_100 <- round(rsq(fullpower$rh100_adj_a5,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adj_a5,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adj_a5,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adj_a5,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adj_a5,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adj_a5,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adj_a5,fullpower$height99), digits = 4)
+r5_99 <- round(rsq(fullpower$rh99_adj_a5,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adj_a5,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adj_a5,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adj_a5,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adj_a5,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adj_a5,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adj_a5,fullpower$height98), digits = 4)
+r5_98 <- round(rsq(fullpower$rh98_adj_a5,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adj_a5,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adj_a5,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adj_a5,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adj_a5,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adj_a5,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adj_a5,fullpower$height95), digits = 4)
+r5_95 <- round(rsq(fullpower$rh95_adj_a5,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adj_a5,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adj_a5,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adj_a5,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adj_a5,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adj_a5,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adj_a5,fullpower$height90), digits = 4)
+r5_90 <- round(rsq(fullpower$rh90_adj_a5,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adj_a5,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adj_a5,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adj_a5,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adj_a5,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adj_a5,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adj_a5,fullpower$height85), digits = 4)
+r5_85 <- round(rsq(fullpower$rh85_adj_a5,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adj_a5,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adj_a5,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adj_a5,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adj_a5,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adj_a5,fullpower$height85), digits = 4)
+
+RMSE80 <-round(hydroGOF::rmse(fullpower$rh80_adj_a5,fullpower$height80), digits = 4)
+r5_80 <- round(rsq(fullpower$rh80_adj_a5,fullpower$height80), digits = 4)
+pear_cor_80 <- cor(fullpower$rh80_adj_a5,fullpower$height80, method = "pearson")
+spear_cor_80 <- cor(fullpower$rh80_adj_a5,fullpower$height80, method = "spearman")
+pear_cor_80_test <- cor.test(fullpower$rh80_adj_a5,fullpower$height80, method = "pearson")
+spear_cor_80_test <- cor.test(fullpower$rh80_adj_a5,fullpower$height80, method = "spearman")
+bias80 <-round(bias(fullpower$rh80_adj_a5,fullpower$height80), digits = 4)
+
+
+RMSE75 <-round(hydroGOF::rmse(fullpower$rh75_adj_a5,fullpower$height75), digits = 4)
+r5_75 <- round(rsq(fullpower$rh75_adj_a5,fullpower$height75), digits = 4)
+pear_cor_75 <- cor(fullpower$rh75_adj_a5,fullpower$height75, method = "pearson")
+spear_cor_75 <- cor(fullpower$rh75_adj_a5,fullpower$height75, method = "spearman")
+pear_cor_75_test <- cor.test(fullpower$rh75_adj_a5,fullpower$height75, method = "pearson")
+spear_cor_75_test <- cor.test(fullpower$rh75_adj_a5,fullpower$height75, method = "spearman")
+bias75 <-round(bias(fullpower$rh75_adj_a5,fullpower$height75), digits = 4)
+```
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85, 80, 75)
+stats <- c("RMSE", "r5_", "pear_cor_", "spear_cor_", "bias")
+
+cop_stats_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(cop_stats_df) <- stats
+
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    cop_stats_df[j,k] <- var
+  }
+}
+cop_stats_df$percentile <- percentiles
+```
+
+```{r}
+# Height adjustment shot by shot
+fullpower$elev_adjust <- fullpower$Elevation-fullpower$coper_elev
+fullpower$rh100_adj_a6 <- fullpower$rh100_a6 + fullpower$elev_adjust
+fullpower$rh99_adj_a6 <- fullpower$rh99_a6 + fullpower$elev_adjust
+fullpower$rh98_adj_a6 <- fullpower$rh98_a6 + fullpower$elev_adjust
+fullpower$rh95_adj_a6 <- fullpower$rh95_a6 + fullpower$elev_adjust
+fullpower$rh90_adj_a6 <- fullpower$rh90_a6 + fullpower$elev_adjust
+fullpower$rh85_adj_a6 <- fullpower$rh85_a6 + fullpower$elev_adjust
+fullpower$rh80_adj_a6 <- fullpower$rh80_a6 + fullpower$elev_adjust
+fullpower$rh75_adj_a6 <- fullpower$rh75_a6 + fullpower$elev_adjust
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adj_a6,fullpower$height100), digits = 4)
+r6_100 <- round(rsq(fullpower$rh100_adj_a6,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adj_a6,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adj_a6,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adj_a6,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adj_a6,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adj_a6,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adj_a6,fullpower$height99), digits = 4)
+r6_99 <- round(rsq(fullpower$rh99_adj_a6,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adj_a6,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adj_a6,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adj_a6,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adj_a6,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adj_a6,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adj_a6,fullpower$height98), digits = 4)
+r6_98 <- round(rsq(fullpower$rh98_adj_a6,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adj_a6,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adj_a6,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adj_a6,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adj_a6,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adj_a6,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adj_a6,fullpower$height95), digits = 4)
+r6_95 <- round(rsq(fullpower$rh95_adj_a6,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adj_a6,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adj_a6,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adj_a6,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adj_a6,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adj_a6,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adj_a6,fullpower$height90), digits = 4)
+r6_90 <- round(rsq(fullpower$rh90_adj_a6,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adj_a6,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adj_a6,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adj_a6,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adj_a6,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adj_a6,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adj_a6,fullpower$height85), digits = 4)
+r6_85 <- round(rsq(fullpower$rh85_adj_a6,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adj_a6,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adj_a6,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adj_a6,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adj_a6,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adj_a6,fullpower$height85), digits = 4)
+
+RMSE80 <-round(hydroGOF::rmse(fullpower$rh80_adj_a6,fullpower$height80), digits = 4)
+r6_80 <- round(rsq(fullpower$rh80_adj_a6,fullpower$height80), digits = 4)
+pear_cor_80 <- cor(fullpower$rh80_adj_a6,fullpower$height80, method = "pearson")
+spear_cor_80 <- cor(fullpower$rh80_adj_a6,fullpower$height80, method = "spearman")
+pear_cor_80_test <- cor.test(fullpower$rh80_adj_a6,fullpower$height80, method = "pearson")
+spear_cor_80_test <- cor.test(fullpower$rh80_adj_a6,fullpower$height80, method = "spearman")
+bias80 <-round(bias(fullpower$rh80_adj_a6,fullpower$height80), digits = 4)
+
+
+RMSE75 <-round(hydroGOF::rmse(fullpower$rh75_adj_a6,fullpower$height75), digits = 4)
+r6_75 <- round(rsq(fullpower$rh75_adj_a6,fullpower$height75), digits = 4)
+pear_cor_75 <- cor(fullpower$rh75_adj_a6,fullpower$height75, method = "pearson")
+spear_cor_75 <- cor(fullpower$rh75_adj_a6,fullpower$height75, method = "spearman")
+pear_cor_75_test <- cor.test(fullpower$rh75_adj_a6,fullpower$height75, method = "pearson")
+spear_cor_75_test <- cor.test(fullpower$rh75_adj_a6,fullpower$height75, method = "spearman")
+bias75 <-round(bias(fullpower$rh75_adj_a6,fullpower$height75), digits = 4)
+```
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85, 80, 75)
+stats <- c("RMSE", "r6_", "pear_cor_", "spear_cor_", "bias")
+
+cop_stats_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(cop_stats_df) <- stats
+
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    cop_stats_df[j,k] <- var
+  }
+}
+cop_stats_df$percentile <- percentiles
+```
 #----------------------------------------------#
 #----------------------------------------------#
 ##----------Point to Point Adjustment-----------
@@ -1665,27 +2405,100 @@ p6 <- fullpower %>%
 multiplot(p1, p2, p3, p4, p5, p6, cols=2)
 ```
 
+#----------------------------------------------#
+#-----------------Algorithm 1----------------
+#----------------------------------------------#
 
+```{r}
+ful_a1 <- na.omit(ful_a1)
+# Height adjustment shot by shot
+ful_a1$elev_adjust_a1 <- ful_a1$Elevation_a1.y-ful_a1$lidar_elev
+summary(ful_a1$elev_adjust_a1)
+
+ful_a1$rh100_adj_a1  <- ful_a1$rh100_a1  + ful_a1$elev_adjust_a1
+summary(ful_a1$rh100_adj_a1 )
+ful_a1$rh99_adj_a1  <- ful_a1$rh99_a1  + ful_a1$elev_adjust_a1
+summary(ful_a1$rh99_adj_a1 )
+ful_a1$rh98_adj_a1  <- ful_a1$rh98_a1  + ful_a1$elev_adjust_a1
+summary(ful_a1$rh98_adj_a1 )
+ful_a1$rh95_adj_a1  <- ful_a1$rh95_a1  + ful_a1$elev_adjust_a1
+summary(ful_a1$rh95_adj_a1 )
+ful_a1$rh90_adj_a1  <- ful_a1$rh90_a1  + ful_a1$elev_adjust_a1
+summary(ful_a1$rh90_adj_a1 )
+ful_a1$rh85_adj_a1  <- ful_a1$rh85_a1  + ful_a1$elev_adjust_a1
+summary(ful_a1$rh85_adj_a1 )
+```
+
+```{r}
+RMSE100_a1 <- round(hydroGOF::rmse(ful_a1$rh100_adj_a1,ful_a1$height100), digits = 4)
+r2_100_a1 <- round(rsq(ful_a1$rh100_adj_a1,ful_a1$height100), digits = 4)
+pear_cor_100_a1 <- cor(ful_a1$rh100_adj_a1,ful_a1$height100, method = "pearson")
+spear_cor_100_a1 <- cor(ful_a1$rh100_adj_a1,ful_a1$height100, method = "spearman")
+pear_cor_100_test_a1 <- cor.test(ful_a1$rh100_adj_a1,ful_a1$height100, method = "pearson")
+spear_cor_100_test_a1 <- cor.test(ful_a1$rh100_adj_a1,ful_a1$height100, method = "spearman")
+bias100_a1 <- round(bias(ful_a1$rh100_adj_a1,ful_a1$height100), digits = 4)
+
+RMSE99_a1 <-round(hydroGOF::rmse(ful_a1$rh99_adj_a1,ful_a1$height99), digits = 4)
+r2_99_a1 <- round(rsq(ful_a1$rh99_adj_a1,ful_a1$height99), digits = 4)
+pear_cor_99_a1 <- cor(ful_a1$rh99_adj_a1,ful_a1$height99, method = "pearson")
+spear_cor_99_a1 <- cor(ful_a1$rh99_adj_a1,ful_a1$height99, method = "spearman")
+pear_cor_99_test_a1 <- cor.test(ful_a1$rh99_adj_a1,ful_a1$height99, method = "pearson")
+spear_cor_99_test_a1 <- cor.test(ful_a1$rh99_adj_a1,ful_a1$height99, method = "spearman")
+bias99_a1 <-round(bias(ful_a1$rh99_adj_a1,ful_a1$height99), digits = 4)
+
+RMSE98_a1 <-round(hydroGOF::rmse(ful_a1$rh98_adj_a1,ful_a1$height98), digits = 4)
+r2_98_a1 <- round(rsq(ful_a1$rh98_adj_a1,ful_a1$height98), digits = 4)
+pear_cor_98_a1 <- cor(ful_a1$rh98_adj_a1,ful_a1$height98, method = "pearson")
+spear_cor_98_a1 <- cor(ful_a1$rh98_adj_a1,ful_a1$height98, method = "spearman")
+pear_cor_98_test_a1 <- cor.test(ful_a1$rh98_adj_a1,ful_a1$height98, method = "pearson")
+spear_cor_98_test_a1 <- cor.test(ful_a1$rh98_adj_a1,ful_a1$height98, method = "spearman")
+bias98_a1 <-round(bias(ful_a1$rh98_adj_a1,ful_a1$height98), digits = 4)
+
+RMSE95_a1 <-round(hydroGOF::rmse(ful_a1$rh95_adj_a1,ful_a1$height95), digits = 4)
+r2_95_a1 <- round(rsq(ful_a1$rh95_adj_a1,ful_a1$height95), digits = 4)
+pear_cor_95_a1 <- cor(ful_a1$rh95_adj_a1,ful_a1$height95, method = "pearson")
+spear_cor_95_a1 <- cor(ful_a1$rh95_adj_a1,ful_a1$height95, method = "spearman")
+pear_cor_95_test_a1 <- cor.test(ful_a1$rh95_adj_a1,ful_a1$height95, method = "pearson")
+spear_cor_95_test_a1 <- cor.test(ful_a1$rh95_adj_a1,ful_a1$height95, method = "spearman")
+bias95_a1 <-round(bias(ful_a1$rh95_adj_a1,ful_a1$height95), digits = 4)
+
+RMSE90_a1 <-round(hydroGOF::rmse(ful_a1$rh90_adj_a1,ful_a1$height90), digits = 4)
+r2_90_a1 <- round(rsq(ful_a1$rh90_adj_a1,ful_a1$height90), digits = 4)
+pear_cor_90_a1 <- cor(ful_a1$rh90_adj_a1,ful_a1$height90, method = "pearson")
+spear_cor_90_a1 <- cor(ful_a1$rh90_adj_a1,ful_a1$height90, method = "spearman")
+pear_cor_90_test_a1 <- cor.test(ful_a1$rh90_adj_a1,ful_a1$height90, method = "pearson")
+spear_cor_90_test_a1 <- cor.test(ful_a1$rh90_adj_a1,ful_a1$height90, method = "spearman")
+bias90_a1 <-round(bias(ful_a1$rh90_adj_a1,ful_a1$height90), digits = 4)
+
+RMSE85_a1 <-round(hydroGOF::rmse(ful_a1$rh85_adj_a1,ful_a1$height85), digits = 4)
+r2_85_a1 <- round(rsq(ful_a1$rh85_adj_a1,ful_a1$height85), digits = 4)
+pear_cor_85_a1 <- cor(ful_a1$rh85_adj_a1,ful_a1$height85, method = "pearson")
+spear_cor_85_a1 <- cor(ful_a1$rh85_adj_a1,ful_a1$height85, method = "spearman")
+pear_cor_85_test_a1 <- cor.test(ful_a1$rh85_adj_a1,ful_a1$height85, method = "pearson")
+spear_cor_85_test_a1 <- cor.test(ful_a1$rh85_adj_a1,ful_a1$height85, method = "spearman")
+bias85_a1 <-round(bias(ful_a1$rh85_adj_a1,ful_a1$height85), digits = 4)
+```
 #----------------------------------------------#
 #-----------------Algorithm 2----------------
 #----------------------------------------------#
 
 ```{r}
+fullpower <-  na.omit(fullpower)
 # Height adjustment shot by shot
 fullpower$elev_adjust_a2 <- fullpower$Elevation_a2-fullpower$lidar_elev
 summary(fullpower$elev_adjust_a2)
 
-fullpower$rh100_adj_a2  <- fullpower$rh100  + fullpower$elev_adjust_a2
+fullpower$rh100_adj_a2  <- fullpower$rh100_a2  + fullpower$elev_adjust_a2
 summary(fullpower$rh100_adj_a2 )
-fullpower$rh99_adj_a2  <- fullpower$rh99  + fullpower$elev_adjust_a2
+fullpower$rh99_adj_a2  <- fullpower$rh99_a2  + fullpower$elev_adjust_a2
 summary(fullpower$rh99_adj_a2 )
-fullpower$rh98_adj_a2  <- fullpower$rh98  + fullpower$elev_adjust_a2
+fullpower$rh98_adj_a2  <- fullpower$rh98_a2  + fullpower$elev_adjust_a2
 summary(fullpower$rh98_adj_a2 )
-fullpower$rh95_adj_a2  <- fullpower$rh95  + fullpower$elev_adjust_a2
+fullpower$rh95_adj_a2  <- fullpower$rh95_a2  + fullpower$elev_adjust_a2
 summary(fullpower$rh95_adj_a2 )
-fullpower$rh90_adj_a2  <- fullpower$rh90  + fullpower$elev_adjust_a2
+fullpower$rh90_adj_a2  <- fullpower$rh90_a2  + fullpower$elev_adjust_a2
 summary(fullpower$rh90_adj_a2 )
-fullpower$rh85_adj_a2  <- fullpower$rh85  + fullpower$elev_adjust_a2
+fullpower$rh85_adj_a2  <- fullpower$rh85_a2  + fullpower$elev_adjust_a2
 summary(fullpower$rh85_adj_a2 )
 ```
 
@@ -1748,17 +2561,17 @@ bias85_a2 <-round(bias(fullpower$rh85_adj_a2,fullpower$height85), digits = 4)
 fullpower$elev_adjust_a3 <- fullpower$Elevation_a3-fullpower$lidar_elev
 summary(fullpower$elev_adjust_a3)
 
-fullpower$rh100_adj_a3  <- fullpower$rh100  + fullpower$elev_adjust_a3
+fullpower$rh100_adj_a3  <- fullpower$rh100_a3  + fullpower$elev_adjust_a3
 summary(fullpower$rh100_adj_a3 )
-fullpower$rh99_adj_a3  <- fullpower$rh99  + fullpower$elev_adjust_a3
+fullpower$rh99_adj_a3  <- fullpower$rh99_a3  + fullpower$elev_adjust_a3
 summary(fullpower$rh99_adj_a3 )
-fullpower$rh98_adj_a3  <- fullpower$rh98  + fullpower$elev_adjust_a3
+fullpower$rh98_adj_a3  <- fullpower$rh98_a3  + fullpower$elev_adjust_a3
 summary(fullpower$rh98_adj_a3 )
-fullpower$rh95_adj_a3  <- fullpower$rh95  + fullpower$elev_adjust_a3
+fullpower$rh95_adj_a3  <- fullpower$rh95_a3  + fullpower$elev_adjust_a3
 summary(fullpower$rh95_adj_a3 )
-fullpower$rh90_adj_a3  <- fullpower$rh90  + fullpower$elev_adjust_a3
+fullpower$rh90_adj_a3  <- fullpower$rh90_a3  + fullpower$elev_adjust_a3
 summary(fullpower$rh90_adj_a3 )
-fullpower$rh85_adj_a3  <- fullpower$rh85  + fullpower$elev_adjust_a3
+fullpower$rh85_adj_a3  <- fullpower$rh85_a3  + fullpower$elev_adjust_a3
 summary(fullpower$rh85_adj_a3 )
 ```
 
@@ -1821,17 +2634,17 @@ bias85_a3 <-round(bias(fullpower$rh85_adj_a3,fullpower$height85), digits = 4)
 fullpower$elev_adjust_a4 <- fullpower$Elevation_a4-fullpower$lidar_elev
 summary(fullpower$elev_adjust_a4)
 
-fullpower$rh100_adj_a4  <- fullpower$rh100  + fullpower$elev_adjust_a4
+fullpower$rh100_adj_a4  <- fullpower$rh100_a4  + fullpower$elev_adjust_a4
 summary(fullpower$rh100_adj_a4 )
-fullpower$rh99_adj_a4  <- fullpower$rh99  + fullpower$elev_adjust_a4
+fullpower$rh99_adj_a4  <- fullpower$rh99_a4  + fullpower$elev_adjust_a4
 summary(fullpower$rh99_adj_a4 )
-fullpower$rh98_adj_a4  <- fullpower$rh98  + fullpower$elev_adjust_a4
+fullpower$rh98_adj_a4  <- fullpower$rh98_a4  + fullpower$elev_adjust_a4
 summary(fullpower$rh98_adj_a4 )
-fullpower$rh95_adj_a4  <- fullpower$rh95  + fullpower$elev_adjust_a4
+fullpower$rh95_adj_a4  <- fullpower$rh95_a4  + fullpower$elev_adjust_a4
 summary(fullpower$rh95_adj_a4 )
-fullpower$rh90_adj_a4  <- fullpower$rh90  + fullpower$elev_adjust_a4
+fullpower$rh90_adj_a4  <- fullpower$rh90_a4  + fullpower$elev_adjust_a4
 summary(fullpower$rh90_adj_a4 )
-fullpower$rh85_adj_a4  <- fullpower$rh85  + fullpower$elev_adjust_a4
+fullpower$rh85_adj_a4  <- fullpower$rh85_a4  + fullpower$elev_adjust_a4
 summary(fullpower$rh85_adj_a4 )
 ```
 
@@ -1894,17 +2707,17 @@ bias85_a4 <-round(bias(fullpower$rh85_adj_a4,fullpower$height85), digits = 4)
 fullpower$elev_adjust_a5 <- fullpower$Elevation_a5-fullpower$lidar_elev
 summary(fullpower$elev_adjust_a5)
 
-fullpower$rh100_adj_a5  <- fullpower$rh100  + fullpower$elev_adjust_a5
+fullpower$rh100_adj_a5  <- fullpower$rh100_a5  + fullpower$elev_adjust_a5
 summary(fullpower$rh100_adj_a5 )
-fullpower$rh99_adj_a5  <- fullpower$rh99  + fullpower$elev_adjust_a5
+fullpower$rh99_adj_a5  <- fullpower$rh99_a5  + fullpower$elev_adjust_a5
 summary(fullpower$rh99_adj_a5 )
-fullpower$rh98_adj_a5  <- fullpower$rh98  + fullpower$elev_adjust_a5
+fullpower$rh98_adj_a5  <- fullpower$rh98_a5  + fullpower$elev_adjust_a5
 summary(fullpower$rh98_adj_a5 )
-fullpower$rh95_adj_a5  <- fullpower$rh95  + fullpower$elev_adjust_a5
+fullpower$rh95_adj_a5  <- fullpower$rh95_a5  + fullpower$elev_adjust_a5
 summary(fullpower$rh95_adj_a5 )
-fullpower$rh90_adj_a5  <- fullpower$rh90  + fullpower$elev_adjust_a5
+fullpower$rh90_adj_a5  <- fullpower$rh90_a5  + fullpower$elev_adjust_a5
 summary(fullpower$rh90_adj_a5 )
-fullpower$rh85_adj_a5  <- fullpower$rh85  + fullpower$elev_adjust_a5
+fullpower$rh85_adj_a5  <- fullpower$rh85_a5  + fullpower$elev_adjust_a5
 summary(fullpower$rh85_adj_a5 )
 ```
 
@@ -1967,17 +2780,17 @@ bias85_a5 <-round(bias(fullpower$rh85_adj_a5,fullpower$height85), digits = 4)
 fullpower$elev_adjust_a6 <- fullpower$Elevation_a6-fullpower$lidar_elev
 summary(fullpower$elev_adjust_a6)
 
-fullpower$rh100_adj_a6  <- fullpower$rh100  + fullpower$elev_adjust_a6
+fullpower$rh100_adj_a6  <- fullpower$rh100_a6  + fullpower$elev_adjust_a6
 summary(fullpower$rh100_adj_a6 )
-fullpower$rh99_adj_a6  <- fullpower$rh99  + fullpower$elev_adjust_a6
+fullpower$rh99_adj_a6  <- fullpower$rh99_a6   + fullpower$elev_adjust_a6
 summary(fullpower$rh99_adj_a6 )
-fullpower$rh98_adj_a6  <- fullpower$rh98  + fullpower$elev_adjust_a6
+fullpower$rh98_adj_a6  <- fullpower$rh98_a6   + fullpower$elev_adjust_a6
 summary(fullpower$rh98_adj_a6 )
-fullpower$rh95_adj_a6  <- fullpower$rh95  + fullpower$elev_adjust_a6
+fullpower$rh95_adj_a6  <- fullpower$rh95_a6   + fullpower$elev_adjust_a6
 summary(fullpower$rh95_adj_a6 )
-fullpower$rh90_adj_a6  <- fullpower$rh90  + fullpower$elev_adjust_a6
+fullpower$rh90_adj_a6  <- fullpower$rh90_a6   + fullpower$elev_adjust_a6
 summary(fullpower$rh90_adj_a6 )
-fullpower$rh85_adj_a6  <- fullpower$rh85  + fullpower$elev_adjust_a6
+fullpower$rh85_adj_a6  <- fullpower$rh85_a6   + fullpower$elev_adjust_a6
 summary(fullpower$rh85_adj_a6 )
 ```
 
@@ -2038,7 +2851,7 @@ bias85_a6 <-round(bias(fullpower$rh85_adj_a6,fullpower$height85), digits = 4)
 #----------------------------------------------#
 ```{r,}
 # make a dataframe with all stats results
-algs <- c("","_a2","_a3","_a4","_a4","_a5","_a6")
+algs <- c("_a1","_a2","_a3","_a4","_a4","_a5","_a6")
 percentiles <- c(100, 99, 98, 95, 90, 85)
 stats <- c("RMSE", "r2_", "pear_cor_", "spear_cor_", "bias")
 
@@ -2162,8 +2975,583 @@ for (j in 1:length(percentiles)){
 }
 linreg_df$percentile <- percentiles
 ```
+# alg 2
+```{r}
+lm(ful_a1$Elevation.x~ful_a1$lidar_elev)
+# linear regression equation: y = 0.9866 x+11.9967
+# gedi = y, drone = x
+
+ful_a1$elevation_linreg <-0.9866*ful_a1$Elevation.x+11.9967
+
+ful_a1$elev_adjust_linreg <- ful_a1$Elevation.x-ful_a1$elevation_linreg
+summary(ful_a1$elev_adjust_linreg)
+
+ful_a1$rh100_adjlinreg <- ful_a1$rh100_a1 + ful_a1$elev_adjust_linreg
+summary(ful_a1$rh100_adjlinreg)
+ful_a1$rh99_adjlinreg <- ful_a1$rh99_a1 + ful_a1$elev_adjust_linreg
+summary(ful_a1$rh99_adjlinreg)
+ful_a1$rh98_adjlinreg <- ful_a1$rh98_a1 + ful_a1$elev_adjust_linreg
+summary(ful_a1$rh98_adjlinreg)
+ful_a1$rh95_adjlinreg <- ful_a1$rh95_a1 + ful_a1$elev_adjust_linreg
+summary(ful_a1$rh95_adjlinreg)
+ful_a1$rh90_adjlinreg <- ful_a1$rh90_a1 + ful_a1$elev_adjust_linreg
+summary(ful_a1$rh90_adjlinreg)
+ful_a1$rh85_adjlinreg <- ful_a1$rh85_a1 + ful_a1$elev_adjust_linreg
+summary(ful_a1$rh85_adjlinreg)
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(ful_a1$rh100_adjlinreg,ful_a1$height100), digits = 4)
+r1_100 <- round(rsq(ful_a1$rh100_adjlinreg,ful_a1$height100), digits = 4)
+pear_cor_100 <- cor(ful_a1$rh100_adjlinreg,ful_a1$height100, method = "pearson")
+spear_cor_100 <- cor(ful_a1$rh100_adjlinreg,ful_a1$height100, method = "spearman")
+pear_cor_100_test <- cor.test(ful_a1$rh100_adjlinreg,ful_a1$height100, method = "pearson")
+spear_cor_100_test <- cor.test(ful_a1$rh100_adjlinreg,ful_a1$height100, method = "spearman")
+bias100 <- round(bias(ful_a1$rh100_adjlinreg,ful_a1$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(ful_a1$rh99_adjlinreg,ful_a1$height99), digits = 4)
+r1_99 <- round(rsq(ful_a1$rh99_adjlinreg,ful_a1$height99), digits = 4)
+pear_cor_99 <- cor(ful_a1$rh99_adjlinreg,ful_a1$height99, method = "pearson")
+spear_cor_99 <- cor(ful_a1$rh99_adjlinreg,ful_a1$height99, method = "spearman")
+pear_cor_99_test <- cor.test(ful_a1$rh99_adjlinreg,ful_a1$height99, method = "pearson")
+spear_cor_99_test <- cor.test(ful_a1$rh99_adjlinreg,ful_a1$height99, method = "spearman")
+bias99 <-round(bias(ful_a1$rh99_adjlinreg,ful_a1$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(ful_a1$rh98_adjlinreg,ful_a1$height98), digits = 4)
+r1_98 <- round(rsq(ful_a1$rh98_adjlinreg,ful_a1$height98), digits = 4)
+pear_cor_98 <- cor(ful_a1$rh98_adjlinreg,ful_a1$height98, method = "pearson")
+spear_cor_98 <- cor(ful_a1$rh98_adjlinreg,ful_a1$height98, method = "spearman")
+pear_cor_98_test <- cor.test(ful_a1$rh98_adjlinreg,ful_a1$height98, method = "pearson")
+spear_cor_98_test <- cor.test(ful_a1$rh98_adjlinreg,ful_a1$height98, method = "spearman")
+bias98 <-round(bias(ful_a1$rh98_adjlinreg,ful_a1$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(ful_a1$rh95_adjlinreg,ful_a1$height95), digits = 4)
+r1_95 <- round(rsq(ful_a1$rh95_adjlinreg,ful_a1$height95), digits = 4)
+pear_cor_95 <- cor(ful_a1$rh95_adjlinreg,ful_a1$height95, method = "pearson")
+spear_cor_95 <- cor(ful_a1$rh95_adjlinreg,ful_a1$height95, method = "spearman")
+pear_cor_95_test <- cor.test(ful_a1$rh95_adjlinreg,ful_a1$height95, method = "pearson")
+spear_cor_95_test <- cor.test(ful_a1$rh95_adjlinreg,ful_a1$height95, method = "spearman")
+bias95 <-round(bias(ful_a1$rh95_adjlinreg,ful_a1$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(ful_a1$rh90_adjlinreg,ful_a1$height90), digits = 4)
+r1_90 <- round(rsq(ful_a1$rh90_adjlinreg,ful_a1$height90), digits = 4)
+pear_cor_90 <- cor(ful_a1$rh90_adjlinreg,ful_a1$height90, method = "pearson")
+spear_cor_90 <- cor(ful_a1$rh90_adjlinreg,ful_a1$height90, method = "spearman")
+pear_cor_90_test <- cor.test(ful_a1$rh90_adjlinreg,ful_a1$height90, method = "pearson")
+spear_cor_90_test <- cor.test(ful_a1$rh90_adjlinreg,ful_a1$height90, method = "spearman")
+bias90 <-round(bias(ful_a1$rh90_adjlinreg,ful_a1$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(ful_a1$rh85_adjlinreg,ful_a1$height85), digits = 4)
+r1_85 <- round(rsq(ful_a1$rh85_adjlinreg,ful_a1$height85), digits = 4)
+pear_cor_85 <- cor(ful_a1$rh85_adjlinreg,ful_a1$height85, method = "pearson")
+spear_cor_85 <- cor(ful_a1$rh85_adjlinreg,ful_a1$height85, method = "spearman")
+pear_cor_85_test <- cor.test(ful_a1$rh85_adjlinreg,ful_a1$height85, method = "pearson")
+spear_cor_85_test <- cor.test(ful_a1$rh85_adjlinreg,ful_a1$height85, method = "spearman")
+bias85 <-round(bias(ful_a1$rh85_adjlinreg,ful_a1$height85), digits = 4)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##----------LinReg Results Dataframe------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85)
+stats <- c("RMSE", "r1_", "pear_cor_", "spear_cor_", "bias")
+
+linreg_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(linreg_df) <- stats
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    linreg_df[j,k] <- var
+  }
+}
+linreg_df$percentile <- percentiles
+```
+
+# alg 2
+```{r}
+lm(fullpower$Elevation~fullpower$lidar_elev)
+# linear regression equation: y = 0.9866 x+11.9967
+# gedi = y, drone = x
+
+fullpower$elevation_linreg <-0.9866*fullpower$Elevation+11.9967
+
+fullpower$elev_adjust_linreg <- fullpower$Elevation-fullpower$elevation_linreg
+summary(fullpower$elev_adjust_linreg)
+
+fullpower$rh100_adjlinreg <- fullpower$rh100_a2 + fullpower$elev_adjust_linreg
+summary(fullpower$rh100_adjlinreg)
+fullpower$rh99_adjlinreg <- fullpower$rh99_a2 + fullpower$elev_adjust_linreg
+summary(fullpower$rh99_adjlinreg)
+fullpower$rh98_adjlinreg <- fullpower$rh98_a2 + fullpower$elev_adjust_linreg
+summary(fullpower$rh98_adjlinreg)
+fullpower$rh95_adjlinreg <- fullpower$rh95_a2 + fullpower$elev_adjust_linreg
+summary(fullpower$rh95_adjlinreg)
+fullpower$rh90_adjlinreg <- fullpower$rh90_a2 + fullpower$elev_adjust_linreg
+summary(fullpower$rh90_adjlinreg)
+fullpower$rh85_adjlinreg <- fullpower$rh85_a2 + fullpower$elev_adjust_linreg
+summary(fullpower$rh85_adjlinreg)
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+r2_100 <- round(rsq(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+r2_99 <- round(rsq(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+r2_98 <- round(rsq(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+r2_95 <- round(rsq(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+r2_90 <- round(rsq(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+r2_85 <- round(rsq(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##----------LinReg Results Dataframe------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85)
+stats <- c("RMSE", "r2_", "pear_cor_", "spear_cor_", "bias")
+
+linreg_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(linreg_df) <- stats
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    linreg_df[j,k] <- var
+  }
+}
+linreg_df$percentile <- percentiles
+```
 
 
+# alg 3
+```{r}
+lm(fullpower$Elevation~fullpower$lidar_elev)
+# linear regression equation: y = 0.9866 x+11.9967
+# gedi = y, drone = x
+
+fullpower$elevation_linreg <-0.9866*fullpower$Elevation+11.9967
+
+fullpower$elev_adjust_linreg <- fullpower$Elevation-fullpower$elevation_linreg
+summary(fullpower$elev_adjust_linreg)
+
+fullpower$rh100_adjlinreg <- fullpower$rh100_a3 + fullpower$elev_adjust_linreg
+summary(fullpower$rh100_adjlinreg)
+fullpower$rh99_adjlinreg <- fullpower$rh99_a3 + fullpower$elev_adjust_linreg
+summary(fullpower$rh99_adjlinreg)
+fullpower$rh98_adjlinreg <- fullpower$rh98_a3 + fullpower$elev_adjust_linreg
+summary(fullpower$rh98_adjlinreg)
+fullpower$rh95_adjlinreg <- fullpower$rh95_a3 + fullpower$elev_adjust_linreg
+summary(fullpower$rh95_adjlinreg)
+fullpower$rh90_adjlinreg <- fullpower$rh90_a3 + fullpower$elev_adjust_linreg
+summary(fullpower$rh90_adjlinreg)
+fullpower$rh85_adjlinreg <- fullpower$rh85_a3 + fullpower$elev_adjust_linreg
+summary(fullpower$rh85_adjlinreg)
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+r3_100 <- round(rsq(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+r3_99 <- round(rsq(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+r3_98 <- round(rsq(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+r3_95 <- round(rsq(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+r3_90 <- round(rsq(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+r3_85 <- round(rsq(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##----------LinReg Results Dataframe------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85)
+stats <- c("RMSE", "r3_", "pear_cor_", "spear_cor_", "bias")
+
+linreg_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(linreg_df) <- stats
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    linreg_df[j,k] <- var
+  }
+}
+linreg_df$percentile <- percentiles
+```
+
+# alg 4
+```{r}
+lm(fullpower$Elevation~fullpower$lidar_elev)
+# linear regression equation: y = 0.9866 x+11.9967
+# gedi = y, drone = x
+
+fullpower$elevation_linreg <-0.9866*fullpower$Elevation+11.9967
+
+fullpower$elev_adjust_linreg <- fullpower$Elevation-fullpower$elevation_linreg
+summary(fullpower$elev_adjust_linreg)
+
+fullpower$rh100_adjlinreg <- fullpower$rh100_a4 + fullpower$elev_adjust_linreg
+summary(fullpower$rh100_adjlinreg)
+fullpower$rh99_adjlinreg <- fullpower$rh99_a4 + fullpower$elev_adjust_linreg
+summary(fullpower$rh99_adjlinreg)
+fullpower$rh98_adjlinreg <- fullpower$rh98_a4 + fullpower$elev_adjust_linreg
+summary(fullpower$rh98_adjlinreg)
+fullpower$rh95_adjlinreg <- fullpower$rh95_a4 + fullpower$elev_adjust_linreg
+summary(fullpower$rh95_adjlinreg)
+fullpower$rh90_adjlinreg <- fullpower$rh90_a4 + fullpower$elev_adjust_linreg
+summary(fullpower$rh90_adjlinreg)
+fullpower$rh85_adjlinreg <- fullpower$rh85_a4 + fullpower$elev_adjust_linreg
+summary(fullpower$rh85_adjlinreg)
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+r4_100 <- round(rsq(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+pear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adjlinreg,fullpower$height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+r4_99 <- round(rsq(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+pear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adjlinreg,fullpower$height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+r4_98 <- round(rsq(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+pear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adjlinreg,fullpower$height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+r4_95 <- round(rsq(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+pear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adjlinreg,fullpower$height95), digits = 4)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+r4_90 <- round(rsq(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+pear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adjlinreg,fullpower$height90), digits = 4)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+r4_85 <- round(rsq(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+pear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adjlinreg,fullpower$height85), digits = 4)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##----------LinReg Results Dataframe------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85)
+stats <- c("RMSE", "r4_", "pear_cor_", "spear_cor_", "bias")
+
+linreg_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(linreg_df) <- stats
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    linreg_df[j,k] <- var
+  }
+}
+linreg_df$percentile <- percentiles
+```
+
+
+# alg 5
+```{r}
+lm(fullpower$Elevation~fullpower$lidar_elev)
+# linear regression equation: y = 0.9866 x+11.9967
+# gedi = y, drone = x
+
+fullpower$elevation_linreg <-0.9866*fullpower$Elevation+11.9967
+
+fullpower$elev_adjust_linreg <- fullpower$Elevation-fullpower$elevation_linreg
+summary(fullpower$elev_adjust_linreg)
+
+fullpower$rh100_adjlinreg <- fullpower$rh100_a5 + fullpower$elev_adjust_linreg
+summary(fullpower$rh100_adjlinreg)
+fullpower$rh99_adjlinreg <- fullpower$rh99_a5 + fullpower$elev_adjust_linreg
+summary(fullpower$rh99_adjlinreg)
+fullpower$rh98_adjlinreg <- fullpower$rh98_a5 + fullpower$elev_adjust_linreg
+summary(fullpower$rh98_adjlinreg)
+fullpower$rh95_adjlinreg <- fullpower$rh95_a5 + fullpower$elev_adjust_linreg
+summary(fullpower$rh95_adjlinreg)
+fullpower$rh90_adjlinreg <- fullpower$rh90_a5 + fullpower$elev_adjust_linreg
+summary(fullpower$rh90_adjlinreg)
+fullpower$rh85_adjlinreg <- fullpower$rh85_a5 + fullpower$elev_adjust_linreg
+summary(fullpower$rh85_adjlinreg)
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adjlinreg,fullpower$height100), digits = 5)
+r5_100 <- round(rsq(fullpower$rh100_adjlinreg,fullpower$height100), digits = 5)
+pear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adjlinreg,fullpower$height100), digits = 5)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adjlinreg,fullpower$height99), digits = 5)
+r5_99 <- round(rsq(fullpower$rh99_adjlinreg,fullpower$height99), digits = 5)
+pear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adjlinreg,fullpower$height99), digits = 5)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adjlinreg,fullpower$height98), digits = 5)
+r5_98 <- round(rsq(fullpower$rh98_adjlinreg,fullpower$height98), digits = 5)
+pear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adjlinreg,fullpower$height98), digits = 5)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adjlinreg,fullpower$height95), digits = 5)
+r5_95 <- round(rsq(fullpower$rh95_adjlinreg,fullpower$height95), digits = 5)
+pear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adjlinreg,fullpower$height95), digits = 5)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adjlinreg,fullpower$height90), digits = 5)
+r5_90 <- round(rsq(fullpower$rh90_adjlinreg,fullpower$height90), digits = 5)
+pear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adjlinreg,fullpower$height90), digits = 5)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adjlinreg,fullpower$height85), digits = 5)
+r5_85 <- round(rsq(fullpower$rh85_adjlinreg,fullpower$height85), digits = 5)
+pear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adjlinreg,fullpower$height85), digits = 5)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##----------LinReg Results Dataframe------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85)
+stats <- c("RMSE", "r5_", "pear_cor_", "spear_cor_", "bias")
+
+linreg_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(linreg_df) <- stats
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    linreg_df[j,k] <- var
+  }
+}
+linreg_df$percentile <- percentiles
+```
+
+# alg 6
+```{r}
+lm(fullpower$Elevation~fullpower$lidar_elev)
+# linear regression equation: y = 0.9866 x+11.9967
+# gedi = y, drone = x
+
+fullpower$elevation_linreg <-0.9866*fullpower$Elevation+11.9967
+
+fullpower$elev_adjust_linreg <- fullpower$Elevation-fullpower$elevation_linreg
+summary(fullpower$elev_adjust_linreg)
+
+fullpower$rh100_adjlinreg <- fullpower$rh100_a6 + fullpower$elev_adjust_linreg
+summary(fullpower$rh100_adjlinreg)
+fullpower$rh99_adjlinreg <- fullpower$rh99_a6 + fullpower$elev_adjust_linreg
+summary(fullpower$rh99_adjlinreg)
+fullpower$rh98_adjlinreg <- fullpower$rh98_a6 + fullpower$elev_adjust_linreg
+summary(fullpower$rh98_adjlinreg)
+fullpower$rh95_adjlinreg <- fullpower$rh95_a6 + fullpower$elev_adjust_linreg
+summary(fullpower$rh95_adjlinreg)
+fullpower$rh90_adjlinreg <- fullpower$rh90_a6 + fullpower$elev_adjust_linreg
+summary(fullpower$rh90_adjlinreg)
+fullpower$rh85_adjlinreg <- fullpower$rh85_a6 + fullpower$elev_adjust_linreg
+summary(fullpower$rh85_adjlinreg)
+```
+
+```{r}
+RMSE100 <- round(hydroGOF::rmse(fullpower$rh100_adjlinreg,fullpower$height100), digits = 6)
+r6_100 <- round(rsq(fullpower$rh100_adjlinreg,fullpower$height100), digits = 6)
+pear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100 <- cor(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+pear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "pearson")
+spear_cor_100_test <- cor.test(fullpower$rh100_adjlinreg,fullpower$height100, method = "spearman")
+bias100 <- round(bias(fullpower$rh100_adjlinreg,fullpower$height100), digits = 6)
+
+RMSE99 <-round(hydroGOF::rmse(fullpower$rh99_adjlinreg,fullpower$height99), digits = 6)
+r6_99 <- round(rsq(fullpower$rh99_adjlinreg,fullpower$height99), digits = 6)
+pear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99 <- cor(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+pear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "pearson")
+spear_cor_99_test <- cor.test(fullpower$rh99_adjlinreg,fullpower$height99, method = "spearman")
+bias99 <-round(bias(fullpower$rh99_adjlinreg,fullpower$height99), digits = 6)
+
+RMSE98 <-round(hydroGOF::rmse(fullpower$rh98_adjlinreg,fullpower$height98), digits = 6)
+r6_98 <- round(rsq(fullpower$rh98_adjlinreg,fullpower$height98), digits = 6)
+pear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98 <- cor(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+pear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "pearson")
+spear_cor_98_test <- cor.test(fullpower$rh98_adjlinreg,fullpower$height98, method = "spearman")
+bias98 <-round(bias(fullpower$rh98_adjlinreg,fullpower$height98), digits = 6)
+
+RMSE95 <-round(hydroGOF::rmse(fullpower$rh95_adjlinreg,fullpower$height95), digits = 6)
+r6_95 <- round(rsq(fullpower$rh95_adjlinreg,fullpower$height95), digits = 6)
+pear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95 <- cor(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+pear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "pearson")
+spear_cor_95_test <- cor.test(fullpower$rh95_adjlinreg,fullpower$height95, method = "spearman")
+bias95 <-round(bias(fullpower$rh95_adjlinreg,fullpower$height95), digits = 6)
+
+RMSE90 <-round(hydroGOF::rmse(fullpower$rh90_adjlinreg,fullpower$height90), digits = 6)
+r6_90 <- round(rsq(fullpower$rh90_adjlinreg,fullpower$height90), digits = 6)
+pear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90 <- cor(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+pear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "pearson")
+spear_cor_90_test <- cor.test(fullpower$rh90_adjlinreg,fullpower$height90, method = "spearman")
+bias90 <-round(bias(fullpower$rh90_adjlinreg,fullpower$height90), digits = 6)
+
+RMSE85 <-round(hydroGOF::rmse(fullpower$rh85_adjlinreg,fullpower$height85), digits = 6)
+r6_85 <- round(rsq(fullpower$rh85_adjlinreg,fullpower$height85), digits = 6)
+pear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85 <- cor(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+pear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "pearson")
+spear_cor_85_test <- cor.test(fullpower$rh85_adjlinreg,fullpower$height85, method = "spearman")
+bias85 <-round(bias(fullpower$rh85_adjlinreg,fullpower$height85), digits = 6)
+```
+
+#----------------------------------------------#
+#----------------------------------------------#
+##----------LinReg Results Dataframe------------
+#----------------------------------------------#
+#----------------------------------------------#
+```{r,}
+# make a dataframe with all stats results
+percentiles <- c(100, 99, 98, 95, 90, 85)
+stats <- c("RMSE", "r6_", "pear_cor_", "spear_cor_", "bias")
+
+linreg_df <- data.frame(matrix(ncol = length(stats), nrow = length(percentiles)))
+colnames(linreg_df) <- stats
+for (j in 1:length(percentiles)){
+  for (k in 1:length(stats)){
+    var <- lapply(paste0(stats[k], percentiles[j]),get)
+    linreg_df[j,k] <- var
+  }
+}
+linreg_df$percentile <- percentiles
+```
 
 
 

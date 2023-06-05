@@ -1768,7 +1768,7 @@ multiplot(p1, p2, p3, p4, p5, p6, cols=2)
 
 ### Comparisons between CHM and Ground Data
 ```{r, echo=FALSE}
-grounddat_field_gedi <- read.csv("~/Desktop/Research_2022/Data/GEDI/cameroon_gedi_field.csv")
+grounddat_field_gedi <- read.csv("~/Desktop/Research_2022/Data/GEDI/cameroon_gedi_field_all.csv")
 grounddat_field_gedi <- na.omit(grounddat_field_gedi)
 grounddat_lidar <- read.csv("~/Desktop/Research_2022/Data/GEDI/cameroon_field_lidar.csv")
 
@@ -1810,6 +1810,10 @@ spear_cor_95 <- cor(grounddat_lidar$field_height95 ,grounddat_lidar$height95, me
 pear_cor_95_test <- cor.test(grounddat_lidar$field_height95 ,grounddat_lidar$height95, method = "pearson")
 spear_cor_95_test <- cor.test(grounddat_lidar$field_height95 ,grounddat_lidar$height95, method = "spearman")
 bias95 <-round(bias(grounddat_lidar$field_height95 ,grounddat_lidar$height95), digits = 4)
+
+
+r2_90 <- round(rsq(grounddat_lidar$field_height90 ,grounddat_lidar$height90), digits = 4)
+r2_85 <- round(rsq(grounddat_lidar$field_height85 ,grounddat_lidar$height85), digits = 4)
 ```
 
 ```{r,}
@@ -1897,6 +1901,10 @@ spear_cor_95 <- cor(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height
 pear_cor_95_test <- cor.test(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height95, method = "pearson")
 spear_cor_95_test <- cor.test(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height95, method = "spearman")
 bias95 <-round(bias(grounddat_field_gedi$rh95 ,grounddat_field_gedi$field_height95), digits = 4)
+
+r2_90 <- round(rsq(grounddat_field_gedi$rh90 ,grounddat_field_gedi$field_height90), digits = 4)
+
+r2_85 <- round(rsq(grounddat_field_gedi$rh85 ,grounddat_field_gedi$field_height85), digits = 4)
 ```
 
 ```{r,}
@@ -2088,13 +2096,115 @@ p4 <- grounddat_lidar %>%
 multiplot(p1, p2, p3, p4, cols=2)
 ```
 
+## Alg 4
+```{r}
+# Calculate R squared and RMSE
+RMSE100 <- round(hydroGOF::rmse(grounddat_field_gedi$rh100_a4,grounddat_field_gedi$field_height100), digits = 4)
+r2_100 <- round(rsq(grounddat_field_gedi$rh100_a4,grounddat_field_gedi$field_height100), digits = 4)
+pear_cor_100 <- cor(grounddat_field_gedi$rh100_a4,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100 <- cor(grounddat_field_gedi$rh100_a4,grounddat_field_gedi$field_height100, method = "spearman")
+pear_cor_100_test <- cor.test(grounddat_field_gedi$rh100_a4,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100_test <- cor.test(grounddat_field_gedi$rh100_a4,grounddat_field_gedi$field_height100, method = "spearman")
+bias100 <- round(bias(grounddat_field_gedi$rh100_a4,grounddat_field_gedi$field_height100), digits = 4)
+
+RMSE99 <-round(hydroGOF::rmse(grounddat_field_gedi$rh99_a4,grounddat_field_gedi$field_height99), digits = 4)
+r2_99 <- round(rsq(grounddat_field_gedi$rh99_a4,grounddat_field_gedi$field_height99), digits = 4)
+pear_cor_99 <- cor(grounddat_field_gedi$rh99_a4,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99 <- cor(grounddat_field_gedi$rh99_a4,grounddat_field_gedi$field_height99, method = "spearman")
+pear_cor_99_test <- cor.test(grounddat_field_gedi$rh99_a4,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99_test <- cor.test(grounddat_field_gedi$rh99_a4,grounddat_field_gedi$field_height99, method = "spearman")
+bias99 <-round(bias(grounddat_field_gedi$rh99_a4,grounddat_field_gedi$field_height99), digits = 4)
+
+RMSE98 <-round(hydroGOF::rmse(grounddat_field_gedi$rh98_a4,grounddat_field_gedi$field_height98), digits = 4)
+r2_98 <- round(rsq(grounddat_field_gedi$rh98_a4,grounddat_field_gedi$field_height98), digits = 4)
+pear_cor_98 <- cor(grounddat_field_gedi$rh98_a4,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98 <- cor(grounddat_field_gedi$rh98_a4,grounddat_field_gedi$field_height98, method = "spearman")
+pear_cor_98_test <- cor.test(grounddat_field_gedi$rh98_a4,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98_test <- cor.test(grounddat_field_gedi$rh98_a4,grounddat_field_gedi$field_height98, method = "spearman")
+bias98 <-round(bias(grounddat_field_gedi$rh98_a4,grounddat_field_gedi$field_height98), digits = 4)
+
+RMSE95 <-round(hydroGOF::rmse(grounddat_field_gedi$rh95_a4,grounddat_field_gedi$field_height95), digits = 4)
+r2_95 <- round(rsq(grounddat_field_gedi$rh95_a4,grounddat_field_gedi$field_height95), digits = 4)
+pear_cor_95 <- cor(grounddat_field_gedi$rh95_a4,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95 <- cor(grounddat_field_gedi$rh95_a4,grounddat_field_gedi$field_height95, method = "spearman")
+pear_cor_95_test <- cor.test(grounddat_field_gedi$rh95_a4,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95_test <- cor.test(grounddat_field_gedi$rh95_a4,grounddat_field_gedi$field_height95, method = "spearman")
+bias95 <-round(bias(grounddat_field_gedi$rh95_a4,grounddat_field_gedi$field_height95), digits = 4)
+```
 
 
 
+## Alg 5
+```{r}
+# Calculate R squared and RMSE
+RMSE100 <- round(hydroGOF::rmse(grounddat_field_gedi$rh100_a5,grounddat_field_gedi$field_height100), digits = 5)
+r2_100 <- round(rsq(grounddat_field_gedi$rh100_a5,grounddat_field_gedi$field_height100), digits = 5)
+pear_cor_100 <- cor(grounddat_field_gedi$rh100_a5,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100 <- cor(grounddat_field_gedi$rh100_a5,grounddat_field_gedi$field_height100, method = "spearman")
+pear_cor_100_test <- cor.test(grounddat_field_gedi$rh100_a5,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100_test <- cor.test(grounddat_field_gedi$rh100_a5,grounddat_field_gedi$field_height100, method = "spearman")
+bias100 <- round(bias(grounddat_field_gedi$rh100_a5,grounddat_field_gedi$field_height100), digits = 5)
 
+RMSE99 <-round(hydroGOF::rmse(grounddat_field_gedi$rh99_a5,grounddat_field_gedi$field_height99), digits = 5)
+r2_99 <- round(rsq(grounddat_field_gedi$rh99_a5,grounddat_field_gedi$field_height99), digits = 5)
+pear_cor_99 <- cor(grounddat_field_gedi$rh99_a5,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99 <- cor(grounddat_field_gedi$rh99_a5,grounddat_field_gedi$field_height99, method = "spearman")
+pear_cor_99_test <- cor.test(grounddat_field_gedi$rh99_a5,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99_test <- cor.test(grounddat_field_gedi$rh99_a5,grounddat_field_gedi$field_height99, method = "spearman")
+bias99 <-round(bias(grounddat_field_gedi$rh99_a5,grounddat_field_gedi$field_height99), digits = 5)
 
+RMSE98 <-round(hydroGOF::rmse(grounddat_field_gedi$rh98_a5,grounddat_field_gedi$field_height98), digits = 5)
+r2_98 <- round(rsq(grounddat_field_gedi$rh98_a5,grounddat_field_gedi$field_height98), digits = 5)
+pear_cor_98 <- cor(grounddat_field_gedi$rh98_a5,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98 <- cor(grounddat_field_gedi$rh98_a5,grounddat_field_gedi$field_height98, method = "spearman")
+pear_cor_98_test <- cor.test(grounddat_field_gedi$rh98_a5,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98_test <- cor.test(grounddat_field_gedi$rh98_a5,grounddat_field_gedi$field_height98, method = "spearman")
+bias98 <-round(bias(grounddat_field_gedi$rh98_a5,grounddat_field_gedi$field_height98), digits = 5)
 
+RMSE95 <-round(hydroGOF::rmse(grounddat_field_gedi$rh95_a5,grounddat_field_gedi$field_height95), digits = 5)
+r2_95 <- round(rsq(grounddat_field_gedi$rh95_a5,grounddat_field_gedi$field_height95), digits = 5)
+pear_cor_95 <- cor(grounddat_field_gedi$rh95_a5,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95 <- cor(grounddat_field_gedi$rh95_a5,grounddat_field_gedi$field_height95, method = "spearman")
+pear_cor_95_test <- cor.test(grounddat_field_gedi$rh95_a5,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95_test <- cor.test(grounddat_field_gedi$rh95_a5,grounddat_field_gedi$field_height95, method = "spearman")
+bias95 <-round(bias(grounddat_field_gedi$rh95_a5,grounddat_field_gedi$field_height95), digits = 5)
+```
 
+## Alg 6
+```{r}
+# Calculate R squared and RMSE
+RMSE100 <- round(hydroGOF::rmse(grounddat_field_gedi$rh100_a6,grounddat_field_gedi$field_height100), digits = 6)
+r2_100 <- round(rsq(grounddat_field_gedi$rh100_a6,grounddat_field_gedi$field_height100), digits = 6)
+pear_cor_100 <- cor(grounddat_field_gedi$rh100_a6,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100 <- cor(grounddat_field_gedi$rh100_a6,grounddat_field_gedi$field_height100, method = "spearman")
+pear_cor_100_test <- cor.test(grounddat_field_gedi$rh100_a6,grounddat_field_gedi$field_height100, method = "pearson")
+spear_cor_100_test <- cor.test(grounddat_field_gedi$rh100_a6,grounddat_field_gedi$field_height100, method = "spearman")
+bias100 <- round(bias(grounddat_field_gedi$rh100_a6,grounddat_field_gedi$field_height100), digits = 6)
+
+RMSE99 <-round(hydroGOF::rmse(grounddat_field_gedi$rh99_a6,grounddat_field_gedi$field_height99), digits = 6)
+r2_99 <- round(rsq(grounddat_field_gedi$rh99_a6,grounddat_field_gedi$field_height99), digits = 6)
+pear_cor_99 <- cor(grounddat_field_gedi$rh99_a6,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99 <- cor(grounddat_field_gedi$rh99_a6,grounddat_field_gedi$field_height99, method = "spearman")
+pear_cor_99_test <- cor.test(grounddat_field_gedi$rh99_a6,grounddat_field_gedi$field_height99, method = "pearson")
+spear_cor_99_test <- cor.test(grounddat_field_gedi$rh99_a6,grounddat_field_gedi$field_height99, method = "spearman")
+bias99 <-round(bias(grounddat_field_gedi$rh99_a6,grounddat_field_gedi$field_height99), digits = 6)
+
+RMSE98 <-round(hydroGOF::rmse(grounddat_field_gedi$rh98_a6,grounddat_field_gedi$field_height98), digits = 6)
+r2_98 <- round(rsq(grounddat_field_gedi$rh98_a6,grounddat_field_gedi$field_height98), digits = 6)
+pear_cor_98 <- cor(grounddat_field_gedi$rh98_a6,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98 <- cor(grounddat_field_gedi$rh98_a6,grounddat_field_gedi$field_height98, method = "spearman")
+pear_cor_98_test <- cor.test(grounddat_field_gedi$rh98_a6,grounddat_field_gedi$field_height98, method = "pearson")
+spear_cor_98_test <- cor.test(grounddat_field_gedi$rh98_a6,grounddat_field_gedi$field_height98, method = "spearman")
+bias98 <-round(bias(grounddat_field_gedi$rh98_a6,grounddat_field_gedi$field_height98), digits = 6)
+
+RMSE95 <-round(hydroGOF::rmse(grounddat_field_gedi$rh95_a6,grounddat_field_gedi$field_height95), digits = 6)
+r2_95 <- round(rsq(grounddat_field_gedi$rh95_a6,grounddat_field_gedi$field_height95), digits = 6)
+pear_cor_95 <- cor(grounddat_field_gedi$rh95_a6,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95 <- cor(grounddat_field_gedi$rh95_a6,grounddat_field_gedi$field_height95, method = "spearman")
+pear_cor_95_test <- cor.test(grounddat_field_gedi$rh95_a6,grounddat_field_gedi$field_height95, method = "pearson")
+spear_cor_95_test <- cor.test(grounddat_field_gedi$rh95_a6,grounddat_field_gedi$field_height95, method = "spearman")
+bias95 <-round(bias(grounddat_field_gedi$rh95_a6,grounddat_field_gedi$field_height95), digits = 6)
+```
 
 Fancy Plot
 

@@ -103,6 +103,7 @@ b2Ht_SEA    = 0.5782 #"coefficient of ln(D)" # Use for dbh2h_01
 hgt_ref_SEA = -0.0114
 hgt_max_SEA = 100
 
+heig <- dbh2h_01(95,hgt_max_SEA,hgt_ref_SEA,b1Ht_SEA,b2Ht_SEA)
 
 #Calculate Heights---------------
 dandat_analysis$height <- dbh2h_01(dandat_analysis$dbh, hgt_max_SEA, hgt_ref_SEA, b1Ht_SEA, b2Ht_SEA)
@@ -122,4 +123,4 @@ dim(analysismetrics)
 
 summary(dandat_analysis)
 dandat_analysis <- filter(dandat_analysis, dbh >=10)
-write.csv(dandat_analysis, ("~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_2022.csv"))
+write_csv(dandat_analysis, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_2022.csv")

@@ -26,7 +26,7 @@ dat <- subset(dat, distance_to_camp <= 4)
 # reserve- for crs
 reserve <- readOGR('~/Desktop/Research/Cameroon/DjaFaunalReserve',"DjaFaunalReserveOSM")
 #plot(reserve)
-
+crs(reserve)
 
 # convert GEDI data to spatial points dataframe
 coords<- dat[,c("Longitude","Latitude")]
@@ -122,7 +122,8 @@ field_sum <- fielddat %>% group_by(`Shot Number`) %>% dplyr::summarise(field_hei
 field_sum <- dplyr::rename(field_sum, Shot_Number = `Shot Number`) 
 write.csv(field_sum, "~/Desktop/Research_2022/Data/GEDI/cameroon_fielddata_w_quantiles_all.csv")
 
-gedifielddat <- merge(heights,field_sum,by="Shot_Number")
+
+gedifielddat <- merge(dat,field_sum,by="Shot_Number")
 write.csv(gedifielddat, "~/Desktop/Research_2022/Data/GEDI/cameroon_gedi_field_all.csv")
 
 full_dat <- merge(heights,field_sum,by="Shot_Number")

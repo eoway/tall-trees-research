@@ -26,6 +26,23 @@ dat1 <- subset(dat, DFstatus == "A")
 
 table(dat1$species)
 
+## Create 300 tree sample
+## Grab random sample from nonemergent trees as a comparison metric
+#nonemrg <- subset(dat1, dbh < quantile99dbh)
+#dandatsamp300 <- sample_n(nonemrg, 300)
+#dandatsamp300$NCI<-rep(NA, nrow(dandatsamp300))
+#
+#write.csv(dandatsamp300, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_300_sample.csv")
+dandatsamp300 <- read_csv("~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_300_sample.csv")
+
+## Create 10,000 tree sample
+## Grab random sample from nonemergent trees as a comparison metric
+#dandatsamp10000 <- sample_n(nonemrg, 10000)
+#
+#write.csv(dandatsamp10000, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_10000_sample.csv")
+dandatsamp10000 <- read_csv("~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_10000_sample.csv")
+
+
 #-------------------------------------------------------------------------------#
 # ---------------------emergent trees- surrounding dataframe-----------------
 # ------------------------------------5 meter----------------------------------#
@@ -459,7 +476,6 @@ emerg_summ_30 <- surr_emerg30 %>% group_by(midtreeID, midtreetype, midNCI) %>% d
                                                                                         same_genus = sum(genuscomp),
                                                                                         same_family = sum(familycomp),
                                                                                         n_emrgnt = sum(emergnt))
-# should have 271 rows
 
 
 #-------------------------------------------------------------------------------#
@@ -541,15 +557,13 @@ emerg_summ_50 <- surr_emerg50 %>% group_by(midtreeID, midtreetype, midNCI) %>% d
 # -----------------------------------5 meter radius--------------------
 # -----------------------------------only alive trees--------------------
 #------------------------------------------------------------------------------#
-# Grab random sample from nonemergent trees as a comparison metric
-nonemrg <- subset(dat1, dbh < quantile99dbh)
-dandatsamp300 <- sample_n(nonemrg, 300)
-dandatsamp300$NCI<-rep(NA, nrow(dandatsamp300))
+
 #-------------------------------------------------------------------------------#
 # -----------------------------5m buffer, 600 tree sample-----------------
 #------------------------------------------------------------------------------#
 # run the following to create a dataframe of all trees within 5 meters of the tree of interest
 nonemrg_samp300 <- data.frame()
+dandatsamp300$NCI<-rep(NA, nrow(dandatsamp300))
 
 radius = 5
 # Loop through every emergent tree
@@ -617,7 +631,7 @@ surr_info300 <- nonemrg_samp300 %>% group_by(midtreeID, midtreetype, midNCI) %>%
 all5_300_alive <- rbind(surr_info300, emerg_summ_5)
 
 # export dataframe
-write.csv(all5_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_5m_600_trees_nci_debug.csv")
+write.csv(all5_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_5m_600_trees.csv")
 
 
 
@@ -625,7 +639,6 @@ write.csv(all5_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/dan
 # -----------------------------10m buffer, 600 tree sample-----------------
 #------------------------------------------------------------------------------#
 dandatsamp300$NCI<-rep(NA, nrow(dandatsamp300))
-
 nonemrg_samp300_10 <- data.frame()
 
 radius = 10
@@ -694,7 +707,7 @@ surr_info300_10 <- nonemrg_samp300_10 %>% group_by(midtreeID, midtreetype, midNC
 all10_300_alive <- rbind(surr_info300_10, emerg_summ_10)
 
 # export dataframe
-write.csv(all10_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_10m_600_trees_nci.csv")
+write.csv(all10_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_10m_600_trees.csv")
 
 
 #-------------------------------------------------------------------------------#
@@ -773,7 +786,7 @@ surr_info300_15 <- nonemrg_samp300_15 %>% group_by(midtreeID, midtreetype, midNC
 all15_300_alive <- rbind(surr_info300_15, emerg_summ_15)
 
 # export dataframe
-write.csv(all15_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_15m_600_trees_nci.csv")
+write.csv(all15_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_15m_600_trees.csv")
 
 
 
@@ -850,7 +863,7 @@ surr_info300_20 <- nonemrg_samp300_20 %>% group_by(midtreeID, midtreetype, midNC
 all20_300_alive <- rbind(surr_info300_20, emerg_summ_20)
 
 # export dataframe
-write.csv(all20_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_20m_600_trees_nci.csv")
+write.csv(all20_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_20m_600_trees.csv")
 
 
 
@@ -927,7 +940,7 @@ surr_info300_25 <- nonemrg_samp300_25 %>% group_by(midtreeID, midtreetype,midNCI
 all25_300_alive <- rbind(surr_info300_25, emerg_summ_25)
 
 # export dataframe
-write.csv(all25_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_25m_600_trees_nci.csv")
+write.csv(all25_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_25m_600_trees.csv")
 
 #-------------------------------------------------------------------------------#
 # -----------------------------60m buffer, 600 tree sample-----------------
@@ -1003,7 +1016,7 @@ surr_info300_30 <- nonemrg_samp300_30 %>% group_by(midtreeID, midtreetype, midNC
 all30_300_alive <- rbind(surr_info300_30, emerg_summ_30)
 
 # export dataframe
-write.csv(all30_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_30m_600_trees_nci.csv")
+write.csv(all30_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_30m_600_trees.csv")
 
 
 #-------------------------------------------------------------------------------#
@@ -1079,7 +1092,7 @@ surr_info300_50 <- nonemrg_samp300_50 %>% group_by(midtreeID, midtreetype,midNCI
 all50_300_alive <- rbind(surr_info300_50, emerg_summ_50)
 
 # export dataframe
-write.csv(all50_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_50m_600_trees_nci.csv")
+write.csv(all50_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_50m_600_trees.csv")
 
 
 
@@ -1107,15 +1120,16 @@ write.csv(all50_300_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/da
 # -----------------------------------5 meter radius--------------------
 # -----------------------------------only alive trees--------------------
 #------------------------------------------------------------------------------#
-# Grab random sample from nonemergent trees as a comparison metric
-nonemrg <- subset(dat1, dbh < quantile99dbh)
-dandatsamp10000 <- sample_n(nonemrg, 10000)
+
 #-------------------------------------------------------------------------------#
-# -----------------------------5m buffer, 600 tree sample-----------------
+# -----------------------------5m buffer, 1000 tree sample-----------------
 #------------------------------------------------------------------------------#
-# run the following to create a dataframe of all trees within 5 meters of the tree of interest
+dandatsamp10000$NCI<-rep(NA, nrow(dandatsamp10000))
+
 nonemrg_samp10000 <- data.frame()
+
 radius = 5
+# Loop through every emergent tree
 for (i in 1:nrow(dandatsamp10000))
 { 
   # define coordinates for tree of interest
@@ -1123,28 +1137,36 @@ for (i in 1:nrow(dandatsamp10000))
   midy <- dandatsamp10000$plot_y[i]
   # crop dat1a to contain only points within the radius of the tree of interest
   temp<-dat1[dat1$plot_x>=(midx-radius) & dat1$plot_x<=(midx+radius) & dat1$plot_y>=(midy-radius) & dat1$plot_y<=(midy+radius), ]
-  
+  # remove tree of interest
+  temp <- subset(temp, treeID != dandatsamp10000$treeID[i])
+  # calculate NCI and distance from tree of interest
+  temp$dis<-rep(NA, nrow(temp))
+  NCI = 0
+  for(j in 1:nrow(temp))
+  { 
+    temp$dis[j]<-sqrt((dandatsamp10000$plot_x[i]-temp$plot_x[j])^2+(dandatsamp10000$plot_y[i]-temp$plot_y[j])^2)
+    NCI<-NCI+sum((temp$dbh[j]^2/temp$dis[j]^2)[temp$dis[j]<=radius & temp$dis[j]>0],na.rm=T)
+  }
+  dandatsamp10000$NCI[i] <- NCI
+  # remove trees outside of buffer
+  temp <- subset(temp, dis <= 5)
   # make a column of that contains the tree of interest's ID and treetype
   temp$midtreeID <-rep(dandatsamp10000$treeID[i], length(nrow(temp)))
   temp$midtreetype <-rep(dandatsamp10000$tree_type[i], length(nrow(temp)))
   temp$midspecies <-rep(dandatsamp10000$species[i], length(nrow(temp)))
-  temp$midspecies <-rep(dandatsamp10000$species[i], length(nrow(temp)))
   temp$midgenus <-rep(dandatsamp10000$genus[i], length(nrow(temp)))
   temp$midfamily <-rep(dandatsamp10000$family[i], length(nrow(temp)))
-  # remove tree of interest
-  emerg_ID <- dandatsamp10000$treeID
-  temp <- temp[!temp$treeID %in% emerg_ID, ]
-  
+  temp$midNCI <-rep(dandatsamp10000$NCI[i], length(nrow(temp)))
   # add dat1a to one dat1aframe
   nonemrg_samp10000 <- rbind(nonemrg_samp10000, temp)
 }
-
-# 48484 observations
+# check number of emrgnt midtreetype labels - should be 1245
+table(nonemrg_samp10000$midtreetype)
 
 # label same species with 1 and different trees with 0
 nonemrg_samp10000$speciescomp <- ifelse(nonemrg_samp10000$species == nonemrg_samp10000$midspecies, 1, 0)
 
-#label same genus with 1 and different trees with 0
+# label same genus with 1 and different trees with 0
 nonemrg_samp10000$genuscomp <- ifelse(nonemrg_samp10000$genus == nonemrg_samp10000$midgenus, 1, 0)
 
 # label same family with 1 and different trees with 0
@@ -1154,34 +1176,35 @@ nonemrg_samp10000$familycomp <- ifelse(nonemrg_samp10000$family == nonemrg_samp1
 nonemrg_samp10000$emergnt <- ifelse(nonemrg_samp10000$tree_type == "emrgnt", 1, 0)
 
 # Summarize based on middle tree ID
-surr_info10000 <- nonemrg_samp10000 %>% group_by(midtreeID, midtreetype, midspecies) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
-                                                                                                          dbhmeansurr=mean(dbh, na.rm = TRUE),
-                                                                                                          height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
-                                                                                                          n_trees = n(),
-                                                                                                          n_species = n_distinct(species),
-                                                                                                          n_family = n_distinct(family),
-                                                                                                          n_genus = n_distinct(genus),
-                                                                                                          same_species = sum(speciescomp),
-                                                                                                          same_genus = sum(genuscomp),
-                                                                                                          same_family = sum(familycomp),
-                                                                                                          same_species = sum(speciescomp),
-                                                                                                          n_emrgnt = sum(emergnt))
-# check number of rows, should = 9875
-## Figure out a way to include trees that have no trees
+surr_info10000 <- nonemrg_samp10000 %>% group_by(midtreeID, midtreetype, midNCI) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
+                                                                                                  dbhmeansurr=mean(dbh, na.rm = TRUE),
+                                                                                                  height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                                                  n_trees = n(),
+                                                                                                  n_species = n_distinct(species),
+                                                                                                  n_family = n_distinct(family),
+                                                                                                  n_genus = n_distinct(genus),
+                                                                                                  same_species = sum(speciescomp),
+                                                                                                  same_genus = sum(genuscomp),
+                                                                                                  same_family = sum(familycomp),
+                                                                                                  n_emrgnt = sum(emergnt))
+# check number of rows, should = 
 # need to find a way to keep in that one has no surrounding trees
 
 # combine with emergent dataframe
 all5_10000_alive <- rbind(surr_info10000, emerg_summ_5)
 
 # export dataframe
-write.csv(all5_10000_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_5m_10000_trees_nci.csv")
+write.csv(all5_10000_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_5m_10000_trees.csv")
 
 #-------------------------------------------------------------------------------#
-# -----------------------------10m buffer, 600 tree sample-----------------
+# -----------------------------20m buffer, 1000 tree sample-----------------
 #------------------------------------------------------------------------------#
-# run the following to create a dataframe of all trees within 10 meters of the tree of interest
+dandatsamp10000$NCI<-rep(NA, nrow(dandatsamp10000))
+
 nonemrg_samp10000_10 <- data.frame()
+
 radius = 10
+# Loop through every emergent tree
 for (i in 1:nrow(dandatsamp10000))
 { 
   # define coordinates for tree of interest
@@ -1189,28 +1212,36 @@ for (i in 1:nrow(dandatsamp10000))
   midy <- dandatsamp10000$plot_y[i]
   # crop dat1a to contain only points within the radius of the tree of interest
   temp<-dat1[dat1$plot_x>=(midx-radius) & dat1$plot_x<=(midx+radius) & dat1$plot_y>=(midy-radius) & dat1$plot_y<=(midy+radius), ]
-  
+  # remove tree of interest
+  temp <- subset(temp, treeID != dandatsamp10000$treeID[i])
+  # calculate NCI and distance from tree of interest
+  temp$dis<-rep(NA, nrow(temp))
+  NCI = 0
+  for(j in 1:nrow(temp))
+  { 
+    temp$dis[j]<-sqrt((dandatsamp10000$plot_x[i]-temp$plot_x[j])^2+(dandatsamp10000$plot_y[i]-temp$plot_y[j])^2)
+    NCI<-NCI+sum((temp$dbh[j]^2/temp$dis[j]^2)[temp$dis[j]<=radius & temp$dis[j]>0],na.rm=T)
+  }
+  dandatsamp10000$NCI[i] <- NCI
+  # remove trees outside of buffer
+  temp <- subset(temp, dis <= 10)
   # make a column of that contains the tree of interest's ID and treetype
   temp$midtreeID <-rep(dandatsamp10000$treeID[i], length(nrow(temp)))
   temp$midtreetype <-rep(dandatsamp10000$tree_type[i], length(nrow(temp)))
   temp$midspecies <-rep(dandatsamp10000$species[i], length(nrow(temp)))
-  temp$midspecies <-rep(dandatsamp10000$species[i], length(nrow(temp)))
   temp$midgenus <-rep(dandatsamp10000$genus[i], length(nrow(temp)))
   temp$midfamily <-rep(dandatsamp10000$family[i], length(nrow(temp)))
-  # remove tree of interest
-  emerg_ID <- dandatsamp10000$treeID
-  temp <- temp[!temp$treeID %in% emerg_ID, ]
-  
+  temp$midNCI <-rep(dandatsamp10000$NCI[i], length(nrow(temp)))
   # add dat1a to one dat1aframe
   nonemrg_samp10000_10 <- rbind(nonemrg_samp10000_10, temp)
 }
-
-# 48484 observations
+# check number of emrgnt midtreetype labels - should be 12410
+table(nonemrg_samp10000_10$midtreetype)
 
 # label same species with 1 and different trees with 0
 nonemrg_samp10000_10$speciescomp <- ifelse(nonemrg_samp10000_10$species == nonemrg_samp10000_10$midspecies, 1, 0)
 
-#label same genus with 1 and different trees with 0
+# label same genus with 1 and different trees with 0
 nonemrg_samp10000_10$genuscomp <- ifelse(nonemrg_samp10000_10$genus == nonemrg_samp10000_10$midgenus, 1, 0)
 
 # label same family with 1 and different trees with 0
@@ -1220,24 +1251,397 @@ nonemrg_samp10000_10$familycomp <- ifelse(nonemrg_samp10000_10$family == nonemrg
 nonemrg_samp10000_10$emergnt <- ifelse(nonemrg_samp10000_10$tree_type == "emrgnt", 1, 0)
 
 # Summarize based on middle tree ID
-surr_info10000 <- nonemrg_samp10000_10 %>% group_by(midtreeID, midtreetype, midspecies) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
-                                                                                                          dbhmeansurr=mean(dbh, na.rm = TRUE),
-                                                                                                          height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
-                                                                                                          n_trees = n(),
-                                                                                                          n_species = n_distinct(species),
-                                                                                                          n_family = n_distinct(family),
-                                                                                                          n_genus = n_distinct(genus),
-                                                                                                          same_species = sum(speciescomp),
-                                                                                                          same_genus = sum(genuscomp),
-                                                                                                          same_family = sum(familycomp),
-                                                                                                          same_species = sum(speciescomp),
-                                                                                                          n_emrgnt = sum(emergnt))
-# check number of rows, should = 98710
-## Figure out a way to include trees that have no trees
+surr_info10000 <- nonemrg_samp10000_10 %>% group_by(midtreeID, midtreetype, midNCI) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
+                                                                                                      dbhmeansurr=mean(dbh, na.rm = TRUE),
+                                                                                                      height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                                                      n_trees = n(),
+                                                                                                      n_species = n_distinct(species),
+                                                                                                      n_family = n_distinct(family),
+                                                                                                      n_genus = n_distinct(genus),
+                                                                                                      same_species = sum(speciescomp),
+                                                                                                      same_genus = sum(genuscomp),
+                                                                                                      same_family = sum(familycomp),
+                                                                                                      n_emrgnt = sum(emergnt))
+# check number of rows, should = 
 # need to find a way to keep in that one has no surrounding trees
 
 # combine with emergent dataframe
 all10_10000_alive <- rbind(surr_info10000, emerg_summ_10)
 
 # export dataframe
-write.csv(all10_10000_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum/danum_10m_10000_trees_nci.csv")
+write.csv(all10_10000_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_10m_10000_trees.csv")
+
+#-------------------------------------------------------------------------------#
+# -----------------------------30m buffer, 1000 tree sample-----------------
+#------------------------------------------------------------------------------#
+dandatsamp10000$NCI<-rep(NA, nrow(dandatsamp10000))
+
+nonemrg_samp10000_15 <- data.frame()
+
+radius = 15
+# Loop through every emergent tree
+for (i in 1:nrow(dandatsamp10000))
+{ 
+  # define coordinates for tree of interest
+  midx <- dandatsamp10000$plot_x[i]
+  midy <- dandatsamp10000$plot_y[i]
+  # crop dat1a to contain only points within the radius of the tree of interest
+  temp<-dat1[dat1$plot_x>=(midx-radius) & dat1$plot_x<=(midx+radius) & dat1$plot_y>=(midy-radius) & dat1$plot_y<=(midy+radius), ]
+  # remove tree of interest
+  temp <- subset(temp, treeID != dandatsamp10000$treeID[i])
+  # calculate NCI and distance from tree of interest
+  temp$dis<-rep(NA, nrow(temp))
+  NCI = 0
+  for(j in 1:nrow(temp))
+  { 
+    temp$dis[j]<-sqrt((dandatsamp10000$plot_x[i]-temp$plot_x[j])^2+(dandatsamp10000$plot_y[i]-temp$plot_y[j])^2)
+    NCI<-NCI+sum((temp$dbh[j]^2/temp$dis[j]^2)[temp$dis[j]<=radius & temp$dis[j]>0],na.rm=T)
+  }
+  dandatsamp10000$NCI[i] <- NCI
+  # remove trees outside of buffer
+  temp <- subset(temp, dis <= 10)
+  # make a column of that contains the tree of interest's ID and treetype
+  temp$midtreeID <-rep(dandatsamp10000$treeID[i], length(nrow(temp)))
+  temp$midtreetype <-rep(dandatsamp10000$tree_type[i], length(nrow(temp)))
+  temp$midspecies <-rep(dandatsamp10000$species[i], length(nrow(temp)))
+  temp$midgenus <-rep(dandatsamp10000$genus[i], length(nrow(temp)))
+  temp$midfamily <-rep(dandatsamp10000$family[i], length(nrow(temp)))
+  temp$midNCI <-rep(dandatsamp10000$NCI[i], length(nrow(temp)))
+  # add dat1a to one dat1aframe
+  nonemrg_samp10000_15 <- rbind(nonemrg_samp10000_15, temp)
+}
+# check number of emrgnt midtreetype labels - should be 12410
+table(nonemrg_samp10000_15$midtreetype)
+
+# label same species with 1 and different trees with 0
+nonemrg_samp10000_15$speciescomp <- ifelse(nonemrg_samp10000_15$species == nonemrg_samp10000_15$midspecies, 1, 0)
+
+# label same genus with 1 and different trees with 0
+nonemrg_samp10000_15$genuscomp <- ifelse(nonemrg_samp10000_15$genus == nonemrg_samp10000_15$midgenus, 1, 0)
+
+# label same family with 1 and different trees with 0
+nonemrg_samp10000_15$familycomp <- ifelse(nonemrg_samp10000_15$family == nonemrg_samp10000_15$midfamily, 1, 0)
+
+# label same family with 1 and different trees with 0
+nonemrg_samp10000_15$emergnt <- ifelse(nonemrg_samp10000_15$tree_type == "emrgnt", 1, 0)
+
+# Summarize based on middle tree ID
+surr_info10000 <- nonemrg_samp10000_15 %>% group_by(midtreeID, midtreetype, midNCI) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
+                                                                                                         dbhmeansurr=mean(dbh, na.rm = TRUE),
+                                                                                                         height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                                                         n_trees = n(),
+                                                                                                         n_species = n_distinct(species),
+                                                                                                         n_family = n_distinct(family),
+                                                                                                         n_genus = n_distinct(genus),
+                                                                                                         same_species = sum(speciescomp),
+                                                                                                         same_genus = sum(genuscomp),
+                                                                                                         same_family = sum(familycomp),
+                                                                                                         n_emrgnt = sum(emergnt))
+# check number of rows, should = 
+# need to find a way to keep in that one has no surrounding trees
+
+# combine with emergent dataframe
+all15_10000_alive <- rbind(surr_info10000, emerg_summ_15)
+
+# export dataframe
+write.csv(all15_10000_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_15m_10000_trees.csv")
+
+#-------------------------------------------------------------------------------#
+# -----------------------------40m buffer, 1000 tree sample-----------------
+#------------------------------------------------------------------------------#
+dandatsamp10000$NCI<-rep(NA, nrow(dandatsamp10000))
+
+nonemrg_samp10000_20 <- data.frame()
+
+radius = 20
+# Loop through every emergent tree
+for (i in 1:nrow(dandatsamp10000))
+{ 
+  # define coordinates for tree of interest
+  midx <- dandatsamp10000$plot_x[i]
+  midy <- dandatsamp10000$plot_y[i]
+  # crop dat1a to contain only points within the radius of the tree of interest
+  temp<-dat1[dat1$plot_x>=(midx-radius) & dat1$plot_x<=(midx+radius) & dat1$plot_y>=(midy-radius) & dat1$plot_y<=(midy+radius), ]
+  # remove tree of interest
+  temp <- subset(temp, treeID != dandatsamp10000$treeID[i])
+  # calculate NCI and distance from tree of interest
+  temp$dis<-rep(NA, nrow(temp))
+  NCI = 0
+  for(j in 1:nrow(temp))
+  { 
+    temp$dis[j]<-sqrt((dandatsamp10000$plot_x[i]-temp$plot_x[j])^2+(dandatsamp10000$plot_y[i]-temp$plot_y[j])^2)
+    NCI<-NCI+sum((temp$dbh[j]^2/temp$dis[j]^2)[temp$dis[j]<=radius & temp$dis[j]>0],na.rm=T)
+  }
+  dandatsamp10000$NCI[i] <- NCI
+  # remove trees outside of buffer
+  temp <- subset(temp, dis <= 10)
+  # make a column of that contains the tree of interest's ID and treetype
+  temp$midtreeID <-rep(dandatsamp10000$treeID[i], length(nrow(temp)))
+  temp$midtreetype <-rep(dandatsamp10000$tree_type[i], length(nrow(temp)))
+  temp$midspecies <-rep(dandatsamp10000$species[i], length(nrow(temp)))
+  temp$midgenus <-rep(dandatsamp10000$genus[i], length(nrow(temp)))
+  temp$midfamily <-rep(dandatsamp10000$family[i], length(nrow(temp)))
+  temp$midNCI <-rep(dandatsamp10000$NCI[i], length(nrow(temp)))
+  # add dat1a to one dat1aframe
+  nonemrg_samp10000_20 <- rbind(nonemrg_samp10000_20, temp)
+}
+# check number of emrgnt midtreetype labels - should be 12410
+table(nonemrg_samp10000_20$midtreetype)
+
+# label same species with 1 and different trees with 0
+nonemrg_samp10000_20$speciescomp <- ifelse(nonemrg_samp10000_20$species == nonemrg_samp10000_20$midspecies, 1, 0)
+
+# label same genus with 1 and different trees with 0
+nonemrg_samp10000_20$genuscomp <- ifelse(nonemrg_samp10000_20$genus == nonemrg_samp10000_20$midgenus, 1, 0)
+
+# label same family with 1 and different trees with 0
+nonemrg_samp10000_20$familycomp <- ifelse(nonemrg_samp10000_20$family == nonemrg_samp10000_20$midfamily, 1, 0)
+
+# label same family with 1 and different trees with 0
+nonemrg_samp10000_20$emergnt <- ifelse(nonemrg_samp10000_20$tree_type == "emrgnt", 1, 0)
+
+# Summarize based on middle tree ID
+surr_info10000 <- nonemrg_samp10000_20 %>% group_by(midtreeID, midtreetype, midNCI) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
+                                                                                                         dbhmeansurr=mean(dbh, na.rm = TRUE),
+                                                                                                         height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                                                         n_trees = n(),
+                                                                                                         n_species = n_distinct(species),
+                                                                                                         n_family = n_distinct(family),
+                                                                                                         n_genus = n_distinct(genus),
+                                                                                                         same_species = sum(speciescomp),
+                                                                                                         same_genus = sum(genuscomp),
+                                                                                                         same_family = sum(familycomp),
+                                                                                                         n_emrgnt = sum(emergnt))
+# check number of rows, should = 
+# need to find a way to keep in that one has no surrounding trees
+
+# combine with emergent dataframe
+all20_10000_alive <- rbind(surr_info10000, emerg_summ_20)
+
+# export dataframe
+write.csv(all20_10000_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_20m_10000_trees.csv")
+
+#-------------------------------------------------------------------------------#
+# -----------------------------50m buffer, 1000 tree sample-----------------
+#------------------------------------------------------------------------------#
+dandatsamp10000$NCI<-rep(NA, nrow(dandatsamp10000))
+
+nonemrg_samp10000_25 <- data.frame()
+
+radius = 25
+# Loop through every emergent tree
+for (i in 1:nrow(dandatsamp10000))
+{ 
+  # define coordinates for tree of interest
+  midx <- dandatsamp10000$plot_x[i]
+  midy <- dandatsamp10000$plot_y[i]
+  # crop dat1a to contain only points within the radius of the tree of interest
+  temp<-dat1[dat1$plot_x>=(midx-radius) & dat1$plot_x<=(midx+radius) & dat1$plot_y>=(midy-radius) & dat1$plot_y<=(midy+radius), ]
+  # remove tree of interest
+  temp <- subset(temp, treeID != dandatsamp10000$treeID[i])
+  # calculate NCI and distance from tree of interest
+  temp$dis<-rep(NA, nrow(temp))
+  NCI = 0
+  for(j in 1:nrow(temp))
+  { 
+    temp$dis[j]<-sqrt((dandatsamp10000$plot_x[i]-temp$plot_x[j])^2+(dandatsamp10000$plot_y[i]-temp$plot_y[j])^2)
+    NCI<-NCI+sum((temp$dbh[j]^2/temp$dis[j]^2)[temp$dis[j]<=radius & temp$dis[j]>0],na.rm=T)
+  }
+  dandatsamp10000$NCI[i] <- NCI
+  # remove trees outside of buffer
+  temp <- subset(temp, dis <= 10)
+  # make a column of that contains the tree of interest's ID and treetype
+  temp$midtreeID <-rep(dandatsamp10000$treeID[i], length(nrow(temp)))
+  temp$midtreetype <-rep(dandatsamp10000$tree_type[i], length(nrow(temp)))
+  temp$midspecies <-rep(dandatsamp10000$species[i], length(nrow(temp)))
+  temp$midgenus <-rep(dandatsamp10000$genus[i], length(nrow(temp)))
+  temp$midfamily <-rep(dandatsamp10000$family[i], length(nrow(temp)))
+  temp$midNCI <-rep(dandatsamp10000$NCI[i], length(nrow(temp)))
+  # add dat1a to one dat1aframe
+  nonemrg_samp10000_25 <- rbind(nonemrg_samp10000_25, temp)
+}
+# check number of emrgnt midtreetype labels - should be 12410
+table(nonemrg_samp10000_25$midtreetype)
+
+# label same species with 1 and different trees with 0
+nonemrg_samp10000_25$speciescomp <- ifelse(nonemrg_samp10000_25$species == nonemrg_samp10000_25$midspecies, 1, 0)
+
+# label same genus with 1 and different trees with 0
+nonemrg_samp10000_25$genuscomp <- ifelse(nonemrg_samp10000_25$genus == nonemrg_samp10000_25$midgenus, 1, 0)
+
+# label same family with 1 and different trees with 0
+nonemrg_samp10000_25$familycomp <- ifelse(nonemrg_samp10000_25$family == nonemrg_samp10000_25$midfamily, 1, 0)
+
+# label same family with 1 and different trees with 0
+nonemrg_samp10000_25$emergnt <- ifelse(nonemrg_samp10000_25$tree_type == "emrgnt", 1, 0)
+
+# Summarize based on middle tree ID
+surr_info10000 <- nonemrg_samp10000_25 %>% group_by(midtreeID, midtreetype, midNCI) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
+                                                                                                         dbhmeansurr=mean(dbh, na.rm = TRUE),
+                                                                                                         height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                                                         n_trees = n(),
+                                                                                                         n_species = n_distinct(species),
+                                                                                                         n_family = n_distinct(family),
+                                                                                                         n_genus = n_distinct(genus),
+                                                                                                         same_species = sum(speciescomp),
+                                                                                                         same_genus = sum(genuscomp),
+                                                                                                         same_family = sum(familycomp),
+                                                                                                         n_emrgnt = sum(emergnt))
+# check number of rows, should = 
+# need to find a way to keep in that one has no surrounding trees
+
+# combine with emergent dataframe
+all25_10000_alive <- rbind(surr_info10000, emerg_summ_25)
+
+# export dataframe
+write.csv(all25_10000_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_25m_10000_trees.csv")
+
+#-------------------------------------------------------------------------------#
+# -----------------------------60m buffer, 1000 tree sample-----------------
+#------------------------------------------------------------------------------#
+dandatsamp10000$NCI<-rep(NA, nrow(dandatsamp10000))
+
+nonemrg_samp10000_30 <- data.frame()
+
+radius = 30
+# Loop through every emergent tree
+for (i in 1:nrow(dandatsamp10000))
+{ 
+  # define coordinates for tree of interest
+  midx <- dandatsamp10000$plot_x[i]
+  midy <- dandatsamp10000$plot_y[i]
+  # crop dat1a to contain only points within the radius of the tree of interest
+  temp<-dat1[dat1$plot_x>=(midx-radius) & dat1$plot_x<=(midx+radius) & dat1$plot_y>=(midy-radius) & dat1$plot_y<=(midy+radius), ]
+  # remove tree of interest
+  temp <- subset(temp, treeID != dandatsamp10000$treeID[i])
+  # calculate NCI and distance from tree of interest
+  temp$dis<-rep(NA, nrow(temp))
+  NCI = 0
+  for(j in 1:nrow(temp))
+  { 
+    temp$dis[j]<-sqrt((dandatsamp10000$plot_x[i]-temp$plot_x[j])^2+(dandatsamp10000$plot_y[i]-temp$plot_y[j])^2)
+    NCI<-NCI+sum((temp$dbh[j]^2/temp$dis[j]^2)[temp$dis[j]<=radius & temp$dis[j]>0],na.rm=T)
+  }
+  dandatsamp10000$NCI[i] <- NCI
+  # remove trees outside of buffer
+  temp <- subset(temp, dis <= 10)
+  # make a column of that contains the tree of interest's ID and treetype
+  temp$midtreeID <-rep(dandatsamp10000$treeID[i], length(nrow(temp)))
+  temp$midtreetype <-rep(dandatsamp10000$tree_type[i], length(nrow(temp)))
+  temp$midspecies <-rep(dandatsamp10000$species[i], length(nrow(temp)))
+  temp$midgenus <-rep(dandatsamp10000$genus[i], length(nrow(temp)))
+  temp$midfamily <-rep(dandatsamp10000$family[i], length(nrow(temp)))
+  temp$midNCI <-rep(dandatsamp10000$NCI[i], length(nrow(temp)))
+  # add dat1a to one dat1aframe
+  nonemrg_samp10000_30 <- rbind(nonemrg_samp10000_30, temp)
+}
+# check number of emrgnt midtreetype labels - should be 12410
+table(nonemrg_samp10000_30$midtreetype)
+
+# label same species with 1 and different trees with 0
+nonemrg_samp10000_30$speciescomp <- ifelse(nonemrg_samp10000_30$species == nonemrg_samp10000_30$midspecies, 1, 0)
+
+# label same genus with 1 and different trees with 0
+nonemrg_samp10000_30$genuscomp <- ifelse(nonemrg_samp10000_30$genus == nonemrg_samp10000_30$midgenus, 1, 0)
+
+# label same family with 1 and different trees with 0
+nonemrg_samp10000_30$familycomp <- ifelse(nonemrg_samp10000_30$family == nonemrg_samp10000_30$midfamily, 1, 0)
+
+# label same family with 1 and different trees with 0
+nonemrg_samp10000_30$emergnt <- ifelse(nonemrg_samp10000_30$tree_type == "emrgnt", 1, 0)
+
+# Summarize based on middle tree ID
+surr_info10000 <- nonemrg_samp10000_30 %>% group_by(midtreeID, midtreetype, midNCI) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
+                                                                                                         dbhmeansurr=mean(dbh, na.rm = TRUE),
+                                                                                                         height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                                                         n_trees = n(),
+                                                                                                         n_species = n_distinct(species),
+                                                                                                         n_family = n_distinct(family),
+                                                                                                         n_genus = n_distinct(genus),
+                                                                                                         same_species = sum(speciescomp),
+                                                                                                         same_genus = sum(genuscomp),
+                                                                                                         same_family = sum(familycomp),
+                                                                                                         n_emrgnt = sum(emergnt))
+# check number of rows, should = 
+# need to find a way to keep in that one has no surrounding trees
+
+# combine with emergent dataframe
+all30_10000_alive <- rbind(surr_info10000, emerg_summ_30)
+
+# export dataframe
+write.csv(all30_10000_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_30m_10000_trees.csv")
+
+#-------------------------------------------------------------------------------#
+# -----------------------------100m buffer, 1000 tree sample-----------------
+#------------------------------------------------------------------------------#
+dandatsamp10000$NCI<-rep(NA, nrow(dandatsamp10000))
+
+nonemrg_samp10000_50 <- data.frame()
+
+radius = 50
+# Loop through every emergent tree
+for (i in 1:nrow(dandatsamp10000))
+{ 
+  # define coordinates for tree of interest
+  midx <- dandatsamp10000$plot_x[i]
+  midy <- dandatsamp10000$plot_y[i]
+  # crop dat1a to contain only points within the radius of the tree of interest
+  temp<-dat1[dat1$plot_x>=(midx-radius) & dat1$plot_x<=(midx+radius) & dat1$plot_y>=(midy-radius) & dat1$plot_y<=(midy+radius), ]
+  # remove tree of interest
+  temp <- subset(temp, treeID != dandatsamp10000$treeID[i])
+  # calculate NCI and distance from tree of interest
+  temp$dis<-rep(NA, nrow(temp))
+  NCI = 0
+  for(j in 1:nrow(temp))
+  { 
+    temp$dis[j]<-sqrt((dandatsamp10000$plot_x[i]-temp$plot_x[j])^2+(dandatsamp10000$plot_y[i]-temp$plot_y[j])^2)
+    NCI<-NCI+sum((temp$dbh[j]^2/temp$dis[j]^2)[temp$dis[j]<=radius & temp$dis[j]>0],na.rm=T)
+  }
+  dandatsamp10000$NCI[i] <- NCI
+  # remove trees outside of buffer
+  temp <- subset(temp, dis <= 10)
+  # make a column of that contains the tree of interest's ID and treetype
+  temp$midtreeID <-rep(dandatsamp10000$treeID[i], length(nrow(temp)))
+  temp$midtreetype <-rep(dandatsamp10000$tree_type[i], length(nrow(temp)))
+  temp$midspecies <-rep(dandatsamp10000$species[i], length(nrow(temp)))
+  temp$midgenus <-rep(dandatsamp10000$genus[i], length(nrow(temp)))
+  temp$midfamily <-rep(dandatsamp10000$family[i], length(nrow(temp)))
+  temp$midNCI <-rep(dandatsamp10000$NCI[i], length(nrow(temp)))
+  # add dat1a to one dat1aframe
+  nonemrg_samp10000_50 <- rbind(nonemrg_samp10000_50, temp)
+}
+# check number of emrgnt midtreetype labels - should be 12410
+table(nonemrg_samp10000_50$midtreetype)
+
+# label same species with 1 and different trees with 0
+nonemrg_samp10000_50$speciescomp <- ifelse(nonemrg_samp10000_50$species == nonemrg_samp10000_50$midspecies, 1, 0)
+
+# label same genus with 1 and different trees with 0
+nonemrg_samp10000_50$genuscomp <- ifelse(nonemrg_samp10000_50$genus == nonemrg_samp10000_50$midgenus, 1, 0)
+
+# label same family with 1 and different trees with 0
+nonemrg_samp10000_50$familycomp <- ifelse(nonemrg_samp10000_50$family == nonemrg_samp10000_50$midfamily, 1, 0)
+
+# label same family with 1 and different trees with 0
+nonemrg_samp10000_50$emergnt <- ifelse(nonemrg_samp10000_50$tree_type == "emrgnt", 1, 0)
+
+# Summarize based on middle tree ID
+surr_info10000 <- nonemrg_samp10000_50 %>% group_by(midtreeID, midtreetype, midNCI) %>% dplyr::summarize(heightmeansurr=mean(height, na.rm = TRUE),
+                                                                                                         dbhmeansurr=mean(dbh, na.rm = TRUE),
+                                                                                                         height99surr = quantile(height, probs = 0.99, na.rm = TRUE),
+                                                                                                         n_trees = n(),
+                                                                                                         n_species = n_distinct(species),
+                                                                                                         n_family = n_distinct(family),
+                                                                                                         n_genus = n_distinct(genus),
+                                                                                                         same_species = sum(speciescomp),
+                                                                                                         same_genus = sum(genuscomp),
+                                                                                                         same_family = sum(familycomp),
+                                                                                                         n_emrgnt = sum(emergnt))
+# check number of rows, should = 
+# need to find a way to keep in that one has no surrounding trees
+
+# combine with emergent dataframe
+all50_10000_alive <- rbind(surr_info10000, emerg_summ_50)
+
+# export dataframe
+write.csv(all50_10000_alive, "~/Desktop/Research_2022/Data/Southeast_Asia/Danum_surrounding/danum_50m_10000_trees.csv")

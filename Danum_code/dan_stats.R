@@ -285,7 +285,7 @@ predict(lm.htwi, data.frame(twi=c(5,10,15)),
 par(mfrow=c(1,1))
 plot(lm.htwi) %>%
   abline()
-plot(dan_quad$twi,dan_quad$height9999)
+plot(dan_quad$twi,dan_quad$height99)
 
 #height99~TWI: 
 lm.htwixy <- lm(height99~twi+quad_x+quad_y, data=dan_quad)
@@ -297,7 +297,7 @@ predict(lm.htwixy, data.frame(twi=c(5,10,15)),
 par(mfrow=c(1,1))
 plot(lm.htwixy) %>%
   abline()
-plot(dan_quad$twi,dan_quad$height9999)
+plot(dan_quad$twi,dan_quad$height99)
 
 #------------------------------------------------------------------------------------#
 #---------------------------Individual level analysis--------------------------------#
